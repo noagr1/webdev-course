@@ -21,8 +21,18 @@ const LESSONS = [
       { slug: 'project', title: 'פרויקט ותרגול מסכם' },
     ],
   },
-  { n: 3, title: 'JavaScript מודרני ב׳', topics: 'מערכים ואובייקטים, map/filter/reduce, destructuring, spread, מודולים, async/await, fetch', ready: false },
-  { n: 4, title: 'React: יסודות', topics: 'Node ו-npm, Vite, JSX, קומפוננטות, props', ready: false },
+  {
+    n: 3, title: 'JavaScript מודרני ב׳', topics: 'מערכים ואובייקטים, map/filter/reduce, ה-DOM ואירועים, async/await, fetch', ready: true,
+    parts: [
+      { slug: 'index', title: 'סקירה ומטרות' },
+      { slug: 'data', title: 'חלק א׳: מערכים ואובייקטים' },
+      { slug: 'methods', title: 'חלק ב׳: map, filter ו-reduce' },
+      { slug: 'dom', title: 'חלק ג׳: ה-DOM ואירועים' },
+      { slug: 'async', title: 'חלק ד׳: async ו-fetch' },
+      { slug: 'project', title: 'פרויקט ותרגול מסכם' },
+    ],
+  },
+  { n: 4, title: 'React: יסודות', topics: 'Node ו-npm, Vite, מודולים (import/export), JSX, קומפוננטות, props', ready: false },
   { n: 5, title: 'State ואירועים', topics: 'useState, אירועים, רינדור מותנה, רשימות ו-key', ready: false },
   { n: 6, title: 'טפסים ונתונים מהרשת', topics: 'טפסים מבוקרים, ולידציה, useEffect, fetch, מצבי טעינה ושגיאה', ready: false },
   { n: 7, title: 'ניתוב ומבנה אפליקציה', topics: 'React Router, layouts, פרמטרים ב-URL, custom hooks', ready: false },
@@ -147,6 +157,8 @@ function captureConsole(token) {
     if (typeof v === 'function') return `ƒ ${v.name || 'anonymous'}()`;
     if (v instanceof Error) return `${v.name}: ${v.message}`;
     if (v instanceof Date) return v.toString();
+    if (v instanceof Promise) return 'Promise {…}';
+    if (typeof Response !== 'undefined' && v instanceof Response) return `Response { status: ${v.status}, ok: ${v.ok} }`;
     if (Array.isArray(v)) return depth > 2 ? '[…]' : `[${v.map((x) => fmt(x, depth + 1)).join(', ')}]`;
     if (v && typeof v === 'object') {
       if (depth > 2) return '{…}';
@@ -213,8 +225,9 @@ function initPlayground(root, index) {
   editor.addEventListener('scroll', () => gutter && (gutter.scrollTop = editor.scrollTop));
 
   const preview = el('iframe', { className: 'pg-preview', title: 'תוצאה' });
-  // עורך HTML/CSS רץ בלי סקריפטים. עורך JavaScript מריץ סקריפטים, ורק בלחיצה על "הרצה"
-  preview.setAttribute('sandbox', isJs ? 'allow-scripts allow-same-origin' : 'allow-same-origin');
+  // עורך HTML/CSS רץ בלי סקריפטים. עורך JavaScript מריץ סקריפטים, ורק בלחיצה על "הרצה".
+  // allow-forms: בלעדיו אירוע submit לא נשלח, ואי אפשר לתרגל טפסים
+  preview.setAttribute('sandbox', isJs ? 'allow-scripts allow-same-origin allow-forms' : 'allow-same-origin');
   const showPreview = !isJs || langs.includes('html');
   preview.style.height = isJs ? `${Math.round(heightPx / 2)}px` : height;
   preview.hidden = !showPreview;
@@ -253,11 +266,15 @@ function initPlayground(root, index) {
     out.errors = [];
     consoleOut.replaceChildren();
     let finished = false;
+    // קוד אסינכרוני (fetch, setTimeout) ממשיך לרוץ אחרי סוף הסקריפט. data-wait קובע כמה מילישניות לחכות לו
+    const wait = Number(root.dataset.wait || 0);
     finishRun = () => {
       if (finished) return;
       finished = true;
-      if (!consoleOut.childElementCount) logLine('hint', 'אין פלט. כדי לראות משהו כאן, כתבו console.log(...)');
-      resolve();
+      setTimeout(() => {
+        if (!consoleOut.childElementCount) logLine('hint', 'אין פלט. כדי לראות משהו כאן, כתבו console.log(...)');
+        resolve();
+      }, wait);
     };
     setTimeout(finishRun, 3000);
     const prefix = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">'

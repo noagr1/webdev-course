@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 3 · חלק ב׳: map, filter ו-reduce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="3" data-part="methods" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 3 · חלק ב׳</span>
+      <h1>‏map, ‏filter ו-reduce</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 35 דק׳ בכיתה</span>
+        <span class="chip">📚 3–4 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: חלק א׳ (מערכים ואובייקטים)</span>
+      </div>
+
+      <p>בחלק הקודם למדנו לשמור הרבה נתונים במערך: רשימת סטודנטים, מוצרים בעגלה, משימות. עכשיו נלמד <strong>לעבוד</strong> עם הנתונים האלה: להפוך כל פריט למשהו אחר, לסנן רק את מה שמעניין אותנו, למצוא פריט אחד, ולחשב סכום או ממוצע.</p>
+      <p>את כל זה אפשר לעשות עם לולאת <code>for</code>, ואתם כבר יודעים איך. אבל ל-JavaScript יש <strong>שיטות מובנות של מערכים</strong> (array methods) שעושות את אותו הדבר בשורה אחת, ברורה יותר ועם פחות מקום לטעויות. מפתחים מקצועיים משתמשים בהן כל הזמן, ו-React בנויה עליהן: <strong>כל רשימה שמוצגת במסך ב-React נבנית עם <code>map</code></strong>.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>להשתמש ב-<code>forEach</code>, ‏<code>map</code>, ‏<code>filter</code>, ‏<code>find</code>, ‏<code>some</code>, ‏<code>every</code> ו-<code>reduce</code></li>
+          <li>להסביר מה כל שיטה מחזירה: מערך חדש, פריט אחד, <code>true</code>/<code>false</code> או ערך יחיד</li>
+          <li>למיין מערך של מספרים ושל אובייקטים בלי לקלקל את המקורי</li>
+          <li>לשרשר כמה שיטות אחת אחרי השנייה כדי לענות על שאלה מורכבת</li>
+          <li>להוסיף, למחוק ולעדכן פריט במערך <strong>בלי לשנות את המערך המקורי</strong>, בדיוק כמו שעושים ב-React</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בכל דוגמה לוחצים ▶ הרצה (או Ctrl+Enter, ובמק Cmd+Enter) ורואים את הפלט. אחר כך משנים משהו ומריצים שוב. הדרך הכי טובה להבין שיטה חדשה היא להוסיף <code>console.log</code> בתוך הפונקציה שמעבירים לה, ולראות מה היא מקבלת בכל סיבוב.</p>
+      </div>
+
+      <h2 id="callbacks">תזכורת: פונקציה שמקבלת פונקציה <span class="time">5 דק׳</span></h2>
+      <p>בשיעור 2 ראינו שאפשר להעביר פונקציה כארגומנט לפונקציה אחרת. פונקציה כזו, שמעבירים כדי שמישהו אחר יקרא לה, נקראת <strong>callback</strong> (בעברית: "פונקציה שתיקרא בחזרה"). כל השיטות בעמוד הזה עובדות כך: אנחנו נותנים להן callback, והן קוראות לו <strong>פעם אחת לכל פריט במערך</strong>.</p>
+      <p>הנה דוגמה מוכרת משיעור 2: הפונקציה <code>repeat</code> מקבלת מספר ופונקציה, וקוראת לפונקציה כמה פעמים:</p>
+      <div class="playground" id="pg-callback-recap" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function repeat(times, action) {
+            for (let i = 1; i <= times; i++) {
+              action(i);   // קוראים ל-callback, ומעבירים לו את מספר הסיבוב
+            }
+          }
+
+          const sayHi = (n) => console.log('שלום מספר', n);
+
+          repeat(3, sayHi);   // מעבירים את sayHi בלי סוגריים: את הפונקציה עצמה, לא את התוצאה שלה
+        </script>
+      </div>
+      <p>שימו לב לשני דברים שנחזור אליהם כל הזמן:</p>
+      <ol>
+        <li>אנחנו כותבים <code>sayHi</code> ולא <code>sayHi()</code>. אנחנו לא קוראים לפונקציה בעצמנו, אלא <em>נותנים</em> אותה ל-<code>repeat</code>, ו-<code>repeat</code> מחליטה מתי לקרוא לה.</li>
+        <li>‏<code>repeat</code> מעבירה ל-callback מידע (כאן: מספר הסיבוב). ה-callback מקבל אותו כפרמטר.</li>
+      </ol>
+      <p>ברוב המקרים לא נגדיר את ה-callback מראש עם שם, אלא נכתוב אותו ישר בתוך הקריאה, כ-arrow function:</p>
+      <pre><code class="language-js">repeat(3, (n) => console.log('שלום מספר', n));</code></pre>
+      <p>זה בדיוק אותו דבר, רק בלי לתת שם לפונקציה. ככה ייראה כמעט כל הקוד בעמוד הזה.</p>
+
+      <h3>הנתונים שנעבוד איתם</h3>
+      <p>ברוב הדוגמאות נשתמש במערכים האלה. כדאי להכיר אותם:</p>
+      <pre><code class="language-js">const numbers = [3, 8, 1, 10, 5];
+
+const students = [
+  { name: 'דנה', grade: 92, city: 'חיפה' },
+  { name: 'יוסי', grade: 55, city: 'תל אביב' },
+  { name: 'מאיה', grade: 78, city: 'חיפה' },
+  { name: 'עומר', grade: 40, city: 'ירושלים' },
+];</code></pre>
+
+      <h2 id="foreach">‏forEach: לעשות משהו עם כל פריט <span class="time">5 דק׳</span></h2>
+      <p>השיטה הפשוטה ביותר. ‏<code>forEach</code> ("לכל אחד") קוראת ל-callback פעם אחת לכל פריט, ומעבירה לו את הפריט. היא <strong>לא מחזירה כלום</strong>. משתמשים בה כשרוצים <em>לעשות</em> משהו עם כל פריט, למשל להדפיס אותו.</p>
+      <p>השוו בין שתי הדרכים. שתיהן מדפיסות בדיוק אותו דבר:</p>
+      <div class="playground" id="pg-foreach" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const fruits = ['תפוח', 'בננה', 'ענבים'];
+
+          // הדרך המוכרת: לולאת for
+          for (let i = 0; i < fruits.length; i++) {
+            console.log('for:', fruits[i]);
+          }
+
+          // אותו דבר עם forEach
+          fruits.forEach((fruit) => {
+            console.log('forEach:', fruit);
+          });
+        </script>
+      </div>
+      <p>עם <code>forEach</code> אין צורך במונה <code>i</code>, אין <code>fruits.length</code> ואין <code>fruits[i]</code>. יש פחות מקומות לטעות בהם, למשל <code>&lt;=</code> במקום <code>&lt;</code>.</p>
+      <p>מה קורה מאחורי הקלעים? ‏<code>forEach</code> עושה בערך את זה:</p>
+      <ol>
+        <li>קוראת ל-callback עם <code>'תפוח'</code>. בתוך ה-callback, ‏<code>fruit</code> שווה ל-<code>'תפוח'</code>.</li>
+        <li>קוראת ל-callback עם <code>'בננה'</code>.</li>
+        <li>קוראת ל-callback עם <code>'ענבים'</code>.</li>
+        <li>נגמרו הפריטים, ולכן היא מסיימת.</li>
+      </ol>
+
+      <h3>הפרמטר השני: המיקום (index)</h3>
+      <p>ה-callback מקבל גם פרמטר שני: המיקום של הפריט במערך, שמתחיל מ-0. לא חייבים להשתמש בו, אבל הוא שימושי למספור:</p>
+      <div class="playground" id="pg-foreach-index" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const fruits = ['תפוח', 'בננה', 'ענבים'];
+
+          fruits.forEach((fruit, index) => {
+            console.log(`${index + 1}. ${fruit}`);
+          });
+        </script>
+      </div>
+      <p>נסו: שנו את <code>index + 1</code> ל-<code>index</code> והריצו. המספור יתחיל מ-0.</p>
+
+      <div class="box warn">
+        <p><strong>‏forEach לא מחזירה כלום.</strong> אם תכתבו <code>const result = fruits.forEach(...)</code>, הערך של <code>result</code> יהיה <code>undefined</code>. כשרוצים <em>לקבל</em> מערך חדש, משתמשים ב-<code>map</code> או ב-<code>filter</code>, שנלמד מיד.</p>
+      </div>
+
+      <h2 id="map">‏map: להפוך כל פריט למשהו אחר <span class="time">10 דק׳</span></h2>
+      <p>‏<code>map</code> היא השיטה החשובה ביותר בעמוד. היא עוברת על כל פריט, מפעילה עליו את ה-callback, ו<strong>אוספת את מה שה-callback מחזיר למערך חדש</strong>. המערך המקורי לא משתנה.</p>
+      <div class="flow">
+        <span class="node">[🍎, 🍌, 🍇]</span><span class="arrow">←</span><span class="node">map<small>כל פרי ← מיץ</small></span><span class="arrow">←</span><span class="node">[🧃, 🧃, 🧃]</span>
+      </div>
+      <p>שלושה פריטים נכנסים, שלושה פריטים יוצאים. ‏<code>map</code> <strong>תמיד</strong> מחזירה מערך באותו אורך כמו המקורי. מה שמשתנה הוא התוכן של כל פריט.</p>
+
+      <h3>הדוגמה הראשונה: להכפיל כל מספר</h3>
+      <div class="playground" id="pg-map-double" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const numbers = [3, 8, 1, 10, 5];
+
+          // עם לולאת for: יוצרים מערך ריק ומוסיפים אליו
+          const doubledFor = [];
+          for (let i = 0; i < numbers.length; i++) {
+            doubledFor.push(numbers[i] * 2);
+          }
+          console.log('for:', doubledFor);
+
+          // עם map: שורה אחת
+          const doubled = numbers.map((n) => n * 2);
+          console.log('map:', doubled);
+
+          console.log('המקורי לא השתנה:', numbers);
+        </script>
+      </div>
+      <p>הפלט:</p>
+      <pre><code class="nohighlight">for: [6, 16, 2, 20, 10]
+map: [6, 16, 2, 20, 10]
+המקורי לא השתנה: [3, 8, 1, 10, 5]</code></pre>
+      <p>נקרא את השורה <code>numbers.map((n) =&gt; n * 2)</code> בקול: "קח את <code>numbers</code>, ולכל מספר <code>n</code> תחזיר <code>n * 2</code>". ה-arrow function מחזירה את <code>n * 2</code> בלי <code>return</code>, כי זו הצורה המקוצרת (implicit return) שלמדנו בשיעור 2.</p>
+
+      <h3>מעקב צעד אחר צעד</h3>
+      <table>
+        <tr><th>סיבוב</th><th><code>n</code> (מה ה-callback מקבל)</th><th>מה ה-callback מחזיר</th><th>המערך החדש עד עכשיו</th></tr>
+        <tr><td>1</td><td><code>3</code></td><td><code>6</code></td><td><code>[6]</code></td></tr>
+        <tr><td>2</td><td><code>8</code></td><td><code>16</code></td><td><code>[6, 16]</code></td></tr>
+        <tr><td>3</td><td><code>1</code></td><td><code>2</code></td><td><code>[6, 16, 2]</code></td></tr>
+        <tr><td>4</td><td><code>10</code></td><td><code>20</code></td><td><code>[6, 16, 2, 20]</code></td></tr>
+        <tr><td>5</td><td><code>5</code></td><td><code>10</code></td><td><code>[6, 16, 2, 20, 10]</code></td></tr>
+      </table>
+
+      <h3>‏map על מחרוזות ועל אובייקטים</h3>
+      <p>ה-callback יכול להחזיר כל דבר: מספר, מחרוזת, אובייקט. דוגמה נפוצה מאוד: <strong>לשלוף שדה אחד</strong> מכל אובייקט ברשימה.</p>
+      <div class="playground" id="pg-map-objects" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92, city: 'חיפה' },
+            { name: 'יוסי', grade: 55, city: 'תל אביב' },
+            { name: 'מאיה', grade: 78, city: 'חיפה' },
+          ];
+
+          // רק השמות
+          const names = students.map((s) => s.name);
+          console.log(names);
+
+          // משפט על כל סטודנט
+          const sentences = students.map((s) => `הציון של ${s.name}: ${s.grade}`);
+          console.log(sentences);
+
+          // אפשר גם עם destructuring בפרמטר, כמו שלמדנו בחלק א׳
+          const cities = students.map(({ city }) => city);
+          console.log(cities);
+        </script>
+      </div>
+      <p>נסו: הוסיפו סטודנט רביעי למערך, והריצו. כל המערכים החדשים יגדלו לבד באחד. זה היתרון הגדול: הקוד לא תלוי בכמות הנתונים.</p>
+
+      <h3>להחזיר אובייקט: צריך סוגריים עגולים</h3>
+      <p>נניח שרוצים להוסיף לכל סטודנט שדה <code>passed</code>. ה-callback צריך להחזיר אובייקט חדש. כאן יש מלכודת:</p>
+      <div class="playground" id="pg-map-object-trap" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+          ];
+
+          // ❌ הסוגריים המסולסלים נקראים כגוף של פונקציה, לא כאובייקט!
+          const wrong = students.map((s) => { name: s.name });
+          console.log('wrong:', wrong);
+
+          // ✅ עוטפים את האובייקט בסוגריים עגולים
+          const right = students.map((s) => ({ ...s, passed: s.grade >= 60 }));
+          console.log('right:', right);
+        </script>
+      </div>
+      <p>הפלט של <code>wrong</code> הוא <code>[undefined, undefined]</code>. למה? כש-JavaScript רואה <code>=&gt; {</code>, היא מבינה שמתחיל גוף של פונקציה, ושם אין <code>return</code>. הכלל פשוט: <strong>כדי להחזיר אובייקט מ-arrow function מקוצרת, עוטפים אותו ב-<code>( )</code></strong>.</p>
+      <p>שימו לב גם ל-<code>...s</code>: זה ה-spread מחלק א׳. הוא מעתיק את כל השדות של הסטודנט לאובייקט החדש, ואז מוסיפים עליהם את <code>passed</code>. האובייקטים המקוריים לא משתנים.</p>
+
+      <h3>הבאג הנפוץ ביותר: שכחתם return</h3>
+      <p>אם כותבים את ה-callback עם סוגריים מסולסלים (גוף מלא), חייבים לכתוב <code>return</code>. בלי זה, הפונקציה מחזירה <code>undefined</code>, ו-<code>map</code> אוספת מערך של <code>undefined</code>:</p>
+      <div class="playground" id="pg-map-forgot-return" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const prices = [10, 20, 30];
+
+          // ❌ גוף מלא בלי return
+          const withShipping1 = prices.map((p) => {
+            p + 5;
+          });
+          console.log(withShipping1);
+
+          // ✅ גוף מלא עם return
+          const withShipping2 = prices.map((p) => {
+            return p + 5;
+          });
+          console.log(withShipping2);
+        </script>
+      </div>
+      <p>כשאתם רואים מערך מלא ב-<code>undefined</code> אחרי <code>map</code>, הדבר הראשון לבדוק הוא אם שכחתם <code>return</code>.</p>
+
+      <h3>גם ל-map יש index</h3>
+      <div class="playground" id="pg-map-index" data-height="180">
+        <script type="text/plain" data-lang="js">
+          const winners = ['דנה', 'מאיה', 'יוסי'];
+          const podium = winners.map((name, i) => `מקום ${i + 1}: ${name}`);
+          console.log(podium);
+        </script>
+      </div>
+
+      <div class="box goals">
+        <p><strong>למה זה כל כך חשוב? כי ככה React מציגה רשימות.</strong> בשיעור 5 תכתבו קוד כזה:</p>
+        <pre><code class="language-js">students.map((s) => &lt;li&gt;{s.name}&lt;/li&gt;)</code></pre>
+        <p>זה בדיוק <code>map</code> שלמדתם עכשיו: לכל סטודנט מחזירים פריט ברשימה במקום מחרוזת. אם <code>map</code> ברורה לכם, חצי מ-React כבר ברור.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה יודפס? <code>console.log([1, 2, 3].map((x) =&gt; x + 1).length)</code></p>
+        <ul>
+          <li>‏<code>[2, 3, 4]</code></li>
+          <li data-correct>‏<code>3</code></li>
+          <li>‏<code>4</code></li>
+          <li>‏<code>9</code></li>
+        </ul>
+        <p class="quiz-explain">‏<code>map</code> מחזירה מערך חדש באותו אורך: <code>[2, 3, 4]</code>. ‏<code>.length</code> שלו הוא 3. ‏<code>map</code> אף פעם לא משנה את מספר הפריטים.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏<code>map</code> שווה את הזמן הכי ארוך בחלק הזה (כ-10 דקות). מומלץ לכתוב על הלוח את טבלת המעקב, ולהדגים חי את שתי המלכודות: אובייקט בלי סוגריים, ו-<code>return</code> חסר. כדאי לשאול לפני ההרצה "מה יודפס?". רוב הכיתה תטעה בדוגמת ה-wrong, וזה מה שגורם לזה להיזכר.</p>
+      </aside>
+
+      <h3>🎯 אתגר 1: להכפיל הכול <span class="level easy">קל</span></h3>
+      <p>כתבו פונקציה בשם <code>doubleAll</code> שמקבלת מערך של מספרים ו<strong>מחזירה</strong> מערך חדש שבו כל מספר מוכפל ב-2. השתמשו ב-<code>map</code>. למשל <code>doubleAll([1, 2, 3])</code> מחזירה <code>[2, 4, 6]</code>. אסור לשנות את המערך שקיבלתם.</p>
+      <div class="playground challenge" id="ch-double" data-check="ch-double" data-height="220">
+        <script type="text/plain" data-lang="js">
+          // כתבו כאן את הפונקציה doubleAll
+
+
+          console.log(doubleAll([1, 2, 3]));
+          console.log(doubleAll([10, -5]));
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const doubleAll = (numbers) => numbers.map((n) => n * 2);
+
+          console.log(doubleAll([1, 2, 3]));
+          console.log(doubleAll([10, -5]));
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-double': (out, win) => {
+            const fn = win.eval('typeof doubleAll === "function" ? doubleAll : null');
+            const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+            const input = [4, 0, 7];
+            const result = fn ? fn(input) : null;
+            return [
+              [fn, 'לא מצאתי פונקציה בשם doubleAll. בדקו את השם (D גדולה באמצע).'],
+              [fn && same(fn([1, 2, 3]), [2, 4, 6]), 'doubleAll([1, 2, 3]) צריכה להחזיר [2, 4, 6]. אולי שכחתם return?'],
+              [fn && same(result, [8, 0, 14]), 'doubleAll([4, 0, 7]) צריכה להחזיר [8, 0, 14]'],
+              [fn && same(fn([]), []), 'על מערך ריק הפונקציה צריכה להחזיר מערך ריק'],
+              [same(input, [4, 0, 7]), 'הפונקציה שינתה את המערך המקורי. map מחזירה מערך חדש, אין צורך לשנות את הישן.'],
+              [/\.map\(/.test(out.code), 'השתמשו ב-map'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="filter">‏filter: להשאיר רק חלק מהפריטים <span class="time">7 דק׳</span></h2>
+      <p>‏<code>filter</code> ("מסננת") עוברת על כל פריט ושואלת את ה-callback שאלה של כן או לא: "להשאיר את הפריט הזה?". אם ה-callback מחזיר <code>true</code>, הפריט נכנס למערך החדש. אם הוא מחזיר <code>false</code>, הפריט לא נכנס.</p>
+      <div class="flow">
+        <span class="node">[🍎, 🥦, 🍌, 🥕]</span><span class="arrow">←</span><span class="node">filter<small>רק פירות?</small></span><span class="arrow">←</span><span class="node">[🍎, 🍌]</span>
+      </div>
+      <p>ההבדל מ-<code>map</code>: ‏<code>filter</code> <strong>לא משנה את הפריטים</strong>, רק מחליטה אילו מהם נשארים. לכן המערך החדש יכול להיות קצר יותר, ואפילו ריק.</p>
+      <div class="playground" id="pg-filter" data-height="340">
+        <script type="text/plain" data-lang="js">
+          const numbers = [3, 8, 1, 10, 5];
+
+          // עם לולאת for
+          const bigFor = [];
+          for (let i = 0; i < numbers.length; i++) {
+            if (numbers[i] > 4) {
+              bigFor.push(numbers[i]);
+            }
+          }
+          console.log('for:', bigFor);
+
+          // עם filter
+          const big = numbers.filter((n) => n > 4);
+          console.log('filter:', big);
+
+          // מספרים זוגיים
+          const even = numbers.filter((n) => n % 2 === 0);
+          console.log('זוגיים:', even);
+
+          // אף מספר לא גדול מ-100: מקבלים מערך ריק
+          console.log('גדולים מ-100:', numbers.filter((n) => n > 100));
+        </script>
+      </div>
+      <p>ה-callback של <code>filter</code> צריך להחזיר תנאי: משהו שהוא <code>true</code> או <code>false</code>. ‏<code>n &gt; 4</code> הוא תנאי כזה. נקרא בקול: "מתוך <code>numbers</code>, תשאיר כל <code>n</code> שגדול מ-4".</p>
+
+      <h3>‏filter על מערך של אובייקטים</h3>
+      <div class="playground" id="pg-filter-objects" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92, city: 'חיפה' },
+            { name: 'יוסי', grade: 55, city: 'תל אביב' },
+            { name: 'מאיה', grade: 78, city: 'חיפה' },
+            { name: 'עומר', grade: 40, city: 'ירושלים' },
+          ];
+
+          const passed = students.filter((s) => s.grade >= 60);
+          console.log('עברו:', passed.length);
+
+          const fromHaifa = students.filter((s) => s.city === 'חיפה');
+          console.log('מחיפה:', fromHaifa);
+
+          // שני תנאים יחד עם &&
+          const haifaExcellent = students.filter((s) => s.city === 'חיפה' && s.grade >= 90);
+          console.log('מצטיינים מחיפה:', haifaExcellent);
+        </script>
+      </div>
+      <p>נסו: כתבו <code>filter</code> שמשאיר רק סטודנטים ש<strong>לא</strong> עברו (ציון מתחת ל-60).</p>
+
+      <h3>מחיקת פריט עם filter</h3>
+      <p>שימוש חשוב מאוד: כדי "למחוק" פריט מרשימה, מסננים את כל הפריטים <strong>חוץ</strong> ממנו. כך עושים את זה ב-React, ונחזור לזה בסוף העמוד:</p>
+      <div class="playground" id="pg-filter-remove" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const names = ['דנה', 'יוסי', 'מאיה'];
+          const withoutYossi = names.filter((name) => name !== 'יוסי');
+          console.log(withoutYossi);
+          console.log('המקורי:', names);
+        </script>
+      </div>
+
+      <h2 id="find">‏find ו-findIndex: למצוא פריט אחד <span class="time">4 דק׳</span></h2>
+      <p>לפעמים לא רוצים רשימה, אלא <strong>פריט אחד</strong>: הסטודנט ששמו מאיה, המוצר שמספרו 7. ‏<code>find</code> עוברת על הפריטים לפי הסדר, ו<strong>מחזירה את הפריט הראשון</strong> שה-callback מחזיר עבורו <code>true</code>. ברגע שהיא מוצאת, היא מפסיקה לחפש. אם אף פריט לא מתאים, היא מחזירה <code>undefined</code>.</p>
+      <div class="playground" id="pg-find" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const products = [
+            { id: 1, name: 'מחברת', price: 12 },
+            { id: 2, name: 'עט', price: 5 },
+            { id: 3, name: 'תיק', price: 120 },
+          ];
+
+          const pen = products.find((p) => p.id === 2);
+          console.log(pen);           // אובייקט אחד, לא מערך
+          console.log(pen.name);
+
+          const expensive = products.find((p) => p.price > 100);
+          console.log(expensive.name);
+
+          const missing = products.find((p) => p.id === 99);
+          console.log(missing);       // undefined: אין מוצר כזה
+        </script>
+      </div>
+      <table>
+        <tr><th></th><th><code>filter</code></th><th><code>find</code></th></tr>
+        <tr><td>מה מחזירה</td><td>מערך (אולי ריק)</td><td>פריט אחד, או <code>undefined</code></td></tr>
+        <tr><td>כמה פריטים</td><td>כל מי שמתאים</td><td>רק הראשון שמתאים</td></tr>
+        <tr><td>מתי משתמשים</td><td>"כל הסטודנטים מחיפה"</td><td>"הסטודנט שמספרו 7"</td></tr>
+      </table>
+      <p>‏<code>findIndex</code> עובדת בדיוק כמו <code>find</code>, אבל מחזירה את <strong>המיקום</strong> של הפריט במקום את הפריט עצמו. אם לא נמצא, היא מחזירה <code>-1</code>:</p>
+      <div class="playground" id="pg-findindex" data-height="180">
+        <script type="text/plain" data-lang="js">
+          const names = ['דנה', 'יוסי', 'מאיה'];
+          console.log(names.findIndex((n) => n === 'מאיה'));   // 2
+          console.log(names.findIndex((n) => n === 'רון'));    // -1
+        </script>
+      </div>
+
+      <div class="box warn">
+        <p><strong>זהירות מ-undefined:</strong> אם <code>find</code> לא מצאה כלום ותנסו לקרוא שדה, למשל <code>missing.name</code>, תקבלו שגיאה: <code>Cannot read properties of undefined</code>. כשייתכן שהפריט לא קיים, בדקו קודם: <code>if (missing) { ... }</code>.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 יש לכם מערך <code>products</code>, ואתם רוצים להציג את <strong>המוצר</strong> שה-<code>id</code> שלו 3. מה מתאים?</p>
+        <ul>
+          <li>‏<code>products.filter((p) =&gt; p.id === 3)</code></li>
+          <li data-correct>‏<code>products.find((p) =&gt; p.id === 3)</code></li>
+          <li>‏<code>products.findIndex((p) =&gt; p.id === 3)</code></li>
+          <li>‏<code>products.some((p) =&gt; p.id === 3)</code></li>
+        </ul>
+        <p class="quiz-explain">‏<code>find</code> מחזירה את המוצר עצמו. ‏<code>filter</code> מחזירה <strong>מערך</strong> עם המוצר בפנים (<code>[{...}]</code>), אז תצטרכו גם <code>[0]</code>. ‏<code>findIndex</code> מחזירה את המיקום שלו (מספר), ו-<code>some</code> רק עונה אם הוא קיים (<code>true</code>).</p>
+      </div>
+
+      <h2 id="some-every">‏some ו-every: שאלות של כן ולא על כל הרשימה <span class="time">3 דק׳</span></h2>
+      <p>שתי שיטות שמחזירות <code>true</code> או <code>false</code> על המערך כולו:</p>
+      <ul>
+        <li>‏<code>some</code> ("לפחות אחד"): האם <strong>לפחות פריט אחד</strong> מקיים את התנאי?</li>
+        <li>‏<code>every</code> ("כולם"): האם <strong>כל</strong> הפריטים מקיימים את התנאי?</li>
+      </ul>
+      <div class="playground" id="pg-some-every" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const grades = [92, 55, 78, 40];
+
+          console.log('מישהו נכשל?', grades.some((g) => g < 60));      // true
+          console.log('כולם עברו?', grades.every((g) => g >= 60));     // false
+          console.log('מישהו קיבל 100?', grades.some((g) => g === 100)); // false
+          console.log('כולם מעל 0?', grades.every((g) => g > 0));       // true
+
+          // שימוש אמיתי: האם יש בעגלה מוצר שאזל מהמלאי?
+          const cart = [{ name: 'עט', inStock: true }, { name: 'תיק', inStock: false }];
+          if (cart.some((item) => !item.inStock)) {
+            console.log('שימו לב: יש בעגלה מוצר שאזל');
+          }
+        </script>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 רוצים לדעת אם יש ברשימת המשתמשים משתמש עם המייל <code>dana@mail.com</code>, כדי למנוע הרשמה כפולה. מה הכי מתאים?</p>
+        <ul>
+          <li>‏<code>users.map(...)</code></li>
+          <li>‏<code>users.filter(...)</code></li>
+          <li data-correct>‏<code>users.some((u) =&gt; u.email === 'dana@mail.com')</code></li>
+          <li>‏<code>users.forEach(...)</code></li>
+        </ul>
+        <p class="quiz-explain">השאלה היא "כן או לא?", ולכן <code>some</code> מתאימה. היא מחזירה <code>true</code> ומפסיקה ברגע שמצאה. ‏<code>filter</code> הייתה עובדת (בודקים אם האורך גדול מ-0), אבל היא בונה מערך שלא צריך.</p>
+      </div>
+
+      <h3>🎯 אתגר 2: שמות וציונים <span class="level easy">קל</span></h3>
+      <p>כתבו שתי פונקציות:</p>
+      <ul>
+        <li>‏<code>getNames(students)</code> מחזירה מערך של השמות בלבד.</li>
+        <li>‏<code>onlyPassed(students, minGrade)</code> מחזירה מערך של הסטודנטים (האובייקטים המלאים) שהציון שלהם גדול או שווה ל-<code>minGrade</code>.</li>
+      </ul>
+      <div class="playground challenge" id="ch-names" data-check="ch-names" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 78 },
+          ];
+
+          // כתבו כאן את getNames ואת onlyPassed
+
+
+          console.log(getNames(students));          // ['דנה', 'יוסי', 'מאיה']
+          console.log(onlyPassed(students, 60));    // דנה ומאיה
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 78 },
+          ];
+
+          const getNames = (list) => list.map((s) => s.name);
+          const onlyPassed = (list, minGrade) => list.filter((s) => s.grade >= minGrade);
+
+          console.log(getNames(students));          // ['דנה', 'יוסי', 'מאיה']
+          console.log(onlyPassed(students, 60));    // דנה ומאיה
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-names': (out, win) => {
+            const names = win.eval('typeof getNames === "function" ? getNames : null');
+            const passed = win.eval('typeof onlyPassed === "function" ? onlyPassed : null');
+            const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+            const list = [{ name: 'רון', grade: 60 }, { name: 'גל', grade: 59 }, { name: 'שי', grade: 100 }];
+            return [
+              [names, 'לא מצאתי פונקציה בשם getNames'],
+              [passed, 'לא מצאתי פונקציה בשם onlyPassed'],
+              [names && same(names(list), ['רון', 'גל', 'שי']), 'getNames צריכה להחזיר מערך של שמות בלבד, באותו סדר'],
+              [passed && same(passed(list, 60), [list[0], list[2]]), 'onlyPassed(list, 60) צריכה להשאיר גם מי שקיבל בדיוק 60 (גדול או שווה)'],
+              [passed && same(passed(list, 101), []), 'כשאף אחד לא עובר, onlyPassed צריכה להחזיר מערך ריק'],
+              [passed && same(passed(list, 0), list), 'onlyPassed(list, 0) צריכה להחזיר את כולם'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="reduce">‏reduce: לצמצם את כל המערך לערך אחד <span class="time">8 דק׳</span></h2>
+      <p>‏<code>map</code> ו-<code>filter</code> מחזירות מערך. אבל לפעמים רוצים <strong>ערך אחד</strong> שמחושב מכל הפריטים: סכום, ממוצע, הציון הכי גבוה. לזה יש <code>reduce</code> ("לצמצם").</p>
+      <div class="flow">
+        <span class="node">[3, 8, 1, 10, 5]</span><span class="arrow">←</span><span class="node">reduce<small>מחברים הכול</small></span><span class="arrow">←</span><span class="node">27</span>
+      </div>
+      <p>‏<code>reduce</code> נחשבת לשיטה הכי מבלבלת, אז נתחיל ממשהו שאתם כבר מכירים: סכום עם לולאה.</p>
+      <div class="playground" id="pg-reduce-for" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const numbers = [3, 8, 1, 10, 5];
+
+          let total = 0;                 // 1. ערך התחלתי
+          for (const n of numbers) {
+            total = total + n;           // 2. בכל סיבוב: מעדכנים את הסכום לפי הפריט
+          }
+          console.log(total);            // 3. בסוף: הערך האחרון
+        </script>
+      </div>
+      <p>יש כאן שלושה חלקים: <strong>ערך התחלתי</strong> (<code>0</code>), <strong>כלל עדכון</strong> שמופעל בכל סיבוב (<code>total + n</code>), ו<strong>התוצאה</strong> בסוף. ‏<code>reduce</code> עושה בדיוק את זה:</p>
+      <div class="playground" id="pg-reduce-sum" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const numbers = [3, 8, 1, 10, 5];
+
+          const total = numbers.reduce((sum, n) => sum + n, 0);
+          console.log(total);
+        </script>
+      </div>
+      <p>בואו נפרק את השורה:</p>
+      <ul>
+        <li>‏<code>reduce</code> מקבלת <strong>שני</strong> ארגומנטים: callback, וערך התחלתי (<code>0</code>, בסוף השורה).</li>
+        <li>ה-callback מקבל שני פרמטרים: <code>sum</code>, ה"צובר" (accumulator), שהוא התוצאה עד עכשיו, ו-<code>n</code>, הפריט הנוכחי.</li>
+        <li>מה שה-callback <strong>מחזיר</strong> הופך לערך של <code>sum</code> בסיבוב הבא.</li>
+        <li>אחרי הפריט האחרון, ‏<code>reduce</code> מחזירה את הערך האחרון של <code>sum</code>.</li>
+      </ul>
+
+      <h3>מעקב צעד אחר צעד</h3>
+      <table>
+        <tr><th>סיבוב</th><th><code>sum</code> (נכנס)</th><th><code>n</code></th><th>מה מוחזר (<code>sum + n</code>)</th></tr>
+        <tr><td>1</td><td><code>0</code> (הערך ההתחלתי)</td><td><code>3</code></td><td><code>3</code></td></tr>
+        <tr><td>2</td><td><code>3</code></td><td><code>8</code></td><td><code>11</code></td></tr>
+        <tr><td>3</td><td><code>11</code></td><td><code>1</code></td><td><code>12</code></td></tr>
+        <tr><td>4</td><td><code>12</code></td><td><code>10</code></td><td><code>22</code></td></tr>
+        <tr><td>5</td><td><code>22</code></td><td><code>5</code></td><td><code>27</code> ← התוצאה הסופית</td></tr>
+      </table>
+      <p>כדי לראות את זה בעיניים, הוסיפו <code>console.log</code> בתוך ה-callback:</p>
+      <div class="playground" id="pg-reduce-trace" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const numbers = [3, 8, 1, 10, 5];
+
+          const total = numbers.reduce((sum, n) => {
+            console.log(`sum = ${sum}, n = ${n}  ←  מחזירים ${sum + n}`);
+            return sum + n;
+          }, 0);
+
+          console.log('התוצאה:', total);
+        </script>
+      </div>
+
+      <h3>עוד דוגמאות: סכום של שדה, מקסימום, ספירה</h3>
+      <div class="playground" id="pg-reduce-more" data-height="380">
+        <script type="text/plain" data-lang="js">
+          const cart = [
+            { name: 'מחברת', price: 12, qty: 3 },
+            { name: 'עט', price: 5, qty: 10 },
+            { name: 'תיק', price: 120, qty: 1 },
+          ];
+
+          // סכום לתשלום: מחיר כפול כמות, לכל מוצר
+          const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+          console.log('לתשלום:', total);
+
+          // כמה פריטים יש בעגלה בסך הכול
+          const count = cart.reduce((sum, item) => sum + item.qty, 0);
+          console.log('פריטים:', count);
+
+          // המוצר הכי יקר: הצובר הוא המוצר הכי יקר שראינו עד עכשיו
+          const mostExpensive = cart.reduce((best, item) => (item.price > best.price ? item : best));
+          console.log('הכי יקר:', mostExpensive.name);
+
+          // ספירה לפי קטגוריה: הצובר הוא אובייקט
+          const cities = ['חיפה', 'תל אביב', 'חיפה', 'ירושלים', 'חיפה'];
+          const byCity = cities.reduce((counts, city) => {
+            counts[city] = (counts[city] || 0) + 1;
+            return counts;
+          }, {});
+          console.log(byCity);
+        </script>
+      </div>
+      <p>בדוגמת "הכי יקר" לא העברנו ערך התחלתי. במקרה כזה, ‏<code>reduce</code> משתמשת בפריט הראשון כערך התחלתי ומתחילה מהשני. זה נוח למקסימום ומינימום, אבל על מערך ריק זה יגרום לשגיאה. <strong>כשאתם לא בטוחים, תמיד תנו ערך התחלתי.</strong></p>
+
+      <h3>ממוצע</h3>
+      <p>‏<code>reduce</code> נותנת את הסכום, ואז מחלקים במספר הפריטים:</p>
+      <div class="playground" id="pg-reduce-average" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const grades = [92, 55, 78, 40];
+          const sum = grades.reduce((acc, g) => acc + g, 0);
+          const average = sum / grades.length;
+          console.log('ממוצע:', average);
+        </script>
+      </div>
+
+      <div class="box tip">
+        <p><strong>מתי עדיף בכל זאת לולאה?</strong> ‏<code>reduce</code> מצוינת לסכומים וספירות פשוטים. אם ה-callback נהיה ארוך ומסובך, ואתם צריכים לקרוא אותו שלוש פעמים כדי להבין מה הוא עושה, לולאת <code>for...of</code> רגילה עם משתנה <code>let</code> היא לגיטימית לגמרי, ולפעמים ברורה יותר. קוד טוב הוא קוד שקל לקרוא, לא קוד קצר.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה התוצאה של <code>[2, 3, 4].reduce((acc, n) =&gt; acc * n, 1)</code>?</p>
+        <ul>
+          <li>‏<code>9</code></li>
+          <li data-correct>‏<code>24</code></li>
+          <li>‏<code>0</code></li>
+          <li>‏<code>[2, 6, 24]</code></li>
+        </ul>
+        <p class="quiz-explain">מתחילים מ-1. אחר כך 1 × 2 = 2, ‏2 × 3 = 6, ‏6 × 4 = 24. ‏<code>reduce</code> מחזירה ערך אחד, לא מערך. אם הערך ההתחלתי היה 0, התוצאה הייתה 0, כי כל דבר כפול 0 הוא 0.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏<code>reduce</code> היא הנקודה שבה חלק מהכיתה "נופל". מומלץ להתחיל מהלולאה ולהראות שהיא אותו דבר, לעבור עם הכיתה על טבלת המעקב בקול, ולהריץ את הדוגמה עם ה-console.log בפנים. אין צורך להתעכב על ספירה לפי קטגוריה בכיתה: זה חומר העשרה לבית. מספיק שכולם יבינו סכום וממוצע.</p>
+      </aside>
+
+      <h3>🎯 אתגר 3: סכום העגלה <span class="level medium">בינוני</span></h3>
+      <p>כתבו פונקציה בשם <code>totalPrice</code> שמקבלת עגלה (מערך של מוצרים עם <code>price</code> ו-<code>qty</code>) ומחזירה את הסכום הכולל לתשלום: לכל מוצר, מחיר כפול כמות. השתמשו ב-<code>reduce</code>. על עגלה ריקה, הפונקציה מחזירה <code>0</code>.</p>
+      <div class="playground challenge" id="ch-total" data-check="ch-total" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const cart = [
+            { name: 'קפה', price: 14, qty: 2 },
+            { name: 'קרואסון', price: 12, qty: 1 },
+          ];
+
+          // כתבו כאן את totalPrice
+
+
+          console.log(totalPrice(cart));   // 40
+          console.log(totalPrice([]));     // 0
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const cart = [
+            { name: 'קפה', price: 14, qty: 2 },
+            { name: 'קרואסון', price: 12, qty: 1 },
+          ];
+
+          const totalPrice = (items) => items.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+          console.log(totalPrice(cart));   // 40
+          console.log(totalPrice([]));     // 0
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-total': (out, win) => {
+            const fn = win.eval('typeof totalPrice === "function" ? totalPrice : null');
+            const safe = (arg) => { try { return fn(arg); } catch { return 'error'; } };
+            return [
+              [fn, 'לא מצאתי פונקציה בשם totalPrice'],
+              [fn && safe([{ price: 14, qty: 2 }, { price: 12, qty: 1 }]) === 40, 'על העגלה מהדוגמה התוצאה צריכה להיות 40 (14×2 + 12×1)'],
+              [fn && safe([{ price: 5, qty: 10 }, { price: 120, qty: 1 }, { price: 3, qty: 0 }]) === 170, 'עגלה של 5×10, ‏120×1 ו-3×0 צריכה לתת 170. בדקו שאתם כופלים מחיר בכמות.'],
+              [fn && safe([]) === 0, 'על עגלה ריקה צריך לקבל 0. רמז: הערך ההתחלתי של reduce.'],
+              [/\.reduce\(/.test(out.code), 'השתמשו ב-reduce'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="sort">‏sort: מיון, והמלכודות שלו <span class="time">5 דק׳</span></h2>
+      <p>‏<code>sort</code> ממיינת מערך. נשמע פשוט, אבל יש בה שתי הפתעות שכל מתכנת נתקל בהן לפחות פעם אחת.</p>
+
+      <h3>הפתעה 1: ‏sort משנה את המערך המקורי</h3>
+      <p>בניגוד ל-<code>map</code> ו-<code>filter</code>, ‏<code>sort</code> <strong>לא יוצרת מערך חדש</strong>. היא מסדרת מחדש את המערך עצמו (וגם מחזירה אותו):</p>
+      <div class="playground" id="pg-sort-mutates" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const names = ['מאיה', 'דנה', 'יוסי'];
+          const sorted = names.sort();
+
+          console.log('sorted:', sorted);
+          console.log('names:', names);   // גם המקורי השתנה!
+        </script>
+      </div>
+
+      <h3>הפתעה 2: מספרים ממוינים כמו טקסט</h3>
+      <p>בלי הוראות, ‏<code>sort</code> הופכת כל פריט למחרוזת וממיינת לפי סדר "מילוני", תו אחרי תו. לכן <code>10</code> מגיע לפני <code>3</code>, כמו ש"אבא" מגיע לפני "בית":</p>
+      <div class="playground" id="pg-sort-numbers" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const numbers = [3, 8, 1, 10, 5];
+
+          console.log([...numbers].sort());                   // [1, 10, 3, 5, 8] ❌
+
+          // הפתרון: פונקציית השוואה
+          console.log([...numbers].sort((a, b) => a - b));    // מהקטן לגדול
+          console.log([...numbers].sort((a, b) => b - a));    // מהגדול לקטן
+        </script>
+      </div>
+      <p>איך עובדת פונקציית ההשוואה? ‏<code>sort</code> לוקחת כל פעם שני פריטים, <code>a</code> ו-<code>b</code>, ושואלת את הפונקציה מי מהם קודם:</p>
+      <ul>
+        <li>אם התוצאה <strong>שלילית</strong>, ‏<code>a</code> בא קודם.</li>
+        <li>אם היא <strong>חיובית</strong>, ‏<code>b</code> בא קודם.</li>
+        <li>אם היא <strong>0</strong>, הם שווים והסדר ביניהם נשמר.</li>
+      </ul>
+      <p>‏<code>a - b</code> שלילי כש-<code>a</code> קטן יותר, ולכן הקטנים באים קודם. אין צורך לזכור למה. מספיק לזכור את התבנית: <strong><code>(a, b) =&gt; a - b</code> מהקטן לגדול, <code>(a, b) =&gt; b - a</code> מהגדול לקטן.</strong></p>
+      <p>שימו לב ל-<code>[...numbers]</code>: לפני כל מיון יצרנו <strong>עותק</strong> עם spread, כדי לא לקלקל את המקורי. זה הרגל טוב.</p>
+
+      <h3>מיון אובייקטים</h3>
+      <p>ממיינים לפי שדה. למספרים משתמשים בחיסור. למחרוזות משתמשים ב-<code>localeCompare</code>, שיודעת לסדר גם עברית:</p>
+      <div class="playground" id="pg-sort-objects" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 78 },
+          ];
+
+          // לפי ציון, מהגבוה לנמוך
+          const byGrade = [...students].sort((a, b) => b.grade - a.grade);
+          console.log(byGrade.map((s) => s.name));
+
+          // לפי שם, לפי סדר האלף-בית
+          const byName = [...students].sort((a, b) => a.name.localeCompare(b.name));
+          console.log(byName.map((s) => s.name));
+
+          console.log('המקורי לא השתנה:', students.map((s) => s.name));
+        </script>
+      </div>
+      <p>בדפדפנים חדשים יש גם <code>toSorted</code>, שעושה את אותו הדבר אבל <strong>תמיד מחזירה מערך חדש</strong>: <code>students.toSorted((a, b) =&gt; b.grade - a.grade)</code>. העותק עם <code>[...arr]</code> עובד בכל מקום, ולכן נשתמש בו.</p>
+
+      <h3>תזכורת: includes</h3>
+      <p>בחלק א׳ פגשנו את <code>includes</code>: היא בודקת אם <strong>ערך מסוים</strong> נמצא במערך. היא לא מקבלת callback, ולכן מתאימה לרשימות פשוטות של מספרים או מחרוזות. לאובייקטים משתמשים ב-<code>some</code>:</p>
+      <div class="playground" id="pg-includes" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const tags = ['react', 'css', 'html'];
+          console.log(tags.includes('css'));       // true
+          console.log(tags.includes('python'));    // false
+
+          const users = [{ name: 'דנה' }, { name: 'יוסי' }];
+          console.log(users.some((u) => u.name === 'דנה'));   // true
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 4: טבלת המצטיינים <span class="level medium">בינוני</span></h3>
+      <p>כתבו פונקציה בשם <code>sortByGrade</code> שמקבלת מערך של סטודנטים ומחזירה <strong>מערך חדש</strong> שממוין לפי ציון, מהגבוה לנמוך. המערך המקורי חייב להישאר כמו שהיה.</p>
+      <div class="playground challenge" id="ch-sort" data-check="ch-sort" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 78 },
+          ];
+
+          function sortByGrade(list) {
+            return list.sort();
+          }
+
+          console.log(sortByGrade(students).map((s) => s.name));   // ['דנה', 'מאיה', 'יוסי']
+          console.log(students.map((s) => s.name));                // ['דנה', 'יוסי', 'מאיה']
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 78 },
+          ];
+
+          function sortByGrade(list) {
+            return [...list].sort((a, b) => b.grade - a.grade);
+          }
+
+          console.log(sortByGrade(students).map((s) => s.name));   // ['דנה', 'מאיה', 'יוסי']
+          console.log(students.map((s) => s.name));                // ['דנה', 'יוסי', 'מאיה']
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-sort': (out, win) => {
+            const fn = win.eval('typeof sortByGrade === "function" ? sortByGrade : null');
+            const list = [{ name: 'א', grade: 9 }, { name: 'ב', grade: 100 }, { name: 'ג', grade: 45 }, { name: 'ד', grade: 70 }];
+            const before = JSON.stringify(list);
+            const result = fn ? fn(list) : null;
+            const order = Array.isArray(result) ? result.map((s) => s.name).join('') : '';
+            return [
+              [fn, 'לא מצאתי פונקציה בשם sortByGrade'],
+              [order === 'בדגא', 'הסדר לא נכון: צריך מהציון הגבוה לנמוך (100, 70, 45, 9). זכרו שבלי פונקציית השוואה sort ממיינת כמו טקסט.'],
+              [JSON.stringify(list) === before, 'המערך המקורי השתנה. צרו עותק עם [...list] לפני המיון.'],
+              [result !== list, 'הפונקציה צריכה להחזיר מערך חדש, לא את אותו מערך'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="chaining">שרשור: כמה שיטות אחת אחרי השנייה <span class="time">5 דק׳</span></h2>
+      <p>כי <code>map</code> ו-<code>filter</code> מחזירות מערך, אפשר להפעיל על התוצאה עוד שיטה מיד. זה נקרא <strong>שרשור</strong> (chaining). כל שיטה מקבלת את מה שהקודמת החזירה, כמו פס ייצור:</p>
+      <div class="flow">
+        <span class="node">כל המוצרים</span><span class="arrow">←</span><span class="node">filter<small>רק מה שבמלאי</small></span><span class="arrow">←</span><span class="node">map<small>מחיר × כמות</small></span><span class="arrow">←</span><span class="node">reduce<small>סכום</small></span><span class="arrow">←</span><span class="node">לתשלום</span>
+      </div>
+      <div class="playground" id="pg-chain-cart" data-height="340">
+        <script type="text/plain" data-lang="js">
+          const cart = [
+            { name: 'מחברת', price: 12, qty: 3, inStock: true },
+            { name: 'עט', price: 5, qty: 10, inStock: true },
+            { name: 'תיק', price: 120, qty: 1, inStock: false },
+          ];
+
+          const total = cart
+            .filter((item) => item.inStock)           // 1. רק מה שבמלאי
+            .map((item) => item.price * item.qty)     // 2. כמה עולה כל שורה
+            .reduce((sum, line) => sum + line, 0);    // 3. מחברים
+
+          console.log('לתשלום:', total);
+        </script>
+      </div>
+      <p>כדאי לכתוב כל שלב בשורה נפרדת, עם הנקודה בתחילת השורה. כך קל לקרוא את הקוד מלמעלה למטה, כמו רשימת הוראות. אם משהו לא עובד, אפשר לפרק את השרשרת למשתנים ולהדפיס כל שלב:</p>
+      <div class="playground" id="pg-chain-debug" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const cart = [
+            { name: 'מחברת', price: 12, qty: 3, inStock: true },
+            { name: 'עט', price: 5, qty: 10, inStock: true },
+            { name: 'תיק', price: 120, qty: 1, inStock: false },
+          ];
+
+          const available = cart.filter((item) => item.inStock);
+          console.log('שלב 1:', available.map((i) => i.name));
+
+          const lines = available.map((item) => item.price * item.qty);
+          console.log('שלב 2:', lines);
+
+          const total = lines.reduce((sum, line) => sum + line, 0);
+          console.log('שלב 3:', total);
+        </script>
+      </div>
+
+      <h3>דוגמה נוספת: שמות המצטיינים, לפי הסדר</h3>
+      <div class="playground" id="pg-chain-top" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 98 },
+            { name: 'עומר', grade: 85 },
+          ];
+
+          const topNames = students
+            .filter((s) => s.grade >= 85)
+            .sort((a, b) => b.grade - a.grade)   // בטוח כאן: filter כבר יצרה מערך חדש
+            .map((s) => `${s.name} (${s.grade})`);
+
+          console.log(topNames);
+        </script>
+      </div>
+      <p>שימו לב: כאן <code>sort</code> לא מקלקלת את <code>students</code>, כי היא ממיינת את המערך החדש ש-<code>filter</code> יצרה.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה יודפס? <code>console.log([1, 2, 3, 4].filter((n) =&gt; n &gt; 1).map((n) =&gt; n * 10))</code></p>
+        <ul>
+          <li>‏<code>[10, 20, 30, 40]</code></li>
+          <li data-correct>‏<code>[20, 30, 40]</code></li>
+          <li>‏<code>[false, true, true, true]</code></li>
+          <li>‏<code>90</code></li>
+        </ul>
+        <p class="quiz-explain">‏<code>filter</code> משאירה <code>[2, 3, 4]</code>, ואז <code>map</code> מכפילה כל אחד ב-10. אם הייתם מחליפים את הסדר (קודם map ואז filter), התוצאה הייתה <code>[10, 20, 30, 40]</code>, כי כל המספרים אחרי ההכפלה גדולים מ-1. הסדר בשרשרת חשוב.</p>
+      </div>
+
+      <h3>🎯 אתגר 5: ממוצע של מי שעבר <span class="level medium">בינוני</span></h3>
+      <p>כתבו פונקציה בשם <code>passedAverage</code> שמקבלת מערך של סטודנטים ומחזירה את <strong>ממוצע הציונים של הסטודנטים שעברו</strong> (ציון 60 ומעלה). אם אף אחד לא עבר, היא מחזירה <code>0</code>.</p>
+      <p>רמז: <code>filter</code>, ואז סכום עם <code>reduce</code>, ואז חלוקה במספר הסטודנטים שעברו.</p>
+      <div class="playground challenge" id="ch-average" data-check="ch-average" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 78 },
+            { name: 'עומר', grade: 40 },
+          ];
+
+          // כתבו כאן את passedAverage
+
+
+          console.log(passedAverage(students));   // 85 (הממוצע של 92 ו-78)
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const students = [
+            { name: 'דנה', grade: 92 },
+            { name: 'יוסי', grade: 55 },
+            { name: 'מאיה', grade: 78 },
+            { name: 'עומר', grade: 40 },
+          ];
+
+          function passedAverage(list) {
+            const passed = list.filter((s) => s.grade >= 60);
+            if (passed.length === 0) return 0;
+            const sum = passed.reduce((acc, s) => acc + s.grade, 0);
+            return sum / passed.length;
+          }
+
+          console.log(passedAverage(students));   // 85 (הממוצע של 92 ו-78)
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-average': (out, win) => {
+            const fn = win.eval('typeof passedAverage === "function" ? passedAverage : null');
+            const safe = (arg) => { try { return fn(arg); } catch { return 'error'; } };
+            const s = (grade) => ({ name: 'x', grade });
+            return [
+              [fn, 'לא מצאתי פונקציה בשם passedAverage'],
+              [fn && safe([s(92), s(55), s(78), s(40)]) === 85, 'על הדוגמה צריך לקבל 85. בדקו שאתם מחלקים במספר מי שעבר, לא במספר כל הסטודנטים.'],
+              [fn && safe([s(60), s(100), s(59)]) === 80, 'מי שקיבל בדיוק 60 עבר: הממוצע של 60 ו-100 הוא 80'],
+              [fn && safe([s(10), s(20)]) === 0, 'כשאף אחד לא עבר, צריך להחזיר 0 (ולא NaN)'],
+              [fn && safe([]) === 0, 'על מערך ריק צריך להחזיר 0'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="immutability">לא לשנות את המקור: הדרך של React <span class="time">7 דק׳</span></h2>
+      <p>ראינו ש-<code>map</code> ו-<code>filter</code> יוצרות מערך חדש, ו-<code>sort</code> משנה את הקיים. ההבדל הזה נשמע טכני, אבל הוא <strong>אחד הדברים החשובים ביותר שתלמדו לקראת React</strong>.</p>
+      <p>הסיבה: React מחליטה אם לצייר מחדש את המסך לפי השאלה "<strong>האם זה מערך אחר?</strong>". אם תוסיפו פריט עם <code>push</code>, זה עדיין אותו מערך (רק עם עוד פריט בפנים), ו-React לא תשים לב שמשהו השתנה. המסך לא יתעדכן, ותבזבזו שעה בחיפוש הבאג. לכן ב-React <strong>אף פעם לא משנים מערך קיים, אלא תמיד יוצרים מערך חדש</strong>. הרעיון הזה נקרא <strong>immutability</strong> (אי-שינוי).</p>
+
+      <table>
+        <tr><th>משנות את המערך המקורי ⚠️</th><th>מחזירות מערך חדש ✅</th></tr>
+        <tr><td><code>push</code>, ‏<code>pop</code> (הוספה/הסרה בסוף)</td><td><code>[...arr, x]</code> (הוספה)</td></tr>
+        <tr><td><code>unshift</code>, ‏<code>shift</code> (הוספה/הסרה בהתחלה)</td><td><code>[x, ...arr]</code></td></tr>
+        <tr><td><code>splice</code> (מחיקה/הכנסה באמצע)</td><td><code>filter</code> (מחיקה), ‏<code>slice</code> (חיתוך)</td></tr>
+        <tr><td><code>sort</code>, ‏<code>reverse</code></td><td><code>[...arr].sort()</code>, ‏<code>toSorted</code>, ‏<code>toReversed</code></td></tr>
+        <tr><td><code>arr[i] = x</code> (החלפה)</td><td><code>map</code> (החלפה), ‏<code>concat</code></td></tr>
+      </table>
+
+      <h3>שלוש התבניות שתכתבו ב-React כל יום</h3>
+      <p>נניח שיש לנו רשימת משימות, וכל משימה היא אובייקט עם <code>id</code>, טקסט, ו-<code>done</code>. אלה שלוש הפעולות שכל אפליקציה צריכה, בלי לשנות את המערך המקורי:</p>
+      <div class="playground" id="pg-immutable-patterns" data-height="440">
+        <script type="text/plain" data-lang="js">
+          const todos = [
+            { id: 1, text: 'לקנות חלב', done: false },
+            { id: 2, text: 'ללמוד map', done: true },
+          ];
+
+          // 1. הוספה: מערך חדש עם כל הישנים, ועוד אחד בסוף
+          const added = [...todos, { id: 3, text: 'לעשות שיעורי בית', done: false }];
+          console.log('אחרי הוספה:', added.length, 'משימות');
+
+          // 2. מחיקה: כל המשימות חוץ מזו שה-id שלה 1
+          const removed = todos.filter((t) => t.id !== 1);
+          console.log('אחרי מחיקה:', removed.map((t) => t.text));
+
+          // 3. עדכון: משימה 1 מסומנת כבוצעה. כל השאר נשארות כמו שהן
+          const updated = todos.map((t) => (t.id === 1 ? { ...t, done: true } : t));
+          console.log('אחרי עדכון:', updated);
+
+          console.log('המקורי לא השתנה:', todos);
+        </script>
+      </div>
+      <p>בואו נקרא את תבנית העדכון לאט, כי היא הכי מסובכת: "לכל משימה <code>t</code>: אם ה-<code>id</code> שלה הוא 1, תחזיר <strong>אובייקט חדש</strong> עם כל השדות שלה (<code>...t</code>) אבל עם <code>done: true</code>. אחרת, תחזיר אותה כמו שהיא".</p>
+      <p>כדאי להעתיק את שלוש התבניות האלה למחברת. בשיעור 5 תשתמשו בהן בדיוק כך, רק בתוך React.</p>
+
+      <div class="box warn">
+        <p><strong>למה לא <code>t.done = true</code> בתוך ה-map?</strong> כי זה משנה את האובייקט המקורי, שנמצא גם במערך הישן. הפלט ייראה נכון, אבל שברתם את הכלל: גם <code>todos</code> השתנה. תמיד יוצרים אובייקט חדש עם <code>{ ...t, done: true }</code>.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>זה הקטע שהכי חשוב שהכיתה תזכור מהעמוד, כי הוא מכין את <code>useState</code> בשיעור 5. מומלץ להראות קודם את <code>push</code>, ולשאול "זה אותו מערך או מערך חדש?" עם <code>console.log(before === after)</code>. אחר כך לכתוב את שלוש התבניות על הלוח ולהשאיר אותן שם עד סוף השיעור.</p>
+      </aside>
+
+      <h3>🎯 אתגר 6: רשימת משימות בלי לשנות את המקור <span class="level hard">מאתגר</span></h3>
+      <p>כתבו שלוש פונקציות. כל אחת מקבלת מערך משימות ומחזירה <strong>מערך חדש</strong>, בלי לשנות את המערך שקיבלה או את האובייקטים שבתוכו:</p>
+      <ul>
+        <li>‏<code>addTodo(todos, text)</code> מוסיפה בסוף משימה חדשה: <code>{ id, text, done: false }</code>. ה-<code>id</code> הוא אחד יותר מה-<code>id</code> הגדול ביותר ברשימה (או 1 אם הרשימה ריקה).</li>
+        <li>‏<code>removeTodo(todos, id)</code> מוחקת את המשימה עם ה-<code>id</code> הזה.</li>
+        <li>‏<code>toggleTodo(todos, id)</code> הופכת את <code>done</code> של המשימה הזו: מ-<code>true</code> ל-<code>false</code>, ומ-<code>false</code> ל-<code>true</code>.</li>
+      </ul>
+      <div class="playground challenge" id="ch-todos" data-check="ch-todos" data-height="420">
+        <script type="text/plain" data-lang="js">
+          const todos = [
+            { id: 1, text: 'לקנות חלב', done: false },
+            { id: 2, text: 'ללמוד map', done: true },
+          ];
+
+          function addTodo(list, text) {
+            list.push({ id: list.length + 1, text, done: false });
+            return list;
+          }
+
+          function removeTodo(list, id) {
+            // כתבו כאן
+          }
+
+          function toggleTodo(list, id) {
+            // כתבו כאן
+          }
+
+          console.log(addTodo(todos, 'לרוץ'));
+          console.log(removeTodo(todos, 1));
+          console.log(toggleTodo(todos, 2));
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const todos = [
+            { id: 1, text: 'לקנות חלב', done: false },
+            { id: 2, text: 'ללמוד map', done: true },
+          ];
+
+          function addTodo(list, text) {
+            const maxId = list.reduce((max, t) => Math.max(max, t.id), 0);
+            return [...list, { id: maxId + 1, text, done: false }];
+          }
+
+          function removeTodo(list, id) {
+            return list.filter((t) => t.id !== id);
+          }
+
+          function toggleTodo(list, id) {
+            return list.map((t) => (t.id === id ? { ...t, done: !t.done } : t));
+          }
+
+          console.log(addTodo(todos, 'לרוץ'));
+          console.log(removeTodo(todos, 1));
+          console.log(toggleTodo(todos, 2));
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-todos': (out, win) => {
+            const get = (name) => win.eval(`typeof ${name} === "function" ? ${name} : null`);
+            const add = get('addTodo');
+            const remove = get('removeTodo');
+            const toggle = get('toggleTodo');
+            const fresh = () => [{ id: 3, text: 'א', done: false }, { id: 7, text: 'ב', done: true }];
+            const try_ = (fn) => { try { return fn(); } catch { return null; } };
+            const ids = (list) => (Array.isArray(list) ? list.map((t) => t.id).join(',') : '');
+
+            const a = fresh(); const aBefore = JSON.stringify(a);
+            const added = add && try_(() => add(a, 'ג'));
+            const r = fresh(); const rBefore = JSON.stringify(r);
+            const removed = remove && try_(() => remove(r, 3));
+            const t = fresh(); const tBefore = JSON.stringify(t);
+            const toggled = toggle && try_(() => toggle(t, 7));
+            const toggledAgain = toggle && try_(() => toggle(fresh(), 3));
+
+            return [
+              [add && remove && toggle, 'צריך שלוש פונקציות: addTodo, removeTodo ו-toggleTodo'],
+              [ids(added) === '3,7,8', 'addTodo צריכה להוסיף בסוף משימה עם id גדול באחד מה-id הכי גדול (ברשימה עם 3 ו-7, ה-id החדש הוא 8)'],
+              [added && added[2] && added[2].text === 'ג' && added[2].done === false, 'למשימה החדשה צריך להיות הטקסט שהתקבל ו-done: false'],
+              [add && try_(() => ids(add([], 'x'))) === '1', 'ברשימה ריקה, ה-id של המשימה החדשה הוא 1'],
+              [JSON.stringify(a) === aBefore && added !== a, 'addTodo שינתה את המערך המקורי. במקום push, החזירו [...list, חדשה].'],
+              [ids(removed) === '7', 'removeTodo(list, 3) צריכה להשאיר רק את המשימה עם id 7'],
+              [JSON.stringify(r) === rBefore, 'removeTodo שינתה את המערך המקורי. השתמשו ב-filter.'],
+              [toggled && toggled[1] && toggled[1].done === false && toggled[0].done === false, 'toggleTodo(list, 7) צריכה להפוך את done של משימה 7 מ-true ל-false, ולא לגעת באחרות'],
+              [toggledAgain && toggledAgain[0] && toggledAgain[0].done === true, 'toggleTodo צריכה לעבוד גם מ-false ל-true'],
+              [JSON.stringify(t) === tBefore, 'toggleTodo שינתה את המשימה המקורית. צרו אובייקט חדש עם { ...t, done: !t.done }.'],
+            ];
+          },
+        });
+      </script>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 איזו מהשורות האלה <strong>משנה</strong> את המערך <code>items</code>?</p>
+        <ul>
+          <li>‏<code>const a = items.filter((i) =&gt; i.done);</code></li>
+          <li>‏<code>const b = [...items, newItem];</code></li>
+          <li data-correct>‏<code>const c = items.reverse();</code></li>
+          <li>‏<code>const d = items.map((i) =&gt; ({ ...i, done: true }));</code></li>
+        </ul>
+        <p class="quiz-explain">‏<code>reverse</code>, כמו <code>sort</code>, ‏<code>push</code> ו-<code>splice</code>, הופכת את המערך המקורי עצמו. אחרי השורה הזו גם <code>items</code> וגם <code>c</code> הפוכים, כי הם בעצם אותו מערך. כדי לא לשנות: <code>[...items].reverse()</code> או <code>items.toReversed()</code>.</p>
+      </div>
+
+      <h2 id="strings">מחרוזות: split, ‏map ו-join <span class="time">4 דק׳</span></h2>
+      <p>לשיטות של מערכים יש שימוש מפתיע גם על טקסט. הטריק: הופכים את המחרוזת למערך, עובדים על המערך, ומחזירים אותו למחרוזת.</p>
+      <ul>
+        <li>‏<code>str.split(' ')</code> חותכת את המחרוזת בכל רווח, ומחזירה מערך של חלקים.</li>
+        <li>‏<code>arr.join(' ')</code> עושה את ההפך: מדביקה את כל האיברים למחרוזת אחת, עם רווח ביניהם.</li>
+      </ul>
+      <div class="flow">
+        <span class="node">'hello big world'</span><span class="arrow">←</span><span class="node">split(' ')<small>['hello', 'big', 'world']</small></span><span class="arrow">←</span><span class="node">map<small>['Hello', 'Big', 'World']</small></span><span class="arrow">←</span><span class="node">join(' ')<small>'Hello Big World'</small></span>
+      </div>
+      <div class="playground" id="pg-split-join" data-height="340">
+        <script type="text/plain" data-lang="js">
+          const title = 'hello big world';
+
+          const words = title.split(' ');
+          console.log(words);
+
+          // אות ראשונה גדולה, ועוד שאר המילה
+          const capitalized = words.map((w) => w[0].toUpperCase() + w.slice(1));
+          console.log(capitalized.join(' '));
+
+          // אותו דבר בשרשרת אחת
+          console.log(title.split(' ').map((w) => w.length).join(', '));
+
+          // הפיכת סדר המילים
+          console.log(title.split(' ').reverse().join(' '));
+
+          // split('') מפרקת לאותיות בודדות
+          console.log('abc'.split(''));
+        </script>
+      </div>
+      <p>‏<code>reverse</code> כאן לא מזיקה, כי היא הופכת מערך חדש ש-<code>split</code> יצרה. המחרוזת <code>title</code> לא השתנתה (ובכלל, מחרוזות ב-JavaScript אף פעם לא משתנות).</p>
+
+      <h2 id="mistakes">טעויות נפוצות <span class="time">2 דק׳</span></h2>
+      <table>
+        <tr><th>מה כתבתם</th><th>מה קורה</th><th>התיקון</th></tr>
+        <tr><td><code>nums.map((n) =&gt; { n * 2 })</code></td><td>מערך מלא ב-<code>undefined</code>: יש סוגריים מסולסלים בלי <code>return</code></td><td><code>(n) =&gt; n * 2</code> או <code>{ return n * 2; }</code></td></tr>
+        <tr><td><code>list.map((s) =&gt; { name: s.name })</code></td><td><code>undefined</code>: ‏JavaScript חושבת שהסוגריים הם גוף פונקציה</td><td>עוטפים בסוגריים עגולים: <code>({ name: s.name })</code></td></tr>
+        <tr><td><code>const x = nums.forEach(...)</code></td><td><code>x</code> הוא <code>undefined</code>. ‏forEach לא מחזירה כלום</td><td>אם צריך מערך חדש, השתמשו ב-<code>map</code></td></tr>
+        <tr><td><code>nums.sort()</code> על מספרים</td><td>ממיינת כמו טקסט: <code>[1, 10, 3]</code></td><td><code>nums.sort((a, b) =&gt; a - b)</code></td></tr>
+        <tr><td><code>const sorted = list.sort(...)</code></td><td>גם <code>list</code> המקורי מוין, ובמקרה של React המסך לא יתעדכן</td><td><code>[...list].sort(...)</code> או <code>list.toSorted(...)</code></td></tr>
+        <tr><td><code>reduce((sum, n) =&gt; sum + n)</code> על מערך ריק</td><td>שגיאה: <code>Reduce of empty array with no initial value</code></td><td>תמיד לתת ערך התחלתי: <code>, 0)</code></td></tr>
+        <tr><td><code>list.find(...).name</code></td><td>שגיאה כשלא נמצא כלום, כי <code>undefined.name</code></td><td>לבדוק קודם: <code>if (found) ...</code></td></tr>
+        <tr><td><code>filter((s) =&gt; s.grade = 100)</code></td><td><code>=</code> אחד זו השמה, לא השוואה. כל הסטודנטים "עוברים" ומקבלים 100</td><td><code>===</code></td></tr>
+      </table>
+
+      <h2 id="cheatsheet">דף עזר</h2>
+      <table>
+        <tr><th>שיטה</th><th>שאלה שהיא עונה עליה</th><th>מה מחזירה</th><th>דוגמה</th></tr>
+        <tr><td><code>forEach</code></td><td>"תעשה משהו עם כל אחד"</td><td><code>undefined</code></td><td><code>nums.forEach((n) =&gt; console.log(n))</code></td></tr>
+        <tr><td><code>map</code></td><td>"תהפוך כל אחד למשהו אחר"</td><td>מערך חדש, באותו אורך</td><td><code>nums.map((n) =&gt; n * 2)</code></td></tr>
+        <tr><td><code>filter</code></td><td>"מי מתאים?"</td><td>מערך חדש, אולי קצר יותר</td><td><code>nums.filter((n) =&gt; n &gt; 5)</code></td></tr>
+        <tr><td><code>find</code></td><td>"מי הראשון שמתאים?"</td><td>איבר אחד, או <code>undefined</code></td><td><code>list.find((p) =&gt; p.id === 2)</code></td></tr>
+        <tr><td><code>findIndex</code></td><td>"איפה הוא?"</td><td>מספר, או <code>-1</code></td><td><code>list.findIndex((p) =&gt; p.id === 2)</code></td></tr>
+        <tr><td><code>some</code></td><td>"יש לפחות אחד?"</td><td><code>true</code>/<code>false</code></td><td><code>nums.some((n) =&gt; n &lt; 0)</code></td></tr>
+        <tr><td><code>every</code></td><td>"כולם?"</td><td><code>true</code>/<code>false</code></td><td><code>nums.every((n) =&gt; n &gt; 0)</code></td></tr>
+        <tr><td><code>includes</code></td><td>"הערך הזה נמצא?"</td><td><code>true</code>/<code>false</code></td><td><code>names.includes('דנה')</code></td></tr>
+        <tr><td><code>reduce</code></td><td>"תסכם הכול לערך אחד"</td><td>כל דבר: מספר, אובייקט...</td><td><code>nums.reduce((s, n) =&gt; s + n, 0)</code></td></tr>
+        <tr><td><code>sort</code> ⚠️</td><td>"תסדר"</td><td>אותו מערך, ממוין (משנה!)</td><td><code>[...nums].sort((a, b) =&gt; a - b)</code></td></tr>
+        <tr><td><code>split</code> / <code>join</code></td><td>מחרוזת ↔ מערך</td><td>מערך / מחרוזת</td><td><code>'a b'.split(' ')</code>, ‏<code>arr.join(', ')</code></td></tr>
+      </table>
+
+      <h2 id="summary">סיכום</h2>
+      <ul>
+        <li>שיטות כמו <code>map</code> ו-<code>filter</code> מקבלות <strong>callback</strong>, פונקציה שהן מפעילות על כל איבר בשבילנו. אין צורך לכתוב לולאה, אינדקס או מערך ריק.</li>
+        <li>‏<code>map</code> הופכת כל איבר (אותו אורך), ‏<code>filter</code> בוחרת איברים (אורך קטן או שווה), ‏<code>find</code> מחזירה איבר אחד, ‏<code>some</code>/<code>every</code> עונות כן או לא, ו-<code>reduce</code> מסכמת לערך אחד.</li>
+        <li>אפשר לשרשר: <code>filter</code> ← <code>map</code> ← <code>reduce</code>. כל שלב מקבל את מה שהקודם החזיר.</li>
+        <li>‏<code>sort</code>, ‏<code>push</code>, ‏<code>splice</code> ו-<code>reverse</code> משנות את המערך המקורי. לפני שממיינים, מעתיקים: <code>[...arr].sort(...)</code>.</li>
+        <li>ב-React לא משנים מערכים. שלוש התבניות: הוספה <code>[...items, x]</code>, מחיקה <code>items.filter(...)</code>, עדכון <code>items.map(... ? { ...i, ... } : i)</code>.</li>
+        <li>‏<code>map</code> היא הדרך שבה React מציירת רשימות. בשיעור 4 נראה אותה שוב, הפעם מחזירה תגיות.</li>
+      </ul>
+
+      <div class="box tip">
+        <p><strong>מקורות להעמקה:</strong></p>
+        <ul>
+          <li><a href="https://developer.mozilla.org/he/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank" rel="noopener">MDN: Array</a> (רשימת כל השיטות של מערכים, עם דוגמאות שאפשר להריץ)</li>
+          <li><a href="https://javascript.info/array-methods" target="_blank" rel="noopener">javascript.info: Array methods</a> (הסבר מסודר עם תרגילים ופתרונות)</li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce" target="_blank" rel="noopener">MDN: reduce</a> (עוד דוגמאות ל-reduce, כולל קיבוץ לפי מאפיין)</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>סגירה (2 דק׳).</strong> לשאול את הכיתה: "יש לכם מערך של מוצרים. איזו שיטה תשתמשו כדי (1) לקבל רק את השמות, (2) לקבל רק את הזולים מ-50, (3) למצוא את המוצר עם id 7, (4) לחשב סכום?" אם הכיתה עונה מהר <code>map</code>, ‏<code>filter</code>, ‏<code>find</code>, ‏<code>reduce</code>, המטרה הושגה. אתגרים 5 ו-6 מתאימים לשיעורי בית. אתגר 6 הוא הכנה ישירה לרשימת המשימות שנבנה ב-React בשיעור 5.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

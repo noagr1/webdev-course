@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 3 · חלק א׳: מערכים ואובייקטים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+  <style>
+    /* תרשים "תיבות" של מערך: כל תיבה עם האינדקס שלה מתחת */
+    .array-diagram { display: flex; gap: 4px; direction: ltr; justify-content: center; flex-wrap: wrap; margin: 1.25rem 0; }
+    .array-diagram .cell { display: flex; flex-direction: column; align-items: center; }
+    .array-diagram .val { min-width: 4.5rem; padding: 0.6rem 0.5rem; border: 2px solid var(--primary); border-radius: 8px; background: var(--surface); text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+    .array-diagram .idx { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+    .array-diagram .cell.hl .val { background: var(--primary-soft); border-width: 3px; }
+    .array-diagram .name { align-self: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-inline-end: 0.5rem; }
+  </style>
+</head>
+<body data-page="lesson" data-lesson="3" data-part="data" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 3 · חלק א׳</span>
+      <h1>מערכים ואובייקטים</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 35 דק׳ בכיתה</span>
+        <span class="chip">📚 3–4 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: שיעור 2 (משתנים, תנאים, לולאות ופונקציות)</span>
+      </div>
+
+      <p>בשיעור 2 כל משתנה החזיק ערך <strong>אחד</strong>: שם אחד, מחיר אחד, ציון אחד. אבל באפליקציות אמיתיות יש הרבה נתונים: רשימת מוצרים בחנות, כל ההודעות בצ׳אט, כל הסטודנטים בכיתה. בחלק הזה נלמד את שני "המכלים" שבהם JavaScript שומרת נתונים: <strong>מערך</strong> (רשימה של דברים) ו<strong>אובייקט</strong> (תיאור של דבר אחד, עם כמה תכונות).</p>
+      <p>הנושא הזה חשוב במיוחד לקראת React. כמעט כל מה שמוצג במסך של אפליקציית React מגיע ממערך של אובייקטים: רשימת משימות, כרטיסי מוצרים, תוצאות חיפוש. מי שמרגיש בנוח עם מערכים ואובייקטים, ירגיש בנוח ב-React.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>ליצור מערך, לקרוא ממנו ולשנות אותו, ולהבין למה האינדקס מתחיל ב-0</li>
+          <li>להשתמש בפעולות הנפוצות של מערכים: <code>push</code>, ‏<code>pop</code>, ‏<code>includes</code>, ‏<code>slice</code>, ‏<code>join</code>, ‏<code>split</code> ועוד</li>
+          <li>לעבור על מערך בלולאה, ולחשב ממנו סכום, ממוצע, מקסימום וספירה</li>
+          <li>ליצור אובייקט, לקרוא ולשנות את התכונות שלו</li>
+          <li>לעבוד עם מערך של אובייקטים, צורת הנתונים הנפוצה ביותר בווב</li>
+          <li>להשתמש ב-destructuring וב-spread (<code>...</code>), כמו שעושים ב-React כל הזמן</li>
+          <li>להבין מה זה JSON, הפורמט שבו שרתים שולחים נתונים</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בכל דוגמה יש עורך JavaScript חי. לוחצים <strong>▶ הרצה</strong> (או Ctrl+Enter) ורואים את הפלט. שנו כל דוגמה, הוסיפו <code>console.log</code> והריצו שוב. ככה לומדים.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>תוכנית ל-35 דקות:</strong> 10 דק׳ מערכים (אינדקס מ-0, ‏push/pop, לולאה), 5 דק׳ תבניות סכום/מקסימום על מערך (חזרה על שיעור 2), 10 דק׳ אובייקטים ומערך של אובייקטים, 10 דק׳ destructuring ו-spread. ‏JSON, ‏slice/splice ו-Object.keys לבית. מומלץ לצייר על הלוח את "התיבות" של המערך עם האינדקסים מתחת.</p>
+      </aside>
+
+      <h2 id="why-arrays">למה צריך מערכים? <span class="time">3 דק׳</span></h2>
+      <p>נניח שיש לנו חמישה סטודנטים, ואנחנו רוצים לשמור את השמות שלהם. עם מה שלמדנו עד עכשיו, זה ייראה כך:</p>
+      <div class="playground" id="pg-why" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const student1 = 'דנה';
+          const student2 = 'יוסי';
+          const student3 = 'מוחמד';
+          const student4 = 'נועה';
+          const student5 = 'אבי';
+
+          console.log(student1, student2, student3, student4, student5);
+        </script>
+      </div>
+      <p>זה עובד, אבל מה אם יש 300 סטודנטים? ומה אם סטודנט חדש מצטרף באמצע הסמסטר, ואנחנו לא יודעים מראש כמה יהיו? אי אפשר להמציא משתנה חדש לכל אחד. בשביל זה יש <strong>מערך</strong> (Array): משתנה אחד שמחזיק <strong>רשימה</strong> של ערכים, לפי סדר.</p>
+      <div class="playground" id="pg-why-array" data-height="160">
+        <script type="text/plain" data-lang="js">
+          const students = ['דנה', 'יוסי', 'מוחמד', 'נועה', 'אבי'];
+
+          console.log(students);
+          console.log('יש', students.length, 'סטודנטים');
+        </script>
+      </div>
+      <p>שורה אחת במקום חמש. ‏<code>students.length</code> אומר כמה איברים יש ברשימה, ואם נוסיף סטודנט, המספר יתעדכן לבד.</p>
+
+      <h2 id="create">יצירת מערך וגישה לאיברים <span class="time">7 דק׳</span></h2>
+      <p>יוצרים מערך עם <strong>סוגריים מרובעים</strong> <code>[ ]</code>, ומפרידים בין הערכים בפסיק. כל ערך ברשימה נקרא <strong>איבר</strong> (element). אפשר לשים במערך כל סוג של ערך: מחרוזות, מספרים, בוליאנים, ואפילו מערכים אחרים.</p>
+<pre><code class="language-js">const fruits = ['תפוח', 'בננה', 'תפוז'];   // מערך של מחרוזות
+const grades = [90, 85, 100, 72];            // מערך של מספרים
+const answers = [true, false, true];         // מערך של בוליאנים
+const empty = [];                            // מערך ריק, נמלא אותו אחר כך</code></pre>
+
+      <h3>האינדקס: המיקום של כל איבר</h3>
+      <p>לכל איבר במערך יש מספר מיקום שנקרא <strong>אינדקס</strong> (index). והדבר הכי חשוב לזכור: <strong>האינדקס מתחיל ב-0, לא ב-1.</strong> האיבר הראשון נמצא במקום 0, השני במקום 1, וכן הלאה. אפשר לחשוב על מערך כעל שורה של תיבות ממוספרות:</p>
+
+      <div class="array-diagram" aria-label="תרשים של המערך fruits">
+        <span class="name">fruits =</span>
+        <div class="cell"><div class="val">'תפוח'</div><div class="idx">[0]</div></div>
+        <div class="cell"><div class="val">'בננה'</div><div class="idx">[1]</div></div>
+        <div class="cell"><div class="val">'תפוז'</div><div class="idx">[2]</div></div>
+      </div>
+
+      <p>כדי לקרוא איבר, כותבים את שם המערך ואחריו את האינדקס בסוגריים מרובעים: <code>fruits[0]</code>. (זה בדיוק מה שעשינו בשיעור 2 עם מחרוזות: <code>'שלום'[0]</code> נתן את האות הראשונה.)</p>
+      <div class="playground" id="pg-index" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const fruits = ['תפוח', 'בננה', 'תפוז'];
+
+          console.log(fruits[0]);   // האיבר הראשון
+          console.log(fruits[1]);   // השני
+          console.log(fruits[2]);   // השלישי
+          console.log(fruits[3]);   // אין איבר כזה!
+          console.log(fruits.length);
+        </script>
+      </div>
+      <p>שימו לב לשתי שורות:</p>
+      <ul>
+        <li><code>fruits[3]</code> מחזיר <code>undefined</code>. אין במערך איבר רביעי, ו-JavaScript לא נותנת שגיאה, אלא מחזירה "לא מוגדר". זה מקור נפוץ לבאגים: אם ראיתם <code>undefined</code> במקום שציפיתם לערך, בדקו את האינדקס.</li>
+        <li><code>fruits.length</code> הוא 3, אבל האינדקס האחרון הוא <strong>2</strong>. תמיד: האינדקס האחרון = <code>length - 1</code>.</li>
+      </ul>
+
+      <h3>האיבר האחרון</h3>
+      <p>כדי להגיע לאיבר האחרון, בלי לדעת כמה איברים יש, משתמשים ב-<code>length - 1</code>. יש גם דרך מודרנית וקצרה יותר: <code>at(-1)</code>, שסופרת מהסוף.</p>
+      <div class="playground" id="pg-last" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const colors = ['אדום', 'ירוק', 'כחול', 'צהוב'];
+
+          console.log(colors[colors.length - 1]);  // צהוב
+          console.log(colors.at(-1));              // צהוב (הדרך המודרנית)
+          console.log(colors.at(-2));              // כחול: השני מהסוף
+
+          // נסו להוסיף צבע לרשימה ולהריץ שוב: שתי השורות עדיין מוצאות את האחרון
+        </script>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 במערך <code>const days = ['א', 'ב', 'ג', 'ד', 'ה']</code>, מה הערך של <code>days[days.length - 1]</code>?</p>
+        <ul>
+          <li><code>'ד'</code></li>
+          <li data-correct><code>'ה'</code></li>
+          <li><code>undefined</code></li>
+          <li><code>5</code></li>
+        </ul>
+        <p class="quiz-explain">‏<code>days.length</code> הוא 5, אז <code>days.length - 1</code> הוא 4, והאיבר במקום 4 (החמישי) הוא <code>'ה'</code>. זו הדרך לקבל את האיבר האחרון.</p>
+      </div>
+
+      <h2 id="change">שינוי איברים</h2>
+      <p>כדי לשנות איבר, משתמשים באותו כתיב של קריאה, ואחריו <code>=</code> והערך החדש:</p>
+      <div class="playground" id="pg-change" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const grades = [70, 85, 90];
+          console.log('לפני:', grades);
+
+          grades[0] = 75;      // מתקנים את הציון הראשון
+          grades[2] += 5;      // מוסיפים 5 נקודות פקטור לשלישי
+
+          console.log('אחרי:', grades);
+        </script>
+      </div>
+
+      <div class="box warn">
+        <p><strong>רגע, זה <code>const</code>! איך אפשר לשנות?</strong> בשיעור 2 למדנו ש-<code>const</code> אי אפשר לשנות. זה נכון, אבל רק לגבי <strong>המשתנה עצמו</strong>: אי אפשר לכתוב <code>grades = [1, 2]</code> ולהחליף את כל המערך במערך אחר. את <strong>התוכן</strong> של המערך מותר לשנות. דמיינו קופסה עם תווית "grades": ‏<code>const</code> אומר שהתווית תמיד מודבקת על אותה קופסה, אבל מה שבתוך הקופסה יכול להשתנות. בפועל, מגדירים מערכים כמעט תמיד עם <code>const</code>.</p>
+      </div>
+
+      <h2 id="methods">פעולות על מערך: הוספה, הסרה וחיפוש <span class="time">5 דק׳</span></h2>
+      <p>למערכים יש הרבה <strong>פעולות מובנות</strong> (methods): פונקציות שכותבים אחרי נקודה, כמו <code>fruits.push(...)</code>. הנה החשובות, אחת אחת.</p>
+
+      <h3>‏push ו-pop: בסוף המערך</h3>
+      <p>‏<code>push</code> מוסיף איבר <strong>לסוף</strong> המערך. ‏<code>pop</code> מסיר את האיבר <strong>האחרון</strong> ומחזיר אותו. אלה הפעולות הנפוצות ביותר.</p>
+      <div class="playground" id="pg-push-pop" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const cart = ['חלב', 'לחם'];
+
+          cart.push('ביצים');
+          console.log(cart);            // ['חלב', 'לחם', 'ביצים']
+
+          cart.push('גבינה', 'עגבניות'); // אפשר כמה בבת אחת
+          console.log(cart);
+
+          const removed = cart.pop();
+          console.log('הסרנו:', removed);
+          console.log(cart);
+        </script>
+      </div>
+
+      <h3>‏unshift ו-shift: בתחילת המערך</h3>
+      <p>אותו דבר, אבל בהתחלה: <code>unshift</code> מוסיף איבר <strong>לתחילת</strong> המערך, ו-<code>shift</code> מסיר את <strong>הראשון</strong>. שימו לב שכל שאר האיברים "זזים" ומקבלים אינדקס חדש.</p>
+      <div class="playground" id="pg-shift" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const queue = ['דנה', 'יוסי', 'נועה'];   // תור בקופה
+
+          const first = queue.shift();           // הראשון בתור משלם ויוצא
+          console.log(first, 'יצא/ה מהתור');
+          console.log(queue);                    // יוסי הוא עכשיו במקום 0
+
+          queue.unshift('אבי');                  // מישהו נדחף לראש התור 😤
+          console.log(queue);
+        </script>
+      </div>
+
+      <table>
+        <tr><th>פעולה</th><th>מה עושה</th><th>איפה</th><th>מה מחזירה</th></tr>
+        <tr><td><code>push(x)</code></td><td>מוסיפה</td><td>בסוף</td><td>האורך החדש</td></tr>
+        <tr><td><code>pop()</code></td><td>מסירה</td><td>מהסוף</td><td>האיבר שהוסר</td></tr>
+        <tr><td><code>unshift(x)</code></td><td>מוסיפה</td><td>בהתחלה</td><td>האורך החדש</td></tr>
+        <tr><td><code>shift()</code></td><td>מסירה</td><td>מההתחלה</td><td>האיבר שהוסר</td></tr>
+      </table>
+
+      <h3>‏includes ו-indexOf: האם יש, ואיפה?</h3>
+      <p>‏<code>includes(x)</code> מחזיר <code>true</code> אם הערך נמצא במערך, ו-<code>false</code> אם לא. ‏<code>indexOf(x)</code> מחזיר את <strong>האינדקס</strong> של הערך, או <code>-1</code> אם הוא לא נמצא. אותם שמות כמו במחרוזות משיעור 2.</p>
+      <div class="playground" id="pg-includes" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const allergies = ['בוטנים', 'חלב', 'גלוטן'];
+
+          console.log(allergies.includes('חלב'));      // true
+          console.log(allergies.includes('ביצים'));    // false
+
+          console.log(allergies.indexOf('גלוטן'));     // 2
+          console.log(allergies.indexOf('סויה'));      // -1: לא נמצא
+
+          if (allergies.includes('בוטנים')) {
+            console.log('⚠️ לא להגיש עוגיות חמאת בוטנים!');
+          }
+        </script>
+      </div>
+
+      <h3>‏slice: להעתיק חלק מהמערך</h3>
+      <p>‏<code>slice(start, end)</code> מחזיר <strong>מערך חדש</strong> עם האיברים מ-<code>start</code> ועד <code>end</code>, <strong>לא כולל</strong> <code>end</code>. המערך המקורי לא משתנה. אם לא כותבים <code>end</code>, מקבלים עד הסוף.</p>
+      <div class="playground" id="pg-slice" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const letters = ['a', 'b', 'c', 'd', 'e'];
+
+          console.log(letters.slice(1, 3));   // ['b', 'c']: מקום 1 ו-2, בלי 3
+          console.log(letters.slice(2));      // ['c', 'd', 'e']: מ-2 עד הסוף
+          console.log(letters.slice(0, 2));   // ['a', 'b']: שני הראשונים
+          console.log(letters.slice(-2));     // ['d', 'e']: שני האחרונים
+
+          console.log('המקורי לא השתנה:', letters);
+        </script>
+      </div>
+
+      <h3>‏splice: לחתוך מתוך המערך (זהירות!)</h3>
+      <p>‏<code>splice(start, count)</code> נשמע דומה ל-<code>slice</code>, אבל הוא שונה מאוד: הוא <strong>מוחק</strong> <code>count</code> איברים מהמערך <strong>המקורי</strong>, החל ממקום <code>start</code>, ומחזיר אותם. אפשר גם להכניס איברים חדשים במקומם.</p>
+      <div class="playground" id="pg-splice" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const tasks = ['לקנות חלב', 'להכין שיעורי בית', 'לכבס', 'להתקשר לסבתא'];
+
+          const done = tasks.splice(1, 2);    // מוחק 2 איברים החל ממקום 1
+          console.log('בוצעו:', done);
+          console.log('נשארו:', tasks);       // המקורי השתנה!
+
+          tasks.splice(1, 0, 'לטייל עם הכלב');  // מוחק 0, ומכניס במקום 1
+          console.log(tasks);
+        </script>
+      </div>
+
+      <div class="box warn">
+        <p><strong>‏slice מול splice:</strong> השמות כמעט זהים, וזה מבלבל גם מתכנתים מנוסים. כלל זיכרון: ‏<strong>slice</strong> (פרוסה) לוקח פרוסה <em>ומשאיר את הלחם שלם</em>: המקורי לא משתנה. ‏<strong>splice</strong> חותך מהמקורי. ב-React נעדיף כמעט תמיד פעולות שלא משנות את המקורי, כמו <code>slice</code>. נבין למה בהמשך העמוד.</p>
+      </div>
+
+      <h3>‏join ו-split: בין מערך למחרוזת</h3>
+      <p>‏<code>join(separator)</code> מחבר את כל איברי המערך <strong>למחרוזת אחת</strong>, עם המפריד שבחרתם ביניהם. הפעולה ההפוכה היא פעולה של מחרוזות: <code>split(separator)</code> מפרקת מחרוזת <strong>למערך</strong>, בכל מקום שבו מופיע המפריד.</p>
+      <div class="playground" id="pg-join-split" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const words = ['JavaScript', 'זה', 'כיף'];
+          console.log(words.join(' '));     // עם רווח
+          console.log(words.join(', '));    // עם פסיק ורווח
+          console.log(words.join(' 🚀 '));  // עם כל מחרוזת שרוצים
+
+          const sentence = 'אני לומד לתכנת';
+          const parts = sentence.split(' ');   // מפרקים בכל רווח
+          console.log(parts);
+          console.log('יש במשפט', parts.length, 'מילים');
+
+          const csv = 'דנה,90,ירושלים';
+          console.log(csv.split(','));         // שורה מקובץ אקסל
+        </script>
+      </div>
+      <p>נסו: כתבו משפט משלכם ב-<code>sentence</code>, והריצו. ואז נסו <code>sentence.split('')</code> (מחרוזת ריקה): מה מקבלים?</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 אחרי <code>const a = [1, 2, 3, 4]; const b = a.slice(1, 3);</code>, מה יש ב-<code>a</code> וב-<code>b</code>?</p>
+        <ul>
+          <li><code>a</code> הוא <code>[1, 4]</code>, ו-<code>b</code> הוא <code>[2, 3]</code></li>
+          <li data-correct><code>a</code> הוא <code>[1, 2, 3, 4]</code>, ו-<code>b</code> הוא <code>[2, 3]</code></li>
+          <li><code>a</code> הוא <code>[1, 2, 3, 4]</code>, ו-<code>b</code> הוא <code>[2, 3, 4]</code></li>
+          <li><code>a</code> הוא <code>[1, 2, 3, 4]</code>, ו-<code>b</code> הוא <code>[1, 2, 3]</code></li>
+        </ul>
+        <p class="quiz-explain">‏<code>slice</code> לא משנה את המקורי, אז <code>a</code> נשאר כמו שהוא. ‏<code>slice(1, 3)</code> לוקח את מקומות 1 ו-2 (בלי 3), כלומר <code>[2, 3]</code>. התשובה הראשונה הייתה נכונה אילו השתמשנו ב-<code>splice(1, 2)</code>.</p>
+      </div>
+
+      <h3>🎯 אתגר 1: רשימת קניות <span class="level easy">קל</span></h3>
+      <p>התחילו מהמערך <code>shopping</code> שבעורך, ובצעו עליו את הפעולות האלה לפי הסדר:</p>
+      <ol>
+        <li>הוסיפו לסוף הרשימה את <code>'קפה'</code>.</li>
+        <li>הוסיפו לתחילת הרשימה את <code>'פירות'</code>.</li>
+        <li>הסירו את האיבר האחרון (אה, כבר יש קפה בבית) ושמרו אותו במשתנה <code>removed</code>.</li>
+        <li>צרו משתנה <code>hasMilk</code> שאומר אם יש <code>'חלב'</code> ברשימה (true/false), בעזרת פעולה, לא ידנית.</li>
+        <li>צרו משתנה <code>text</code> עם כל הרשימה כמחרוזת אחת, מופרדת ב-<code>', '</code>, והדפיסו אותו.</li>
+      </ol>
+      <div class="playground challenge" id="ch-shopping" data-check="ch-shopping" data-height="280">
+        <script type="text/plain" data-lang="js">
+          const shopping = ['חלב', 'לחם', 'ביצים'];
+
+          // 1. הוסיפו 'קפה' לסוף
+
+          // 2. הוסיפו 'פירות' להתחלה
+
+          // 3. הסירו את האחרון ושמרו ב-removed
+
+          // 4. hasMilk
+
+          // 5. text
+
+          console.log(shopping);
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const shopping = ['חלב', 'לחם', 'ביצים'];
+
+          shopping.push('קפה');
+          shopping.unshift('פירות');
+          const removed = shopping.pop();
+          const hasMilk = shopping.includes('חלב');
+          const text = shopping.join(', ');
+
+          console.log(shopping);
+          console.log(removed, hasMilk);
+          console.log(text);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-shopping': (out, win) => {
+            const get = (name) => win.eval(`typeof ${name} === 'undefined' ? undefined : ${name}`);
+            const list = get('shopping');
+            const removed = get('removed');
+            const hasMilk = get('hasMilk');
+            const text = get('text');
+            return [
+              [JSON.stringify(list) === JSON.stringify(['פירות', 'חלב', 'לחם', 'ביצים']), "בסוף, shopping צריך להיות ['פירות', 'חלב', 'לחם', 'ביצים']"],
+              [removed === 'קפה', "removed צריך להכיל את מה שהוסר, 'קפה'. השתמשו ב-pop ושמרו את מה שהוא מחזיר"],
+              [hasMilk === true, 'hasMilk צריך להיות true. השתמשו ב-includes'],
+              [/includes|indexOf/.test(out.code), 'את hasMilk חשבו בעזרת includes, לא ידנית'],
+              [text === 'פירות, חלב, לחם, ביצים', "text צריך להיות 'פירות, חלב, לחם, ביצים'. השתמשו ב-join(', ')"],
+              [out.logs.includes('פירות, חלב, לחם, ביצים'), 'הדפיסו את text עם console.log'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="loops">לעבור על מערך בלולאה <span class="time">5 דק׳</span></h2>
+      <p>הכוח האמיתי של מערכים מגיע יחד עם לולאות: כותבים קוד <strong>פעם אחת</strong>, והוא רץ על <strong>כל</strong> איבר, לא משנה כמה איברים יש. יש שתי דרכים עיקריות.</p>
+
+      <h3>דרך 1: ‏for עם אינדקס</h3>
+      <p>זו לולאת ה-<code>for</code> מחלק ב׳ של שיעור 2. המונה <code>i</code> מתחיל ב-0 (האינדקס הראשון), ורץ כל עוד הוא <strong>קטן מ-</strong><code>length</code>. בכל סיבוב, <code>students[i]</code> הוא האיבר הנוכחי:</p>
+      <div class="playground" id="pg-for-index" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const students = ['דנה', 'יוסי', 'מוחמד', 'נועה'];
+
+          for (let i = 0; i < students.length; i++) {
+            console.log(`סטודנט/ית מספר ${i + 1}: ${students[i]}`);
+          }
+        </script>
+      </div>
+      <table>
+        <tr><th>סיבוב</th><th><code>i</code></th><th><code>i &lt; 4</code>?</th><th><code>students[i]</code></th><th>מה מודפס</th></tr>
+        <tr><td>1</td><td>0</td><td>כן</td><td>'דנה'</td><td>סטודנט/ית מספר 1: דנה</td></tr>
+        <tr><td>2</td><td>1</td><td>כן</td><td>'יוסי'</td><td>סטודנט/ית מספר 2: יוסי</td></tr>
+        <tr><td>3</td><td>2</td><td>כן</td><td>'מוחמד'</td><td>סטודנט/ית מספר 3: מוחמד</td></tr>
+        <tr><td>4</td><td>3</td><td>כן</td><td>'נועה'</td><td>סטודנט/ית מספר 4: נועה</td></tr>
+        <tr><td>—</td><td>4</td><td>לא, עוצרים</td><td colspan="2">הלולאה נגמרת</td></tr>
+      </table>
+      <div class="box warn">
+        <p><strong>‏<code>&lt;</code> ולא <code>&lt;=</code>!</strong> אם תכתבו <code>i &lt;= students.length</code>, הלולאה תרוץ סיבוב אחד יותר מדי, ו-<code>students[4]</code> יהיה <code>undefined</code>. נסו את זה בעורך ותראו.</p>
+      </div>
+
+      <h3>דרך 2: ‏for...of, כשלא צריך את האינדקס</h3>
+      <p>ב-<code>for...of</code> לא צריך מונה בכלל. בכל סיבוב, המשתנה מקבל ישר את <strong>האיבר הבא</strong>. זה קצר וקריא יותר, ולכן זו הדרך המומלצת כשלא צריך לדעת באיזה מקום אנחנו:</p>
+      <div class="playground" id="pg-for-of" data-height="180">
+        <script type="text/plain" data-lang="js">
+          const students = ['דנה', 'יוסי', 'מוחמד', 'נועה'];
+
+          for (const student of students) {
+            console.log('שלום ' + student + '!');
+          }
+        </script>
+      </div>
+      <p>קוראים את זה כך: "<em>לכל student מתוך students</em>". נהוג לקרוא למערך בשם ברבים (<code>students</code>) ולאיבר בודד ביחיד (<code>student</code>). זה עוזר להבין את הקוד.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מתי עדיף <code>for</code> עם אינדקס על <code>for...of</code>?</p>
+        <ul>
+          <li>תמיד, כי הוא מהיר יותר</li>
+          <li data-correct>כשצריך לדעת את המיקום של האיבר, למשל כדי להדפיס מספר סידורי או להשוות לאיבר הקודם</li>
+          <li>כשהמערך מכיל מחרוזות</li>
+          <li>אף פעם, <code>for</code> עם אינדקס כבר לא בשימוש</li>
+        </ul>
+        <p class="quiz-explain">‏<code>for...of</code> נותן רק את האיבר. אם צריך את המספר <code>i</code> (לדוגמה "מקום 3"), או לגשת לאיבר שלפני/אחרי, משתמשים ב-<code>for</code> הרגיל.</p>
+      </div>
+
+      <h2 id="patterns">תבניות נפוצות: סכום, ממוצע, מקסימום וספירה <span class="time">5 דק׳</span></h2>
+      <p>בשיעור 2 למדנו תבניות של לולאות: לצבור סכום, לספור, למצוא מקסימום. עכשיו נפעיל אותן על מערכים. אלה התבניות שתכתבו הכי הרבה, ובחלק הבא נלמד דרכים קצרות יותר לכתוב אותן.</p>
+
+      <h3>סכום וממוצע</h3>
+      <p>מתחילים ממשתנה <code>sum = 0</code>, ובכל סיבוב מוסיפים לו את האיבר הנוכחי. הממוצע הוא הסכום חלקי מספר האיברים:</p>
+      <div class="playground" id="pg-sum" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const grades = [90, 75, 100, 82, 68];
+
+          let sum = 0;
+          for (const grade of grades) {
+            sum += grade;
+          }
+
+          const average = sum / grades.length;
+          console.log('סכום:', sum);          // 415
+          console.log('ממוצע:', average);     // 83
+        </script>
+      </div>
+
+      <h3>מקסימום</h3>
+      <p>מניחים שהאיבר <strong>הראשון</strong> הוא הגדול ביותר, ועוברים על כל השאר: אם מוצאים גדול ממנו, מחליפים. (למה לא להתחיל מ-0? כי אם כל המספרים שליליים, 0 "ינצח" בטעות.)</p>
+      <div class="playground" id="pg-max" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const temperatures = [22, 28, 31, 25, 19, 30];
+
+          let max = temperatures[0];
+          for (const t of temperatures) {
+            if (t > max) {
+              max = t;
+            }
+          }
+
+          console.log('הטמפרטורה הגבוהה ביותר השבוע:', max);  // 31
+        </script>
+      </div>
+
+      <h3>ספירה, וסינון ידני למערך חדש</h3>
+      <p>לפעמים רוצים לספור כמה איברים עונים על תנאי, או ליצור <strong>מערך חדש</strong> רק עם האיברים האלה. מתחילים ממערך ריק, ובכל פעם שהתנאי מתקיים עושים <code>push</code>:</p>
+      <div class="playground" id="pg-count-filter" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const grades = [90, 45, 100, 52, 68, 30];
+
+          let failedCount = 0;
+          const passed = [];          // מערך חדש וריק
+
+          for (const grade of grades) {
+            if (grade >= 56) {
+              passed.push(grade);     // עבר: מוסיפים לרשימה החדשה
+            } else {
+              failedCount++;          // נכשל: סופרים
+            }
+          }
+
+          console.log('עברו:', passed);            // [90, 100, 68]
+          console.log('נכשלו:', failedCount);      // 3
+          console.log('המקורי לא השתנה:', grades);
+        </script>
+      </div>
+      <p>שימו לב: לא שינינו את <code>grades</code>, אלא יצרנו מערך <strong>חדש</strong>. בחלק הבא תגלו שיש לזה פעולה מוכנה, <code>filter</code>, שעושה בדיוק את זה בשורה אחת. אבל כדאי להבין קודם מה קורה "מתחת למכסה".</p>
+
+      <h3>🎯 אתגר 2: ממוצע ציונים <span class="level easy">קל</span></h3>
+      <p>כתבו פונקציה <code>getAverage(grades)</code> שמקבלת מערך של ציונים ומחזירה את הממוצע שלהם. אם המערך ריק, החזירו <code>0</code> (אחרת תקבלו חילוק ב-0, ו-JavaScript תחזיר <code>NaN</code>).</p>
+      <div class="playground challenge" id="ch-average" data-check="ch-average" data-height="260">
+        <script type="text/plain" data-lang="js">
+          function getAverage(grades) {
+            // כתבו כאן
+          }
+
+          console.log(getAverage([90, 80, 70]));   // 80
+          console.log(getAverage([100]));          // 100
+          console.log(getAverage([]));             // 0
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function getAverage(grades) {
+            if (grades.length === 0) {
+              return 0;
+            }
+            let sum = 0;
+            for (const grade of grades) {
+              sum += grade;
+            }
+            return sum / grades.length;
+          }
+
+          console.log(getAverage([90, 80, 70]));   // 80
+          console.log(getAverage([100]));          // 100
+          console.log(getAverage([]));             // 0
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-average': (out, win) => {
+            const fn = win.eval('typeof getAverage === "function" ? getAverage : null');
+            // את מערכי הבדיקה יוצרים בתוך חלון העורך, כדי שיתנהגו כמו מערכים שהסטודנטים יצרו
+            const cases = win.eval('[[[90, 80, 70], 80], [[100], 100], [[50, 100], 75], [[1, 2, 3, 4], 2.5], [[0, 0], 0], [[], 0]]');
+            const wrong = fn ? cases.filter(([arr, expected]) => fn(arr) !== expected) : cases;
+            return [
+              [fn, 'לא מצאתי פונקציה בשם getAverage'],
+              [fn && fn(win.eval('[90, 80, 70]')) !== undefined, 'הפונקציה מחזירה undefined. שכחתם return?'],
+              [fn && fn(win.eval('[]')) === 0, 'עבור מערך ריק צריך להחזיר 0 (בדקו את grades.length לפני שמחלקים)'],
+              [!wrong.length, `התשובה לא נכונה עבור: ${wrong.map(([arr]) => `[${arr.join(', ')}]`).join(' ')}`],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="references">מלכודת: מערך הוא "הפניה"</h2>
+      <p>עם מספרים ומחרוזות, <code>let b = a</code> יוצר <strong>עותק</strong>: שינוי של <code>b</code> לא משפיע על <code>a</code>. עם מערכים (ואובייקטים, שנלמד מיד) זה <strong>לא</strong> ככה. הריצו ותופתעו:</p>
+      <div class="playground" id="pg-reference" data-height="240">
+        <script type="text/plain" data-lang="js">
+          // מספרים: עותק
+          let a = 5;
+          let b = a;
+          b = 10;
+          console.log('a:', a, 'b:', b);       // a לא השתנה
+
+          // מערכים: אותו מערך!
+          const original = ['🍎', '🍌'];
+          const copy = original;
+          copy.push('🍊');
+          console.log('original:', original);  // גם הוא השתנה! 😱
+          console.log('copy:', copy);
+        </script>
+      </div>
+      <p>למה? משתנה של מערך לא מחזיק את המערך עצמו, אלא <strong>הפניה</strong> (reference) אליו: מעין "כתובת" של המקום בזיכרון שבו המערך נמצא. ‏<code>const copy = original</code> מעתיק את <strong>הכתובת</strong>, לא את המערך. עכשיו יש שתי תוויות שמודבקות על <strong>אותה קופסה</strong>, ומה שמכניסים דרך אחת, רואים גם דרך השנייה.</p>
+      <div class="flow">
+        <span class="node">original</span><span class="arrow">←</span><span class="node">📦 ['🍎', '🍌', '🍊']<small>מערך אחד בזיכרון</small></span><span class="arrow">→</span><span class="node">copy</span>
+      </div>
+      <p>אז איך יוצרים <strong>עותק אמיתי</strong>? הדרך המודרנית היא עם שלוש נקודות, <code>[...original]</code>, שנקראת spread. נלמד אותה לעומק בהמשך העמוד, אבל הנה טעימה:</p>
+      <div class="playground" id="pg-real-copy" data-height="180">
+        <script type="text/plain" data-lang="js">
+          const original = ['🍎', '🍌'];
+          const copy = [...original];   // מערך חדש עם אותם איברים
+          copy.push('🍊');
+
+          console.log('original:', original);  // לא השתנה 🙂
+          console.log('copy:', copy);
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>למה זה חשוב ל-React?</strong> ‏React מחליטה אם לצייר מחדש את המסך לפי השאלה "האם זה מערך <em>חדש</em>?". אם משנים את המערך הקיים עם <code>push</code>, ‏React לא תמיד שמה לב, והמסך לא מתעדכן. לכן ב-React יוצרים תמיד <strong>עותק</strong> עם השינוי. זוכרים את המלכודת הזו, ונחזור אליה.</p>
+      </div>
+
+      <h2 id="objects">אובייקטים: תיאור של דבר אחד <span class="time">10 דק׳</span></h2>
+      <p>מערך הוא רשימה של דברים <strong>מאותו סוג</strong>: רשימת שמות, רשימת ציונים. אבל מה אם רוצים לתאר <strong>סטודנטית אחת</strong>, עם שם, גיל, עיר וציון? אפשר לנסות מערך, <code>['דנה', 22, 'חיפה', 95]</code>, אבל אז צריך לזכור ש-<code>[2]</code> זו העיר. זה לא קריא, וקל לטעות.</p>
+      <p>בשביל זה יש <strong>אובייקט</strong> (Object): אוסף של <strong>תכונות</strong> (properties), ולכל תכונה יש <strong>שם</strong> (מפתח, key) ו<strong>ערך</strong> (value). יוצרים אובייקט עם <strong>סוגריים מסולסלים</strong> <code>{ }</code>:</p>
+<pre><code class="language-js">const student = {
+  name: 'דנה',
+  age: 22,
+  city: 'חיפה',
+  grade: 95,
+  isActive: true,
+};</code></pre>
+      <table>
+        <tr><th>חלק</th><th>בדוגמה</th><th>הסבר</th></tr>
+        <tr><td>מפתח (key)</td><td><code>name</code></td><td>השם של התכונה. באנגלית, ‏camelCase, כמו שם של משתנה.</td></tr>
+        <tr><td>נקודתיים</td><td><code>:</code></td><td>מפרידות בין המפתח לערך.</td></tr>
+        <tr><td>ערך (value)</td><td><code>'דנה'</code></td><td>כל סוג של ערך: מחרוזת, מספר, בוליאני, מערך, ואפילו אובייקט אחר.</td></tr>
+        <tr><td>פסיק</td><td><code>,</code></td><td>מפריד בין תכונות. מותר (ומומלץ) גם פסיק אחרי האחרונה.</td></tr>
+      </table>
+      <p>ההבדל בין מערך לאובייקט, במשפט אחד: <strong>במערך ניגשים לפי מיקום</strong> (<code>[0]</code>, <code>[1]</code>), <strong>באובייקט ניגשים לפי שם</strong> (<code>.name</code>, <code>.age</code>).</p>
+
+      <h3>קריאת תכונות: נקודה</h3>
+      <p>הדרך הרגילה לקרוא תכונה היא שם האובייקט, נקודה, ושם התכונה. (זה בדיוק מה שעשיתם כל הזמן עם <code>fruits.length</code> ו-<code>console.log</code>: גם הם תכונות של אובייקטים!)</p>
+      <div class="playground" id="pg-object-read" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const student = {
+            name: 'דנה',
+            age: 22,
+            city: 'חיפה',
+            grade: 95,
+          };
+
+          console.log(student);
+          console.log(student.name);
+          console.log(`${student.name} בת ${student.age}, גרה ב${student.city}`);
+          console.log(student.phone);   // תכונה שלא קיימת: undefined
+        </script>
+      </div>
+
+      <h3>קריאה עם סוגריים מרובעים</h3>
+      <p>יש דרך נוספת: <code>student['name']</code>, עם שם התכונה כמחרוזת. בדרך כלל משתמשים בנקודה, כי היא קצרה. סוגריים מרובעים צריך כשהשם של התכונה נמצא <strong>בתוך משתנה</strong>:</p>
+      <div class="playground" id="pg-bracket" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const product = { name: 'מקלדת', price: 250, stock: 12 };
+
+          console.log(product['price']);    // כמו product.price
+
+          const field = 'stock';            // שם התכונה נמצא במשתנה
+          console.log(product[field]);      // 12
+          console.log(product.field);       // undefined! מחפש תכונה שנקראת "field"
+
+          // נסו לשנות את field ל-'name' ולהריץ שוב
+        </script>
+      </div>
+
+      <h3>שינוי, הוספה ומחיקה של תכונות</h3>
+      <p>כמו במערכים, גם אובייקט שהוגדר עם <code>const</code> אפשר לשנות מבפנים. אם כותבים לתכונה שלא קיימת, היא <strong>נוצרת</strong>. ‏<code>delete</code> מוחק תכונה.</p>
+      <div class="playground" id="pg-object-change" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const user = { name: 'יוסי', age: 30 };
+
+          user.age = 31;                 // שינוי (יום הולדת שמח!)
+          user.email = 'yossi@mail.com'; // הוספה: התכונה לא הייתה קיימת
+          console.log(user);
+
+          delete user.email;             // מחיקה
+          console.log(user);
+
+          console.log('age' in user);    // האם יש תכונה כזו? true
+        </script>
+      </div>
+
+      <h3>אובייקטים מקוננים ומערכים בתוך אובייקטים</h3>
+      <p>ערך של תכונה יכול להיות בעצמו מערך או אובייקט. ככה מתארים מידע מורכב. כדי להגיע פנימה, פשוט ממשיכים לשרשר נקודות וסוגריים:</p>
+      <div class="playground" id="pg-nested" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const course = {
+            title: 'פיתוח ווב מודרני',
+            lecturer: {
+              name: 'ד״ר כהן',
+              email: 'cohen@college.ac.il',
+            },
+            topics: ['HTML', 'CSS', 'JavaScript', 'React'],
+            lessons: 10,
+          };
+
+          console.log(course.lecturer.name);    // אובייקט בתוך אובייקט
+          console.log(course.topics[3]);        // מערך בתוך אובייקט
+          console.log(course.topics.length);    // 4
+          console.log(`בקורס "${course.title}" יש ${course.lessons} שיעורים`);
+        </script>
+      </div>
+
+      <h3>מתודות: פונקציה בתוך אובייקט (בקצרה)</h3>
+      <p>ערך של תכונה יכול להיות גם <strong>פונקציה</strong>. פונקציה כזו נקראת <strong>מתודה</strong> (method). ‏<code>console.log</code> היא בדיוק זה: המתודה <code>log</code> של האובייקט <code>console</code>.</p>
+      <div class="playground" id="pg-method" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const calculator = {
+            brand: 'Casio',
+            add: (a, b) => a + b,
+            multiply: (a, b) => a * b,
+          };
+
+          console.log(calculator.add(2, 3));       // 5
+          console.log(calculator.multiply(4, 5));  // 20
+        </script>
+      </div>
+      <p>לא נכתוב הרבה מתודות בעצמנו בקורס הזה, כי ב-React עובדים בעיקר עם פונקציות רגילות ואובייקטים של נתונים. אבל חשוב לזהות את התחביר.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 נתון <code>const car = { brand: 'Mazda', year: 2020 }</code> ו-<code>const key = 'year'</code>. מה מדפיס <code>console.log(car.key)</code>?</p>
+        <ul>
+          <li><code>2020</code></li>
+          <li><code>'year'</code></li>
+          <li data-correct><code>undefined</code></li>
+          <li>שגיאה</li>
+        </ul>
+        <p class="quiz-explain">‏<code>car.key</code> מחפש תכונה ששמה ממש <code>"key"</code>, ואין כזו, אז מתקבל <code>undefined</code>. כדי להשתמש בערך שבתוך המשתנה <code>key</code>, כותבים <code>car[key]</code>, ואז מקבלים <code>2020</code>.</p>
+      </div>
+
+      <h3>מעבר על כל התכונות: Object.keys, values, entries</h3>
+<p>אי אפשר לרוץ על אובייקט עם <code>for...of</code> כמו על מערך. במקום זה, הופכים אותו קודם <strong>למערך</strong> בעזרת אחת משלוש פונקציות:</p>
+      <table>
+        <tr><th>פונקציה</th><th>מחזירה</th><th>עבור <code>{ a: 1, b: 2 }</code></th></tr>
+        <tr><td><code>Object.keys(obj)</code></td><td>מערך של המפתחות</td><td><code>['a', 'b']</code></td></tr>
+        <tr><td><code>Object.values(obj)</code></td><td>מערך של הערכים</td><td><code>[1, 2]</code></td></tr>
+        <tr><td><code>Object.entries(obj)</code></td><td>מערך של זוגות [מפתח, ערך]</td><td><code>[['a', 1], ['b', 2]]</code></td></tr>
+      </table>
+      <div class="playground" id="pg-keys" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const prices = { coffee: 12, tea: 9, cake: 18 };
+
+          console.log(Object.keys(prices));     // ['coffee', 'tea', 'cake']
+          console.log(Object.values(prices));   // [12, 9, 18]
+          console.log('כמה מוצרים?', Object.keys(prices).length);
+
+          // סכום כל המחירים: לולאה רגילה על מערך הערכים
+          let total = 0;
+          for (const price of Object.values(prices)) {
+            total += price;
+          }
+          console.log('סה״כ:', total);           // 39
+
+          // entries: גם המפתח וגם הערך
+          for (const [item, price] of Object.entries(prices)) {
+            console.log(`${item}: ${price} ₪`);
+          }
+        </script>
+      </div>
+      <p>את התחביר <code>const [item, price]</code> בשורה האחרונה (פירוק, destructuring) נסביר בהמשך העמוד. בינתיים: הוא מוציא את שני האיברים של כל זוג לשני משתנים.</p>
+      <p>יש גם לולאה מיוחדת לאובייקטים, <code>for...in</code>, שעוברת על <strong>המפתחות</strong>. היא עובדת, אבל היום רוב המתכנתים מעדיפים את <code>Object.keys</code> / <code>Object.entries</code>, אז מספיק שתזהו אותה:</p>
+      <div class="playground" id="pg-for-in" data-height="160">
+        <script type="text/plain" data-lang="js">
+          const prices = { coffee: 12, tea: 9, cake: 18 };
+
+          for (const key in prices) {
+            console.log(key, '→', prices[key]);   // שימו לב: סוגריים מרובעים, כי key הוא משתנה
+          }
+        </script>
+      </div>
+      <div class="box warn">
+        <p><strong>לא להתבלבל:</strong> ‏<code>for...<strong>of</strong></code> עובר על <strong>ערכים</strong> של מערך. ‏<code>for...<strong>in</strong></code> עובר על <strong>מפתחות</strong> של אובייקט. על מערכים השתמשו תמיד ב-<code>for...of</code>.</p>
+      </div>
+
+      <h3>🎯 אתגר 3: כרטיס סטודנט <span class="level easy">קל</span></h3>
+      <p>צרו אובייקט בשם <code>student</code> עם התכונות:</p>
+      <ul>
+        <li><code>name</code>: מחרוזת (השם שלכם או כל שם)</li>
+        <li><code>age</code>: מספר</li>
+        <li><code>courses</code>: מערך של <strong>לפחות 2</strong> מחרוזות (שמות קורסים)</li>
+      </ul>
+      <p>אחר כך:</p>
+      <ol>
+        <li>הוסיפו לאובייקט (בשורה נפרדת, אחרי היצירה) תכונה בשם <code>city</code>.</li>
+        <li>הדפיסו עם <strong>template literal</strong> שורה בצורה: <code>דנה (22) לומדת 3 קורסים</code>. המספר צריך להגיע מ-<code>courses.length</code>, לא להיכתב ביד.</li>
+      </ol>
+      <div class="playground challenge" id="ch-student" data-height="260" data-check="ch-student">
+        <script type="text/plain" data-lang="js">
+          const student = {
+            name: 'דנה',
+            // השלימו: age ו-courses
+          };
+
+          // הוסיפו כאן את city
+
+          // הדפיסו את השורה עם template literal
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const student = {
+            name: 'דנה',
+            age: 22,
+            courses: ['JavaScript', 'React', 'עיצוב'],
+          };
+
+          student.city = 'חיפה';
+
+          console.log(`${student.name} (${student.age}) לומדת ${student.courses.length} קורסים`);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-student': (out, win) => {
+            const s = win.eval("typeof student === 'undefined' ? undefined : student");
+            const ok = s && typeof s === 'object';
+            const expected = ok && Array.isArray(s.courses) ? `${s.name} (${s.age}) לומדת ${s.courses.length} קורסים` : null;
+            return [
+              [ok, 'צריך ליצור אובייקט בשם student'],
+              [ok && typeof s.name === 'string' && s.name.length > 0, 'ל-student צריכה להיות תכונה name עם מחרוזת'],
+              [ok && typeof s.age === 'number', 'ל-student צריכה להיות תכונה age עם מספר (בלי מרכאות)'],
+              [ok && Array.isArray(s.courses) && s.courses.length >= 2 && s.courses.every(c => typeof c === 'string'), 'courses צריך להיות מערך של לפחות 2 מחרוזות'],
+              [ok && typeof s.city === 'string' && s.city.length > 0, 'הוסיפו ל-student תכונה city עם מחרוזת'],
+              [/student\s*(\.\s*city|\[\s*['"]city['"]\s*\])\s*=/.test(out.code), 'את city צריך להוסיף בשורה נפרדת: student.city = ...'],
+              [/`/.test(out.code) && /courses\s*\.\s*length/.test(out.code), 'השתמשו ב-template literal (גרש הפוך `) וב-courses.length'],
+              [expected !== null && out.logs.some(l => l.trim() === expected), `השורה המודפסת צריכה להיות בדיוק: ${expected || 'שם (גיל) לומדת X קורסים'}`],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="array-of-objects">מערך של אובייקטים: הצורה הכי נפוצה של מידע <span class="time">8 דק׳</span></h2>
+      <p>עכשיו מחברים את שני הנושאים. כמעט כל מידע שתראו באפליקציות אמיתיות נראה כך: <strong>מערך</strong> (רשימה), שבו כל איבר הוא <strong>אובייקט</strong> (פריט אחד עם הפרטים שלו). רשימת מוצרים בחנות, רשימת הודעות בצ׳אט, רשימת סטודנטים בקורס.</p>
+<pre><code class="language-js">const products = [
+  { id: 1, name: 'מקלדת', price: 250, inStock: true },
+  { id: 2, name: 'עכבר',  price: 90,  inStock: false },
+  { id: 3, name: 'מסך',   price: 900, inStock: true },
+];</code></pre>
+      <p>איך קוראים את זה? ‏<code>products[0]</code> הוא האובייקט הראשון (המקלדת), ו-<code>products[0].price</code> הוא המחיר שלו: קודם בוחרים <strong>איזה פריט</strong> (לפי אינדקס), ואז <strong>איזו תכונה</strong> (לפי שם).</p>
+      <div class="box tip">
+        <p><strong>ב-React זה בדיוק ככה:</strong> בשיעורים הבאים ניקח מערך כזה ונצייר ממנו רשימה על המסך, כרטיס לכל מוצר. התכונה <code>id</code> שבכל אובייקט תהיה חשובה מאוד: ‏React משתמשת בה כדי לזהות כל פריט ברשימה.</p>
+      </div>
+      <div class="playground" id="pg-products" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const products = [
+            { id: 1, name: 'מקלדת', price: 250, inStock: true },
+            { id: 2, name: 'עכבר', price: 90, inStock: false },
+            { id: 3, name: 'מסך', price: 900, inStock: true },
+          ];
+
+          console.log(products[0].name);          // מקלדת
+          console.log(products[2].price);         // 900
+          console.log('מספר מוצרים:', products.length);
+
+          // מעבר על כל המוצרים
+          for (const product of products) {
+            const status = product.inStock ? '✅' : '❌ אזל';
+            console.log(`${product.name}: ${product.price} ₪ ${status}`);
+          }
+
+          // נסו להוסיף מוצר רביעי עם push ולהריץ שוב
+        </script>
+      </div>
+
+      <h3>חיפוש פריט לפי תנאי</h3>
+      <p>משימה נפוצה: "תמצא לי את המוצר עם id מספר 3", או "את הסטודנט שקוראים לו נועם". עושים את זה בלולאה עם <code>if</code>, ומחזירים את הפריט ברגע שמוצאים אותו:</p>
+      <div class="playground" id="pg-find" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const students = [
+            { name: 'נועם', grade: 88 },
+            { name: 'שירה', grade: 95 },
+            { name: 'אבי', grade: 72 },
+          ];
+
+          function findStudent(list, name) {
+            for (const student of list) {
+              if (student.name === name) {
+                return student;   // מצאנו! יוצאים מיד מהפונקציה
+              }
+            }
+            return null;          // עברנו על כולם ולא מצאנו
+          }
+
+          console.log(findStudent(students, 'שירה'));   // { name: 'שירה', grade: 95 }
+          console.log(findStudent(students, 'דני'));    // null
+
+          // סכום וממוצע של הציונים: אותה תבנית מקודם, רק עם .grade
+          let sum = 0;
+          for (const s of students) {
+            sum += s.grade;
+          }
+          console.log('ממוצע:', sum / students.length);  // 85
+        </script>
+      </div>
+      <p>בחלק ב׳ נלמד את <code>find</code>, שעושה בדיוק את זה בשורה אחת: <code>students.find(s =&gt; s.name === 'שירה')</code>. כשתראו אותה, תדעו שבפנים יש לולאה כמו זו.</p>
+
+      <h3>🎯 אתגר 4: המוצר היקר ביותר <span class="level medium">בינוני</span></h3>
+      <p>כתבו פונקציה <code>getMostExpensive(products)</code> שמקבלת מערך של מוצרים (כל מוצר הוא אובייקט עם <code>name</code> ו-<code>price</code>) ו<strong>מחזירה</strong> (<code>return</code>) את <strong>האובייקט</strong> של המוצר היקר ביותר. אם המערך ריק, החזירו <code>null</code>.</p>
+      <p>רמז: זו תבנית המקסימום מקודם, אבל במקום לשמור את המספר הגדול ביותר, שומרים את <strong>המוצר</strong> שהמחיר שלו הכי גבוה, ומשווים <code>product.price &gt; best.price</code>.</p>
+      <div class="playground challenge" id="ch-expensive" data-height="320" data-check="ch-expensive">
+        <script type="text/plain" data-lang="js">
+          function getMostExpensive(products) {
+            // השלימו כאן
+          }
+
+          const shop = [
+            { name: 'מקלדת', price: 250 },
+            { name: 'מסך', price: 900 },
+            { name: 'עכבר', price: 90 },
+          ];
+          console.log(getMostExpensive(shop));   // צריך: { name: 'מסך', price: 900 }
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function getMostExpensive(products) {
+            if (products.length === 0) {
+              return null;
+            }
+            let best = products[0];
+            for (const product of products) {
+              if (product.price > best.price) {
+                best = product;
+              }
+            }
+            return best;
+          }
+
+          const shop = [
+            { name: 'מקלדת', price: 250 },
+            { name: 'מסך', price: 900 },
+            { name: 'עכבר', price: 90 },
+          ];
+          console.log(getMostExpensive(shop));   // { name: 'מסך', price: 900 }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-expensive': (out, win) => {
+            const f = win.eval('typeof getMostExpensive === "function" ? getMostExpensive : null');
+            const cases = [
+              ["[{name:'a',price:5},{name:'b',price:50},{name:'c',price:20}]", 1],
+              ["[{name:'a',price:100},{name:'b',price:3}]", 0],
+              ["[{name:'a',price:1},{name:'b',price:2},{name:'c',price:30}]", 2],
+              ["[{name:'יחיד',price:7}]", 0],
+            ];
+            const results = cases.map(([src, idx]) => {
+              if (!f) return false;
+              try { const arr = win.eval(src); return f(arr) === arr[idx]; } catch (e) { return false; }
+            });
+            let empty = false;
+            try { empty = !!f && f(win.eval('[]')) === null; } catch (e) {}
+            return [
+              [!!f, 'צריך להגדיר פונקציה בשם getMostExpensive'],
+              [results[0], 'כשהיקר באמצע: getMostExpensive([{price:5},{price:50},{price:20}]) צריך להחזיר את המוצר עם 50'],
+              [results[1], 'כשהיקר ראשון: האם התחלתם את best מ-products[0]?'],
+              [results[2], 'כשהיקר אחרון: האם הלולאה עוברת על כל המוצרים?'],
+              [results[3], 'עם מוצר יחיד צריך להחזיר אותו'],
+              [empty, 'עבור מערך ריק צריך להחזיר null'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="destructuring">פירוק (Destructuring): להוציא ערכים למשתנים <span class="time">5 דק׳</span></h2>
+      <p>הרבה פעמים כותבים שורות כאלה:</p>
+<pre><code class="language-js">const name = user.name;
+const age = user.age;
+const city = user.city;</code></pre>
+      <p>זה חוזר על עצמו. ל-JavaScript יש קיצור שנקרא <strong>destructuring</strong> (פירוק): כותבים בצד שמאל סוגריים מסולסלים עם שמות התכונות, ומקבלים משתנה לכל אחת:</p>
+<pre><code class="language-js">const { name, age, city } = user;   // אותו דבר בדיוק, בשורה אחת</code></pre>
+      <div class="playground" id="pg-destructure-object" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const user = { name: 'מאיה', age: 27, city: 'תל אביב' };
+
+          const { name, age } = user;
+          console.log(name);   // מאיה
+          console.log(age);    // 27
+
+          // שם אחר למשתנה: התכונה city תיכנס למשתנה בשם town
+          const { city: town } = user;
+          console.log(town);   // תל אביב
+
+          // ערך ברירת מחדל: אם אין תכונה כזו, ייכנס הערך שאחרי =
+          const { phone = 'אין טלפון', name: n } = user;
+          console.log(phone);  // אין טלפון
+          console.log(n);      // מאיה
+        </script>
+      </div>
+      <p>שימו לב: באובייקט, <strong>השמות קובעים</strong>. ‏<code>const { age } = user</code> לוקח את התכונה ששמה <code>age</code>, לא משנה באיזה סדר היא כתובה באובייקט.</p>
+
+      <h3>פירוק של מערך</h3>
+      <p>עם מערך משתמשים בסוגריים <strong>מרובעים</strong>, ומה שקובע הוא <strong>המיקום</strong>: המשתנה הראשון מקבל את האיבר הראשון, וכן הלאה.</p>
+      <div class="playground" id="pg-destructure-array" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const podium = ['שירה', 'נועם', 'אבי', 'דני'];
+
+          const [first, second, third] = podium;
+          console.log('🥇', first, '🥈', second, '🥉', third);
+
+          // מדלגים על איבר עם פסיק ריק
+          const [, , bronze] = podium;
+          console.log(bronze);   // אבי
+
+          // נסו: מה יקבל fifth ב-const [a, b, c, d, fifth] = podium ?
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>תצוגה מקדימה של React:</strong> כשנגיע ל-React תכירו את <code>const [count, setCount] = useState(0)</code>. זה פירוק של מערך! הפונקציה <code>useState</code> מחזירה מערך של שני איברים, ואנחנו נותנים לכל אחד שם.</p>
+      </div>
+
+      <h3>פירוק בפרמטרים של פונקציה</h3>
+      <p>אפשר לפרק אובייקט ישר בתוך הסוגריים של הפונקציה. כך הפונקציה מקבלת אובייקט אחד, ומיד שולפת ממנו את מה שהיא צריכה. זו בדיוק הדרך שבה קומפוננטה ב-React מקבלת את ה-<strong>props</strong> שלה:</p>
+      <div class="playground" id="pg-destructure-params" data-height="280">
+        <script type="text/plain" data-lang="js">
+          // בלי פירוק
+          function describe1(product) {
+            return `${product.name} עולה ${product.price} ₪`;
+          }
+
+          // עם פירוק בפרמטר, כולל ברירת מחדל
+          function describe2({ name, price, currency = '₪' }) {
+            return `${name} עולה ${price} ${currency}`;
+          }
+
+          const keyboard = { name: 'מקלדת', price: 250 };
+          console.log(describe1(keyboard));
+          console.log(describe2(keyboard));
+          console.log(describe2({ name: 'Mouse', price: 25, currency: '$' }));
+
+          // ב-React זה ייראה ככה (רק לקריאה, עוד לא מריצים):
+          // function ProductCard({ name, price }) { return <div>{name}: {price}</div> }
+        </script>
+      </div>
+
+      <h2 id="spread">שלוש נקודות: Spread ו-Rest <span class="time">5 דק׳</span></h2>
+      <p>זוכרים את המלכודת של <code>const copy = original</code>? הפתרון היה <code>[...original]</code>. שלוש הנקודות נקראות <strong>spread</strong> ("פריסה"): הן "שופכות" את כל האיברים של מערך (או את כל התכונות של אובייקט) לתוך מערך או אובייקט <strong>חדש</strong>.</p>
+
+      <h3>spread במערכים</h3>
+      <div class="playground" id="pg-spread-array" data-height="280">
+        <script type="text/plain" data-lang="js">
+          const fruits = ['🍎', '🍌'];
+          const veggies = ['🥕', '🥒'];
+
+          const copy = [...fruits];                    // עותק
+          const all = [...fruits, ...veggies];         // איחוד
+          const more = [...fruits, '🍊'];              // הוספה לסוף, בלי לשנות את fruits
+          const first = ['🍇', ...fruits];             // הוספה להתחלה
+
+          console.log(all);
+          console.log(more);
+          console.log(first);
+          console.log('fruits לא השתנה:', fruits);
+
+          console.log(copy === fruits);   // false: מערך אחר בזיכרון
+        </script>
+      </div>
+
+      <h3>spread באובייקטים</h3>
+      <p>אותו רעיון עובד באובייקטים: <code>{ ...user }</code> יוצר עותק. אם אחרי ה-spread כותבים תכונה, היא <strong>דורסת</strong> את הערך שהגיע מהעותק. ככה "משנים" תכונה בלי לגעת במקור:</p>
+      <div class="playground" id="pg-spread-object" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const user = { name: 'יוסי', age: 30 };
+
+          const older = { ...user, age: 31 };                   // עותק עם age חדש
+          const withEmail = { ...user, email: 'y@mail.com' };   // עותק עם תכונה נוספת
+
+          console.log(older);
+          console.log(withEmail);
+          console.log('user לא השתנה:', user);
+
+          // איחוד של שני אובייקטים: אם יש אותו מפתח, האחרון מנצח
+          const defaults = { theme: 'light', lang: 'he' };
+          const settings = { ...defaults, theme: 'dark' };
+          console.log(settings);   // { theme: 'dark', lang: 'he' }
+        </script>
+      </div>
+
+      <h3>למה React כל כך אוהבת עותקים? (Immutability)</h3>
+      <p>‏<strong>Immutability</strong> ("אי-שינוי") היא הגישה שלפיה <strong>לא משנים</strong> מערך או אובייקט קיים, אלא יוצרים <strong>חדש</strong> עם השינוי. נשמע בזבזני, אבל יש לזה סיבה טובה:</p>
+      <ul>
+        <li>‏React צריכה לדעת מתי המידע השתנה כדי לצייר מחדש את המסך. במקום לבדוק כל איבר ואיבר, היא שואלת שאלה אחת מהירה: "<strong>זה אותו מערך כמו קודם?</strong>" (<code>===</code>).</li>
+        <li>אם עשיתם <code>push</code> על המערך הקיים, התשובה היא "כן, אותו מערך", ו-React חושבת ששום דבר לא השתנה. המסך לא מתעדכן, וזה באג מבלבל מאוד.</li>
+        <li>אם יצרתם מערך חדש עם <code>[...list, item]</code>, התשובה היא "לא", ו-React מעדכנת את המסך.</li>
+      </ul>
+      <table>
+        <tr><th>במקום (משנה את המקור) ❌</th><th>ב-React כותבים (יוצר חדש) ✅</th></tr>
+        <tr><td><code>list.push(item)</code></td><td><code>[...list, item]</code></td></tr>
+        <tr><td><code>list.unshift(item)</code></td><td><code>[item, ...list]</code></td></tr>
+        <tr><td><code>user.age = 31</code></td><td><code>{ ...user, age: 31 }</code></td></tr>
+        <tr><td>הסרה עם <code>splice</code></td><td><code>filter</code> (בחלק ב׳)</td></tr>
+      </table>
+      <div class="box warn">
+        <p><strong>העתקה "רדודה":</strong> ‏spread מעתיק רק את הרמה הראשונה. אם יש באובייקט מערך או אובייקט פנימי, העותק והמקור עדיין <strong>חולקים</strong> אותו. למשל, אחרי <code>const b = { ...a }</code>, שינוי של <code>b.courses.push(...)</code> ישנה גם את <code>a.courses</code>. בינתיים פשוט זכרו שזה קיים.</p>
+      </div>
+
+      <h3>rest: לאסוף את "כל השאר"</h3>
+      <p>אותן שלוש נקודות, בצד <strong>השני</strong>, עושות את ההפך: הן <strong>אוספות</strong> כמה ערכים לתוך מערך אחד. זה נקרא <strong>rest</strong>. משתמשים בזה בפרמטרים של פונקציה (כדי לקבל כמה ארגומנטים שרוצים) ובפירוק:</p>
+      <div class="playground" id="pg-rest" data-height="260">
+        <script type="text/plain" data-lang="js">
+          // rest בפרמטרים: numbers הוא מערך של כל מה שנשלח
+          function sumAll(...numbers) {
+            let total = 0;
+            for (const n of numbers) {
+              total += n;
+            }
+            return total;
+          }
+          console.log(sumAll(1, 2));           // 3
+          console.log(sumAll(5, 10, 15, 20));  // 50
+
+          // rest בפירוק: הראשון לבד, השאר במערך
+          const [winner, ...others] = ['שירה', 'נועם', 'אבי'];
+          console.log(winner);   // שירה
+          console.log(others);   // ['נועם', 'אבי']
+        </script>
+      </div>
+      <p>איך יודעים אם זה spread או rest? ‏<strong>spread</strong> מופיע כשמשתמשים בערך (בצד ימין של <code>=</code>, או בקריאה לפונקציה) ו"פורס" אותו. ‏<strong>rest</strong> מופיע כשמגדירים משתנים או פרמטרים (בצד שמאל של <code>=</code>) ו"אוסף" לתוכם.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 אחרי הקוד <code>const a = [1, 2]; const b = [...a, 3]; b.push(4);</code> מה הערך של <code>a</code>?</p>
+        <ul>
+          <li><code>[1, 2, 3, 4]</code></li>
+          <li><code>[1, 2, 3]</code></li>
+          <li data-correct><code>[1, 2]</code></li>
+          <li><code>[3, 4]</code></li>
+        </ul>
+        <p class="quiz-explain">‏<code>[...a, 3]</code> יוצר מערך <strong>חדש</strong>, אז <code>b</code> ו-<code>a</code> הם שני מערכים נפרדים. ‏<code>push</code> על <code>b</code> לא נוגע ב-<code>a</code>, שנשאר <code>[1, 2]</code>.</p>
+      </div>
+
+      <h3>🎯 אתגר 5: הוספה בלי לשנות את המקור <span class="level medium">בינוני</span></h3>
+      <p>כתבו שתי פונקציות בסגנון של React, שלא משנות את מה שהן מקבלות:</p>
+      <ol>
+        <li><code>addItem(list, item)</code>: מחזירה מערך <strong>חדש</strong> עם כל האיברים של <code>list</code> ו-<code>item</code> בסוף. אסור להשתמש ב-<code>push</code>.</li>
+        <li><code>rename(user, newName)</code>: מחזירה אובייקט <strong>חדש</strong>, זהה ל-<code>user</code>, אבל עם <code>name</code> שהוא <code>newName</code>.</li>
+      </ol>
+      <p>הבדיקה תוודא שהתוצאה נכונה, ושהמערך והאובייקט המקוריים <strong>לא השתנו</strong>.</p>
+      <div class="playground challenge" id="ch-immutable" data-height="320" data-check="ch-immutable">
+        <script type="text/plain" data-lang="js">
+          function addItem(list, item) {
+            list.push(item);   // ❌ זה משנה את המקור! תקנו
+            return list;
+          }
+
+          function rename(user, newName) {
+            // השלימו
+          }
+
+          const todos = ['לקנות חלב', 'ללמוד JS'];
+          const newTodos = addItem(todos, 'לעשות ספורט');
+          console.log(todos, newTodos);
+
+          const me = { name: 'דנה', age: 22 };
+          console.log(me, rename(me, 'דניאל'));
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function addItem(list, item) {
+            return [...list, item];
+          }
+
+          function rename(user, newName) {
+            return { ...user, name: newName };
+          }
+
+          const todos = ['לקנות חלב', 'ללמוד JS'];
+          const newTodos = addItem(todos, 'לעשות ספורט');
+          console.log(todos, newTodos);
+
+          const me = { name: 'דנה', age: 22 };
+          console.log(me, rename(me, 'דניאל'));
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-immutable': (out, win) => {
+            const add = win.eval('typeof addItem === "function" ? addItem : null');
+            const ren = win.eval('typeof rename === "function" ? rename : null');
+            let addOk = false, addPure = false;
+            if (add) {
+              try {
+                const list = win.eval("['a', 'b']");
+                const res = add(list, 'c');
+                addOk = JSON.stringify(res) === '["a","b","c"]' && res !== list;
+                addPure = JSON.stringify(list) === '["a","b"]';
+              } catch (e) {}
+            }
+            let renOk = false, renPure = false;
+            if (ren) {
+              try {
+                const u = win.eval("({ name: 'x', age: 5, city: 'y' })");
+                const res = ren(u, 'z');
+                renOk = !!res && res !== u && res.name === 'z' && res.age === 5 && res.city === 'y';
+                renPure = u.name === 'x';
+              } catch (e) {}
+            }
+            return [
+              [!!add, 'צריך להגדיר פונקציה בשם addItem'],
+              [addPure, 'addItem שינתה את המערך המקורי! במקום push, צרו מערך חדש עם [...list, item]'],
+              [addOk, "addItem(['a','b'], 'c') צריכה להחזיר מערך חדש ['a','b','c']"],
+              [!/\.push\s*\(/.test(out.code), 'אסור להשתמש ב-push בפתרון'],
+              [!!ren, 'צריך להגדיר פונקציה בשם rename'],
+              [renPure, 'rename שינתה את האובייקט המקורי! צרו עותק עם { ...user, name: newName }'],
+              [renOk, 'rename צריכה להחזיר אובייקט חדש עם name מעודכן ושאר התכונות כמו במקור'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="optional-chaining">‏?. : גישה בטוחה לתכונות</h2>
+      <p>מה קורה כשמנסים לקרוא תכונה מתוך משהו ש<strong>לא קיים</strong>? שגיאה, והתוכנית נעצרת. זה קורה כל הזמן עם מידע שמגיע מהאינטרנט, כשחלק מהשדות חסרים:</p>
+      <div class="playground" id="pg-optional" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const user1 = { name: 'רון', address: { city: 'חיפה' } };
+          const user2 = { name: 'גל' };   // אין address
+
+          console.log(user1.address.city);    // חיפה
+          console.log(user2.address);         // undefined: עדיין בסדר
+
+          // עם ?. : אם מה שלפני הוא undefined או null, מקבלים undefined במקום שגיאה
+          console.log(user2.address?.city);   // undefined
+          console.log(user2.address?.city ?? 'עיר לא ידועה');   // ?? נותן ברירת מחדל
+
+          // ובלי ?. : שגיאה! (השורה האחרונה, כדי שתראו את ההודעה)
+          console.log(user2.address.city);
+        </script>
+      </div>
+      <p>‏<code>?.</code> אומר: "אם הדבר משמאלי קיים, תמשיך לתכונה. אם לא, תעצור ותחזיר <code>undefined</code>". ‏<code>??</code> (שראיתם בשיעור 2) מוסיף ערך ברירת מחדל למקרה הזה. אל תשימו <code>?.</code> בכל מקום: השתמשו בו רק כשבאמת ייתכן שהערך חסר, אחרת הוא מסתיר באגים.</p>
+
+      <h2 id="json">JSON: איך מידע עובר באינטרנט <span class="time">4 דק׳</span></h2>
+      <p>כשהאתר שלכם מבקש מידע משרת (מזג אוויר, רשימת מוצרים, פוסטים), המידע מגיע כ<strong>טקסט</strong>. כדי ששני הצדדים יבינו את הטקסט, משתמשים בפורמט מוסכם: ‏<strong>JSON</strong> ‏(JavaScript Object Notation). הוא נראה כמעט בדיוק כמו אובייקטים ומערכים של JavaScript, עם כמה כללים קשוחים יותר:</p>
+<pre><code class="language-json">{
+  "id": 7,
+  "title": "ללמוד JSON",
+  "done": false,
+  "tags": ["js", "web"],
+  "author": { "name": "דנה" }
+}</code></pre>
+      <ul>
+        <li>מפתחות תמיד בתוך <strong>מרכאות כפולות</strong>: <code>"title"</code>, לא <code>title</code>.</li>
+        <li>מחרוזות רק עם מרכאות כפולות, לא <code>'...'</code>.</li>
+        <li>אין פונקציות, אין <code>undefined</code>, ואין פסיק אחרי האיבר האחרון.</li>
+      </ul>
+      <p>יש שתי פונקציות שממירות הלוך ושוב:</p>
+      <table>
+        <tr><th>פונקציה</th><th>מה עושה</th><th>מתי</th></tr>
+        <tr><td><code>JSON.stringify(obj)</code></td><td>אובייקט/מערך ← טקסט</td><td>כששולחים מידע לשרת, או שומרים ב-localStorage</td></tr>
+        <tr><td><code>JSON.parse(text)</code></td><td>טקסט ← אובייקט/מערך</td><td>כשמקבלים מידע מהשרת</td></tr>
+      </table>
+      <div class="playground" id="pg-json" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const todo = { id: 7, title: 'ללמוד JSON', done: false, tags: ['js', 'web'] };
+
+          const text = JSON.stringify(todo);
+          console.log(text);
+          console.log(typeof text);             // string: זה רק טקסט!
+
+          // כמו שמגיע מהשרת: טקסט
+          const fromServer = '[{"id":1,"name":"מקלדת","price":250},{"id":2,"name":"עכבר","price":90}]';
+          const products = JSON.parse(fromServer);
+          console.log(typeof products, products.length);   // object 2
+          console.log(products[1].name);                    // עכשיו זה מערך אמיתי: עכבר
+
+          // JSON שבור: מפתח בלי מרכאות
+          JSON.parse('{ name: "x" }');
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>מה הלאה:</strong> בחלק ד׳ של השיעור נשתמש ב-<code>fetch</code> כדי לבקש מידע אמיתי משרת. התשובה תגיע כ-JSON, נמיר אותה למערך של אובייקטים, ונעבוד איתה בדיוק כמו שלמדתם בעמוד הזה.</p>
+      </div>
+
+      <h3>🎯 אתגר 6: ספירת מילים <span class="level hard">מאתגר</span></h3>
+      <p>כתבו פונקציה <code>countWords(sentence)</code> שמחזירה כמה מילים יש במשפט. נשמע קל עם <code>split(' ')</code>, אבל שימו לב למלכודות:</p>
+      <ul>
+        <li>ייתכנו רווחים בהתחלה ובסוף: <code>'  שלום עולם  '</code> ← 2</li>
+        <li>ייתכנו כמה רווחים בין מילים: <code>'אני   לומד JS'</code> ← 3</li>
+        <li>מחרוזת ריקה או רק רווחים: <code>''</code> או <code>'   '</code> ← 0</li>
+      </ul>
+      <p>רמז: ‏<code>trim()</code> מוריד רווחים מהקצוות. אחרי <code>split(' ')</code>, רווח כפול יוצר <strong>מחרוזות ריקות</strong> <code>''</code> במערך. עברו בלולאה וספרו רק את המילים שהן לא <code>''</code> (תבנית הספירה מקודם).</p>
+      <div class="playground challenge" id="ch-words" data-height="300" data-check="ch-words">
+        <script type="text/plain" data-lang="js">
+          function countWords(sentence) {
+            return sentence.split(' ').length;   // עובד רק במקרה הפשוט. תקנו!
+          }
+
+          console.log(countWords('שלום עולם'));        // 2
+          console.log(countWords('  שלום עולם  '));    // צריך 2
+          console.log(countWords('אני   לומד JS'));    // צריך 3
+          console.log(countWords(''));                 // צריך 0
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function countWords(sentence) {
+            const parts = sentence.trim().split(' ');
+            let count = 0;
+            for (const part of parts) {
+              if (part !== '') {
+                count++;
+              }
+            }
+            return count;
+          }
+
+          console.log(countWords('שלום עולם'));        // 2
+          console.log(countWords('  שלום עולם  '));    // 2
+          console.log(countWords('אני   לומד JS'));    // 3
+          console.log(countWords(''));                 // 0
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-words': (out, win) => {
+            const f = win.eval('typeof countWords === "function" ? countWords : null');
+            const t = (s, n) => { try { return !!f && f(s) === n; } catch (e) { return false; } };
+            return [
+              [!!f, 'צריך להגדיר פונקציה בשם countWords'],
+              [t('שלום עולם', 2) && t('אחת', 1), "countWords('שלום עולם') צריך להחזיר 2"],
+              [t('  שלום עולם  ', 2), "רווחים בקצוות: countWords('  שלום עולם  ') צריך להחזיר 2. נסו trim()"],
+              [t('אני   לומד JS', 3) && t('a  b  c  d', 4), "רווחים כפולים: countWords('אני   לומד JS') צריך להחזיר 3. ספרו רק חלקים שאינם ''"],
+              [t('', 0) && t('    ', 0), "מחרוזת ריקה או רק רווחים צריכה להחזיר 0"],
+              [/split/.test(out.code), 'השתמשו ב-split כדי לפרק את המשפט למערך'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="mistakes">טעויות נפוצות</h2>
+      <table>
+        <tr><th>הטעות</th><th>מה קורה</th><th>התיקון</th></tr>
+        <tr><td><code>arr[arr.length]</code></td><td>‏<code>undefined</code>: האינדקס האחרון הוא <code>length - 1</code></td><td><code>arr[arr.length - 1]</code> או <code>arr.at(-1)</code></td></tr>
+        <tr><td><code>for (let i = 0; i &lt;= arr.length; i++)</code></td><td>סיבוב אחד יותר מדי, ואיבר <code>undefined</code> בסוף</td><td><code>i &lt; arr.length</code></td></tr>
+        <tr><td><code>const copy = arr</code></td><td>לא עותק! שתי תוויות על אותו מערך</td><td><code>const copy = [...arr]</code></td></tr>
+        <tr><td>בלבול בין <code>slice</code> ל-<code>splice</code></td><td>‏<code>splice</code> משנה את המקור</td><td>להעתקה: <code>slice</code>. ב-React: spread / ‏filter</td></tr>
+        <tr><td><code>obj.key</code> כש-key הוא משתנה</td><td>מחפש תכונה ששמה ממש "key"</td><td><code>obj[key]</code></td></tr>
+        <tr><td><code>for (const x in arr)</code> על מערך</td><td>מקבלים אינדקסים (כמחרוזות!) במקום ערכים</td><td><code>for (const x of arr)</code></td></tr>
+        <tr><td><code>user.address.city</code> כשאין address</td><td>‏TypeError: Cannot read properties of undefined</td><td><code>user.address?.city</code></td></tr>
+        <tr><td><code>console.log('המשתמש: ' + user)</code></td><td>מודפס <code>[object Object]</code></td><td><code>console.log('המשתמש:', user)</code> עם פסיק</td></tr>
+        <tr><td>שכחה של <code>JSON.parse</code></td><td>‏<code>text[0]</code> מחזיר תו ראשון של הטקסט, לא איבר</td><td><code>const data = JSON.parse(text)</code></td></tr>
+      </table>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה ידפיס הקוד <code>const nums = [10, 20, 30]; for (const n in nums) { console.log(n); }</code>?</p>
+        <ul>
+          <li><code>10</code>, <code>20</code>, <code>30</code></li>
+          <li data-correct><code>0</code>, <code>1</code>, <code>2</code></li>
+          <li>שגיאה</li>
+          <li>כלום</li>
+        </ul>
+        <p class="quiz-explain">‏<code>for...in</code> עובר על <strong>מפתחות</strong>, ובמערך המפתחות הם האינדקסים (כמחרוזות <code>'0'</code>, <code>'1'</code>, <code>'2'</code>). כדי לקבל את הערכים, השתמשו ב-<code>for...of</code>.</p>
+      </div>
+
+      <h2 id="cheatsheet">דף עזר</h2>
+      <table>
+        <tr><th>מה</th><th>קוד</th><th>תוצאה / הערה</th></tr>
+        <tr><td>יצירת מערך</td><td><code>const a = [1, 2, 3]</code></td><td>אינדקסים 0, 1, 2</td></tr>
+        <tr><td>אורך, ראשון, אחרון</td><td><code>a.length</code>, <code>a[0]</code>, <code>a.at(-1)</code></td><td>3, 1, 3</td></tr>
+        <tr><td>הוספה / הסרה בסוף</td><td><code>a.push(x)</code>, <code>a.pop()</code></td><td>משנים את המקור</td></tr>
+        <tr><td>הוספה / הסרה בהתחלה</td><td><code>a.unshift(x)</code>, <code>a.shift()</code></td><td>משנים את המקור</td></tr>
+        <tr><td>חיפוש</td><td><code>a.includes(x)</code>, <code>a.indexOf(x)</code></td><td>true/false, אינדקס או ‎-1</td></tr>
+        <tr><td>העתקת חלק</td><td><code>a.slice(1, 3)</code></td><td>לא משנה את המקור</td></tr>
+        <tr><td>חיתוך מהמקור</td><td><code>a.splice(1, 2)</code></td><td>משנה את המקור!</td></tr>
+        <tr><td>מערך ↔ מחרוזת</td><td><code>a.join(', ')</code>, <code>s.split(' ')</code></td><td></td></tr>
+        <tr><td>לולאה</td><td><code>for (const x of a) { }</code></td><td>עם אינדקס: <code>for (let i = 0; i &lt; a.length; i++)</code></td></tr>
+        <tr><td>יצירת אובייקט</td><td><code>const o = { name: 'דנה', age: 22 }</code></td><td></td></tr>
+        <tr><td>קריאה</td><td><code>o.name</code>, <code>o[key]</code></td><td>סוגריים כששם התכונה במשתנה</td></tr>
+        <tr><td>הוספה / מחיקה</td><td><code>o.city = 'חיפה'</code>, <code>delete o.city</code></td><td></td></tr>
+        <tr><td>מפתחות / ערכים / זוגות</td><td><code>Object.keys(o)</code>, <code>Object.values(o)</code>, <code>Object.entries(o)</code></td><td>מחזירים מערכים</td></tr>
+        <tr><td>פירוק</td><td><code>const { name, age = 0 } = o</code>, <code>const [first, second] = a</code></td><td>אובייקט לפי שם, מערך לפי מיקום</td></tr>
+        <tr><td>spread</td><td><code>[...a, 4]</code>, <code>{ ...o, age: 23 }</code></td><td>עותק חדש, המקור לא משתנה</td></tr>
+        <tr><td>rest</td><td><code>function f(...args)</code>, <code>const [x, ...rest] = a</code></td><td>אוסף למערך</td></tr>
+        <tr><td>גישה בטוחה</td><td><code>o.address?.city ?? 'לא ידוע'</code></td><td></td></tr>
+        <tr><td>JSON</td><td><code>JSON.stringify(o)</code>, <code>JSON.parse(text)</code></td><td>אובייקט ↔ טקסט</td></tr>
+      </table>
+
+      <h2 id="summary">סיכום</h2>
+      <ul>
+        <li><strong>מערך</strong> הוא רשימה מסודרת. ניגשים לפי <strong>אינדקס</strong> שמתחיל מ-0, והאחרון הוא <code>length - 1</code>.</li>
+        <li>‏<strong>push/pop/shift/unshift/splice</strong> משנים את המערך המקורי. ‏<strong>slice, join</strong> ו-spread לא.</li>
+        <li>עוברים על מערך עם <code>for...of</code>, ועם תבניות הסכום, המקסימום והספירה משיעור 2.</li>
+        <li><strong>אובייקט</strong> מתאר דבר אחד בעזרת זוגות של מפתח וערך. ניגשים לפי שם: <code>obj.key</code> או <code>obj[key]</code>.</li>
+        <li><strong>מערך של אובייקטים</strong> הוא הצורה הנפוצה ביותר של מידע, ובדיוק מה שנציג על המסך ב-React.</li>
+        <li>מערכים ואובייקטים הם <strong>הפניות</strong>: <code>b = a</code> לא מעתיק. ‏<code>[...a]</code> ו-<code>{ ...o }</code> כן.</li>
+        <li><strong>destructuring</strong> מוציא ערכים למשתנים, גם בפרמטרים של פונקציה (כמו props ב-React).</li>
+        <li>ב-React לא משנים מידע קיים, אלא יוצרים עותק עם השינוי (<strong>immutability</strong>).</li>
+        <li>‏<strong>JSON</strong> הוא הטקסט שבו מידע עובר באינטרנט: ‏<code>JSON.parse</code> כשמקבלים, ‏<code>JSON.stringify</code> כששולחים.</li>
+      </ul>
+      <p>בחלק הבא נלמד את <code>map</code>, ‏<code>filter</code> ו-<code>find</code>: הדרך המודרנית לעשות את כל הלולאות שכתבתם כאן בשורה אחת, והדרך שבה React מציגה רשימות.</p>
+
+      <h2 id="sources">מקורות להעמקה</h2>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank" rel="noopener">MDN: ‏Array</a>: כל הפעולות של מערכים, עם דוגמאות</li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Object_basics" target="_blank" rel="noopener">MDN: ‏JavaScript object basics</a></li>
+        <li><a href="https://javascript.info/array" target="_blank" rel="noopener">javascript.info: ‏Arrays</a> ו-<a href="https://javascript.info/object" target="_blank" rel="noopener">Objects</a>: הסברים מצוינים עם תרגילים</li>
+        <li><a href="https://javascript.info/destructuring-assignment" target="_blank" rel="noopener">javascript.info: ‏Destructuring assignment</a></li>
+        <li><a href="https://react.dev/learn/updating-arrays-in-state" target="_blank" rel="noopener">react.dev: ‏Updating Arrays in State</a>: למה React צריכה עותקים (לקריאה אחרי שיעור React הראשון)</li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p><strong>סיכום למרצה:</strong> הנקודות שהכי חשוב שייצאו איתן מהכיתה הן אינדקס מ-0, ‏<code>for...of</code>, מערך של אובייקטים, ו-spread כ"עותק עם שינוי". את Object.entries, ‏rest ו-JSON אפשר להשאיר לקריאה עצמית אם הזמן לוחץ.</p>
+        <p>הדגמה שעובדת טוב: לכתוב על הלוח <code>const b = a; b.push(9)</code> ולבקש מהכיתה לנחש מה יש ב-<code>a</code>. רוב הכיתה טועה, וזה הרגע לצייר שתי תוויות על אותה קופסה. אחר כך לחזור לזה כשמגיעים ל-immutability.</p>
+        <p>אתגרים 1–3 מתאימים לתרגול בכיתה (5 דק׳ כל אחד). אתגרים 4–6 לבית.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

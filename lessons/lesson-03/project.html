@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 3 · פרויקט: חיפוש מתכונים ותרגול מסכם</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="3" data-part="project" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 3 · פרויקט</span>
+      <h1>חיפוש מתכונים: אפליקציה אמיתית ב-JavaScript</h1>
+      <div class="lesson-meta">
+        <span class="chip">מערכים ואובייקטים</span>
+        <span class="chip">map ו-filter</span>
+        <span class="chip">DOM ואירועים</span>
+        <span class="chip">fetch</span>
+        <span class="chip">localStorage</span>
+      </div>
+
+      <p>בעמוד הזה נבנה אפליקציה שלמה: <strong>חיפוש מתכונים</strong>. האפליקציה טוענת מתכונים אמיתיים מהאינטרנט, מציגה אותם בכרטיסים עם תמונה, מאפשרת לחפש ולסנן לפי רמת קושי, ולסמן מתכונים כמועדפים. המועדפים נשמרים בדפדפן גם אחרי רענון.</p>
+      <p>זה הפרויקט הראשון שלנו שמחבר את כל החלקים: <strong>HTML</strong> לשלד, <strong>CSS</strong> לעיצוב, ו-<strong>JavaScript</strong> שמביאה נתונים, מחליטה מה להציג ובונה את הדף.</p>
+
+      <div class="box tip">
+        <p><strong>חשוב: את אותה אפליקציה נבנה שוב בשיעור 4, ב-React.</strong> לכן כדאי לבנות אותה כאן עד הסוף, ולשים לב לדברים שמרגישים מסורבלים: כמה פעמים צריך לחפש אלמנט בדף, כמה פעמים צריך לזכור לקרוא ל-<code>render()</code>, וכמה שורות לוקח ליצור כרטיס אחד. בשיעור הבא נראה איך React פותרת בדיוק את הבעיות האלה.</p>
+      </div>
+
+      <p>נבנה את האפליקציה בשלבים. בכל שלב יש עורך עם <strong>כל הקוד עד אותו שלב</strong>, בשלוש לשוניות: <code>HTML</code>, <code>CSS</code> ו-<code>JS</code>. התוספות של השלב מסומנות בהערה <code>// חדש</code>. לחצו "▶ הרצה" כדי לראות את האפליקציה למעלה ואת הפלט של <code>console.log</code> למטה. כדאי ללחוץ גם "⤢ הרחבה", כדי שהאפליקציה תקבל את כל רוחב העמוד.</p>
+      <p><a class="btn" href="../../examples/lesson-03/recipes/index.html" target="_blank">👀 לאפליקציה הסופית</a></p>
+
+      <div class="box goals">
+        <h3>מה נתרגל כאן</h3>
+        <ul>
+          <li>לתכנן אפליקציה לפני שכותבים: מה רואים במסך, ואיך נראים הנתונים</li>
+          <li>לבנות אלמנטים מ-JavaScript עם <code>createElement</code>, ‏<code>textContent</code> ו-<code>append</code></li>
+          <li>להביא נתונים מ-API עם <code>fetch</code>, ‏<code>async</code>/<code>await</code>, ולטפל בטעינה ובשגיאות</li>
+          <li>להגיב לפעולות של המשתמש: שליחת טופס, בחירה ברשימה ולחיצה על כפתור</li>
+          <li>לעבוד בתבנית <strong>state + render</strong>: שומרים את המידע במשתנים, ובונים את הדף מחדש לפיהם</li>
+          <li>לעדכן מערכים בלי לשנות אותם (<code>filter</code> ו-<code>...spread</code>), ולשמור אותם ב-<code>localStorage</code></li>
+          <li>להעלות את האפליקציה לאינטרנט עם GitHub ו-Netlify</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>בכיתה (כ-15 דק׳ מתוך השיעור):</strong> להציג את האפליקציה הסופית, ולבנות יחד את שלבים 2 ו-3 (render מנתונים קבועים, ואז fetch). שאר השלבים לבית. כדאי להשאיר דקה בסוף ל"מה היה מייגע?" (שלב 9) ולכתוב את התשובות על הלוח. בשיעור 4 חוזרים לרשימה הזו ומוחקים ממנה סעיף אחרי סעיף.</p>
+        <p>‏<strong>תוכנית גיבוי:</strong> ה-API של dummyjson.com חינמי ובדרך כלל יציב, אבל אם הרשת בכיתה חסומה, שלב 2 עובד בלי אינטרנט (חוץ מהתמונות), ואפשר להמשיך ממנו את ההדגמה של state ו-render.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="plan">שלב 0: מתכננים לפני שכותבים</h2>
+      <p>מתכנתים מנוסים לא מתחילים מהמקלדת. לפני שורת הקוד הראשונה עונים על שתי שאלות: <strong>מה המשתמש רואה?</strong> ו<strong>איך נראים הנתונים?</strong></p>
+
+      <h3>מה רואים במסך</h3>
+      <p>שרטוט מהיר, על דף או בראש, מספיק. מלמעלה למטה:</p>
+      <ol>
+        <li><strong>כותרת:</strong> "🍳 חיפוש מתכונים", ובצד השני מונה: "⭐ 2 מועדפים".</li>
+        <li><strong>שורת חיפוש:</strong> שדה טקסט, כפתור "חיפוש", ורשימה נפתחת לרמת קושי.</li>
+        <li><strong>שורת סטטוס:</strong> "טוען מתכונים...", "מציגים 12 מתכונים" או הודעת שגיאה.</li>
+        <li><strong>רשת של כרטיסים:</strong> בכל כרטיס תמונה, שם, שורת פרטים (מטבח · רמת קושי · זמן הכנה), וכפתור "☆ למועדפים".</li>
+      </ol>
+      <p>כל שורה ברשימה הזו תהפוך לאלמנט ב-HTML, וכל דבר שמשתנה בה (המונה, הסטטוס, הכרטיסים) יהיה משהו ש-JavaScript צריכה לעדכן.</p>
+
+      <h3>איך נראים הנתונים</h3>
+      <p>נשתמש ב-API חינמי בשם <a href="https://dummyjson.com/docs/recipes" target="_blank" rel="noopener">DummyJSON</a>, שמחזיר מתכונים לדוגמה (באנגלית). לפני שכותבים קוד, כדאי לראות מה הוא מחזיר. פתחו בלשונית חדשה את הכתובת:</p>
+      <p dir="ltr" style="text-align: left;"><a href="https://dummyjson.com/recipes?limit=1" target="_blank" rel="noopener">https://dummyjson.com/recipes?limit=1</a></p>
+      <p>הדפדפן יציג JSON. הנה החלק שמעניין אותנו, מקוצר:</p>
+      <pre><code class="language-json">{
+  "recipes": [
+    {
+      "id": 1,
+      "name": "Classic Margherita Pizza",
+      "prepTimeMinutes": 20,
+      "cookTimeMinutes": 15,
+      "difficulty": "Easy",
+      "cuisine": "Italian",
+      "image": "https://cdn.dummyjson.com/recipe-images/1.webp",
+      "rating": 4.6
+    }
+  ],
+  "total": 50,
+  "skip": 0,
+  "limit": 1
+}</code></pre>
+      <p>מה למדנו מזה:</p>
+      <ul>
+        <li>התשובה היא <strong>אובייקט</strong>, והמתכונים נמצאים בתוך המפתח <code>recipes</code>, שהוא <strong>מערך של אובייקטים</strong>. כדי להגיע אליהם נכתוב <code>data.recipes</code>.</li>
+        <li>לכל מתכון יש <code>id</code> ייחודי. נשתמש בו כדי לזכור אילו מתכונים במועדפים.</li>
+        <li>הזמן הכולל להכנה הוא <code>prepTimeMinutes + cookTimeMinutes</code>. את זה נחשב בעצמנו.</li>
+        <li>‏<code>difficulty</code> הוא <code>"Easy"</code> או <code>"Medium"</code>. לפי זה נסנן.</li>
+      </ul>
+
+      <h3>הכתובות שנשתמש בהן</h3>
+      <table>
+        <tr><th>מה רוצים</th><th>כתובת</th></tr>
+        <tr><td>12 המתכונים הראשונים</td><td dir="ltr"><code>https://dummyjson.com/recipes?limit=12</code></td></tr>
+        <tr><td>חיפוש לפי מילה</td><td dir="ltr"><code>https://dummyjson.com/recipes/search?q=pasta</code></td></tr>
+      </table>
+      <p>החלק שאחרי סימן השאלה (<code>?limit=12</code>) נקרא <strong>query string</strong>. כך שולחים לשרת "פרמטרים", כמו פרמטרים של פונקציה.</p>
+
+      <h3>מה האפליקציה צריכה לזכור (ה-state)</h3>
+      <p>זו השאלה הכי חשובה בתכנון, והיא תהיה חשובה עוד יותר ב-React. <strong>state</strong> (מצב) הוא כל מידע שיכול להשתנות בזמן שהאפליקציה רצה, ושמשפיע על מה שרואים:</p>
+      <table>
+        <tr><th>משתנה</th><th>מה הוא שומר</th><th>מתי הוא משתנה</th></tr>
+        <tr><td><code>recipes</code></td><td>מערך המתכונים שהגיעו מהשרת</td><td>כשהטעינה מסתיימת</td></tr>
+        <tr><td><code>status</code></td><td>הודעת "טוען..." או הודעת שגיאה</td><td>בתחילת הטעינה ובסופה</td></tr>
+        <tr><td><code>difficulty</code></td><td>רמת הקושי שנבחרה ברשימה</td><td>כשהמשתמש בוחר ברשימה</td></tr>
+        <tr><td><code>favorites</code></td><td>מערך של ה-id של המתכונים המועדפים</td><td>בלחיצה על ⭐</td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>הרעיון המרכזי של הפרויקט:</strong> הדף הוא <em>תוצאה</em> של ה-state. בכל פעם שמשהו ב-state משתנה, קוראים לפונקציה אחת, <code>render()</code>, שבונה את הדף מחדש לפי ה-state. ככה אף פעם לא צריך לזכור "איזה חלק בדף צריך לעדכן". זה בדיוק הרעיון ש-React בנויה עליו.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-skeleton">שלב 1: שלד HTML ועיצוב</h2>
+      <p>מתחילים בלי JavaScript בכלל: רק HTML ו-CSS. כתבנו כרטיס אחד <strong>ידנית</strong>, כדי לראות איך הוא צריך להיראות. בשלב הבא נמחק אותו, ו-JavaScript תייצר כרטיסים כאלה בעצמה.</p>
+      <p>שימו לב ל-<code>id</code>: לכל אלמנט ש-JavaScript תצטרך למצוא יש <code>id</code> ייחודי: <code>search-form</code>, ‏<code>search-input</code>, ‏<code>status</code> ו-<code>results</code>. עברו גם ללשונית CSS: הרשת של הכרטיסים בנויה עם <code>grid</code> ו-<code>auto-fill</code>, כך שמספר העמודות משתנה לבד לפי רוחב המסך.</p>
+      <div class="playground wide" id="pg-step1" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <header class="app-header">
+            <h1>🍳 חיפוש מתכונים</h1>
+          </header>
+
+          <form id="search-form" class="controls">
+            <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta">
+            <button type="submit">חיפוש</button>
+          </form>
+
+          <p id="status">כאן תופיע הודעת סטטוס</p>
+
+          <main id="results">
+            <!-- כרטיס לדוגמה. בשלב הבא JavaScript תייצר אותו -->
+            <article class="card">
+              <img src="https://cdn.dummyjson.com/recipe-images/1.webp" alt="Classic Margherita Pizza">
+              <h3>Classic Margherita Pizza</h3>
+              <p class="meta">Italian · Easy · 35 דק׳</p>
+            </article>
+          </main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; }
+          body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+          .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+          .app-header h1 { margin: 0; font-size: 1.3rem; }
+
+          .controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+          .controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+          #status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+          #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+          .card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+          .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+          .card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+          .card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+          .card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+          .card .fav[aria-pressed="true"] { background: #e85d04; color: white; }
+        </script>
+      </div>
+      <p>נסו: העתיקו את ה-<code>&lt;article&gt;</code> עוד פעמיים בלשונית HTML, ותראו איך הרשת מסדרת את הכרטיסים. עכשיו דמיינו שצריך לכתוב ככה 50 כרטיסים, ולעדכן אותם בכל חיפוש. בשביל זה יש JavaScript.</p>
+      <p>‏ה-CSS לא ישתנה עד סוף הפרויקט, אז בשלבים הבאים נתמקד בלשונית JS.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="step-render">שלב 2: JavaScript בונה את הכרטיסים</h2>
+      <p>עכשיו מוחקים את הכרטיס הידני מה-HTML, ונותנים ל-JavaScript לבנות כרטיסים מתוך <strong>מערך של אובייקטים</strong>. בשלב הזה הנתונים עדיין כתובים בקוד ("hard-coded"): שלושה מתכונים שהעתקנו מה-API. ככה אפשר לבדוק שהבנייה של הכרטיסים עובדת, לפני שמוסיפים את הסיבוך של רשת.</p>
+      <p>הקוד מחולק לשתי פונקציות, ולכל אחת תפקיד אחד:</p>
+      <ul>
+        <li>‏<code>createCard(recipe)</code> מקבלת <strong>אובייקט</strong> אחד של מתכון, ומחזירה <strong>אלמנט</strong> אחד של כרטיס. היא לא מכניסה אותו לדף, רק בונה ומחזירה.</li>
+        <li>‏<code>render(list)</code> מקבלת <strong>מערך</strong> של מתכונים, הופכת אותו עם <code>map</code> למערך של כרטיסים, ומחליפה בבת אחת את כל מה שיש בתוך <code>#results</code>.</li>
+      </ul>
+      <div class="playground wide" id="pg-step2" data-height="640">
+        <script type="text/plain" data-lang="html">
+          <header class="app-header">
+            <h1>🍳 חיפוש מתכונים</h1>
+          </header>
+
+          <form id="search-form" class="controls">
+            <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta">
+            <button type="submit">חיפוש</button>
+          </form>
+
+          <p id="status"></p>
+
+          <main id="results"></main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; }
+          body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+          .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+          .app-header h1 { margin: 0; font-size: 1.3rem; }
+
+          .controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+          .controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+          #status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+          #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+          .card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+          .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+          .card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+          .card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+          .card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+          .card .fav[aria-pressed="true"] { background: #e85d04; color: white; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          // הנתונים: מערך של אובייקטים, באותו מבנה שה-API מחזיר
+          const recipes = [
+            { id: 1, name: 'Classic Margherita Pizza', cuisine: 'Italian', difficulty: 'Easy',
+              prepTimeMinutes: 20, cookTimeMinutes: 15, image: 'https://cdn.dummyjson.com/recipe-images/1.webp' },
+            { id: 2, name: 'Vegetarian Stir-Fry', cuisine: 'Asian', difficulty: 'Medium',
+              prepTimeMinutes: 15, cookTimeMinutes: 20, image: 'https://cdn.dummyjson.com/recipe-images/2.webp' },
+            { id: 3, name: 'Chocolate Chip Cookies', cuisine: 'American', difficulty: 'Easy',
+              prepTimeMinutes: 15, cookTimeMinutes: 10, image: 'https://cdn.dummyjson.com/recipe-images/3.webp' },
+          ];
+
+          // מוצאים פעם אחת את האלמנטים שנעבוד איתם
+          const results = document.querySelector('#results');
+          const statusEl = document.querySelector('#status');
+
+          // מקבלת אובייקט של מתכון, ומחזירה אלמנט של כרטיס
+          function createCard(recipe) {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            const img = document.createElement('img');
+            img.src = recipe.image;
+            img.alt = recipe.name;
+
+            const title = document.createElement('h3');
+            title.textContent = recipe.name;
+
+            const meta = document.createElement('p');
+            meta.className = 'meta';
+            const minutes = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+            meta.textContent = `${recipe.cuisine} · ${recipe.difficulty} · ${minutes} דק׳`;
+
+            card.append(img, title, meta);
+            return card;
+          }
+
+          // מקבלת מערך של מתכונים, ומציגה אותם בדף
+          function render(list) {
+            const cards = list.map(createCard);
+            results.replaceChildren(...cards);
+            statusEl.textContent = `מציגים ${list.length} מתכונים`;
+          }
+
+          render(recipes);
+          console.log('נבנו', results.children.length, 'כרטיסים');
+        </script>
+      </div>
+
+      <h3>מה קורה בשורה <code>results.replaceChildren(...cards)</code>?</h3>
+      <ol>
+        <li>‏<code>list.map(createCard)</code> עוברת על כל מתכון במערך, קוראת ל-<code>createCard</code> עם המתכון, ואוספת את מה שחזר. מתקבל מערך חדש: <code>[כרטיס, כרטיס, כרטיס]</code>. שימו לב שכתבנו <code>createCard</code> בלי סוגריים: אנחנו <em>מעבירים</em> את הפונקציה ל-<code>map</code>, ולא קוראים לה בעצמנו.</li>
+        <li>שלוש הנקודות (<code>...cards</code>) הן <strong>spread</strong>: הן "פורקות" את המערך לרשימה של ארגומנטים נפרדים. ‏<code>replaceChildren(...cards)</code> זהה ל-<code>replaceChildren(cards[0], cards[1], cards[2])</code>.</li>
+        <li>‏<code>replaceChildren</code> מוחקת את כל מה שהיה בתוך <code>#results</code>, ושמה במקום את הכרטיסים החדשים. לכן אפשר לקרוא ל-<code>render</code> שוב ושוב, והכרטיסים לא יוכפלו.</li>
+      </ol>
+
+      <p>נסו בעצמכם:</p>
+      <ul>
+        <li>הוסיפו למערך מתכון רביעי (המציאו אותו, ואפשר להשתמש בתמונה <code>https://cdn.dummyjson.com/recipe-images/4.webp</code>). כמה שורות שיניתם ב-<code>render</code>? אף אחת. זה כל הכוח של הפרדה בין <strong>נתונים</strong> לבין <strong>הקוד שמציג אותם</strong>.</li>
+        <li>הוסיפו לכרטיס שורה עם הדירוג (‏<code>rating</code>). צריך להוסיף את השדה לאובייקטים, ליצור עוד אלמנט ב-<code>createCard</code>, ולהוסיף אותו ל-<code>append</code>.</li>
+      </ul>
+
+      <div class="box warn">
+        <p><strong>למה לא <code>innerHTML</code>?</strong> אפשר היה לכתוב <code>card.innerHTML = `&lt;h3&gt;${recipe.name}&lt;/h3&gt;`</code>, וזה נראה קצר יותר. אבל אז הדפדפן מפרש את הטקסט כ-HTML. אם בשם של מתכון יופיע <code>&lt;img src=x onerror="..."&gt;</code>, הקוד הזה ירוץ אצל כל מי שפותח את הדף. זו פרצת אבטחה מוכרת בשם <strong>XSS</strong>. ‏<code>textContent</code> תמיד מתייחס לתוכן כטקסט רגיל, ולכן הוא בטוח. בפרויקט הזה נבנה הכול עם <code>createElement</code> ו-<code>textContent</code>.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>כדאי לכתוב את <code>createCard</code> מול הכיתה שורה אחר שורה, ולהריץ אחרי כל אלמנט שנוסף. זו ההזדמנות להראות כמה DOM ידני זה הרבה קוד: 17 שורות בשביל כרטיס של שלושה אלמנטים. בשיעור 4 אותו כרטיס ייכתב ב-JSX בחמש שורות שנראות כמו HTML. לא לגלות את זה עכשיו, רק לשאול: "נוח לכם?"</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="step-fetch">שלב 3: מביאים מתכונים אמיתיים עם fetch</h2>
+      <p>עכשיו מחליפים את המערך הקבוע בנתונים מהשרת. הפונקציות <code>createCard</code> ו-<code>render</code> נשארות <strong>בדיוק אותו דבר</strong>. משתנה רק <em>מאיפה</em> מגיע המערך שמעבירים ל-<code>render</code>.</p>
+      <p>הפונקציה החדשה <code>loadRecipes(url)</code> עושה ארבעה דברים, לפי הסדר:</p>
+      <ol>
+        <li>מציגה "טוען מתכונים..." ומרוקנת את הרשת, כדי שהמשתמש יבין שמשהו קורה.</li>
+        <li>שולחת בקשה עם <code>await fetch(url)</code>, ומחכה לתשובה.</li>
+        <li>בודקת את <code>res.ok</code>. אם השרת החזיר שגיאה (למשל 404 או 500), זורקת שגיאה בעצמה, כי <code>fetch</code> <strong>לא</strong> זורקת שגיאה במקרה כזה.</li>
+        <li>הופכת את התשובה ל-JSON עם <code>await res.json()</code>, ושולחת את <code>data.recipes</code> ל-<code>render</code>.</li>
+      </ol>
+      <p>כל זה בתוך <code>try</code>. אם משהו נכשל בדרך (אין אינטרנט, שגיאה מהשרת, JSON שבור), הקוד קופץ ל-<code>catch</code>, ומציג הודעה ברורה במקום מסך ריק.</p>
+      <div class="playground wide" id="pg-step3" data-height="640" data-wait="3000">
+        <script type="text/plain" data-lang="html">
+          <header class="app-header">
+            <h1>🍳 חיפוש מתכונים</h1>
+          </header>
+
+          <form id="search-form" class="controls">
+            <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta">
+            <button type="submit">חיפוש</button>
+          </form>
+
+          <p id="status"></p>
+
+          <main id="results"></main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; }
+          body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+          .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+          .app-header h1 { margin: 0; font-size: 1.3rem; }
+
+          .controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+          .controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+          #status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+          #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+          .card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+          .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+          .card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+          .card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+          .card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+          .card .fav[aria-pressed="true"] { background: #e85d04; color: white; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const API = 'https://dummyjson.com/recipes'; // חדש
+
+          const results = document.querySelector('#results');
+          const statusEl = document.querySelector('#status');
+
+          function createCard(recipe) {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            const img = document.createElement('img');
+            img.src = recipe.image;
+            img.alt = recipe.name;
+
+            const title = document.createElement('h3');
+            title.textContent = recipe.name;
+
+            const meta = document.createElement('p');
+            meta.className = 'meta';
+            const minutes = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+            meta.textContent = `${recipe.cuisine} · ${recipe.difficulty} · ${minutes} דק׳`;
+
+            card.append(img, title, meta);
+            return card;
+          }
+
+          function render(list) {
+            results.replaceChildren(...list.map(createCard));
+            statusEl.textContent = `מציגים ${list.length} מתכונים`;
+          }
+
+          // חדש: מביאה מתכונים מהשרת ומציגה אותם
+          async function loadRecipes(url) {
+            statusEl.textContent = 'טוען מתכונים...';
+            results.replaceChildren();
+            try {
+              const res = await fetch(url);
+              if (!res.ok) {
+                throw new Error(`השרת החזיר שגיאה ${res.status}`);
+              }
+              const data = await res.json();
+              console.log('הגיעו', data.recipes.length, 'מתכונים. הראשון:', data.recipes[0].name);
+              render(data.recipes);
+            } catch (err) {
+              statusEl.textContent = `אופס, משהו השתבש: ${err.message}`;
+              console.log('שגיאה:', err.message);
+            }
+          }
+
+          loadRecipes(`${API}?limit=12`); // חדש
+        </script>
+      </div>
+      <p>נסו לשבור את הקוד בכוונה, כדי לראות שהטיפול בשגיאות עובד:</p>
+      <ul>
+        <li>שנו את הכתובת ל-<code>'https://dummyjson.com/recipesXXX'</code>. השרת יחזיר 404, ו-<code>res.ok</code> יהיה <code>false</code>. איזו הודעה מופיעה?</li>
+        <li>שנו את הכתובת ל-<code>'https://no-such-site.example'</code>. הפעם אין בכלל שרת, ו-<code>fetch</code> עצמה זורקת שגיאה. איזו הודעה מופיעה עכשיו?</li>
+        <li>מחקו את המילה <code>await</code> לפני <code>res.json()</code>. מה מודפס בקונסול? (רמז: <code>data</code> הוא עכשיו Promise, ול-Promise אין <code>recipes</code>.)</li>
+        <li>שנו את <code>limit=12</code> ל-<code>limit=4</code>, ואחר כך ל-<code>limit=30</code>.</li>
+      </ul>
+
+      <div class="box tip">
+        <p><strong>שימו לב לסדר:</strong> הקריאה <code>loadRecipes(...)</code> בשורה האחרונה מתחילה את הטעינה, אבל לא מחכה לה. הדפדפן ממשיך הלאה, ומציג "טוען מתכונים..." עד שהתשובה מגיעה. ככה הדף לא "קופא" בזמן ההמתנה לשרת. אם עוד לא ברור למה, חזרו לחלק על <a href="async.html">async ו-fetch</a>.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏<strong>שתי הטעויות הנפוצות בשלב הזה:</strong> לשכוח את ה-<code>await</code> לפני <code>res.json()</code> (ואז <code>data.recipes</code> הוא <code>undefined</code> והשגיאה היא <code>Cannot read properties of undefined</code>), ולכתוב <code>render(data)</code> במקום <code>render(data.recipes)</code> (ואז <code>list.map is not a function</code>). כדאי לעשות את שתיהן בכוונה מול הכיתה, ולקרוא יחד את הודעת השגיאה. ‏<code>console.log(data)</code> לפני ה-render הוא הכלי הכי טוב לדבג את זה.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="step-search">שלב 4: חיפוש עם טופס</h2>
+      <p>הטופס כבר קיים ב-HTML, אבל עוד לא עושה כלום. נאזין לאירוע <code>submit</code> שלו. למה <code>submit</code> של הטופס, ולא <code>click</code> של הכפתור? כי <code>submit</code> קורה גם כשלוחצים על הכפתור וגם כשלוחצים <kbd>Enter</kbd> בתוך שדה החיפוש. אנחנו מקבלים את שני המקרים בהאזנה אחת.</p>
+      <p>מה קורה כשהמשתמש שולח את הטופס:</p>
+      <ol>
+        <li>‏<code>event.preventDefault()</code>. בלי השורה הזו הדפדפן עושה מה שטפסים עשו מאז שנות ה-90: שולח את הנתונים לשרת וטוען את הדף מחדש. כל מה שהיה ב-JavaScript נמחק.</li>
+        <li>קוראים את הטקסט מהשדה עם <code>input.value</code>, ומורידים רווחים מההתחלה ומהסוף עם <code>trim()</code>.</li>
+        <li>אם השדה ריק, טוענים שוב את 12 המתכונים הראשונים. אחרת, בונים כתובת חיפוש: <code>/recipes/search?q=...</code>.</li>
+        <li>שולחים את הכתובת ל-<code>loadRecipes</code>. היא כבר יודעת להציג "טוען...", לטפל בשגיאות ולהציג את התוצאות.</li>
+      </ol>
+      <p>תוספת נוספת: אם החיפוש לא מצא כלום, השרת מחזיר מערך ריק, ו-<code>render</code> מציגה עכשיו הודעה "לא נמצאו מתכונים" במקום מסך ריק ומבלבל.</p>
+      <div class="playground wide" id="pg-step4" data-height="640" data-wait="3000">
+        <script type="text/plain" data-lang="html">
+          <header class="app-header">
+            <h1>🍳 חיפוש מתכונים</h1>
+          </header>
+
+          <form id="search-form" class="controls">
+            <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta">
+            <button type="submit">חיפוש</button>
+          </form>
+
+          <p id="status"></p>
+
+          <main id="results"></main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; }
+          body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+          .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+          .app-header h1 { margin: 0; font-size: 1.3rem; }
+
+          .controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+          .controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+          #status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+          #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+          .card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+          .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+          .card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+          .card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+          .card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+          .card .fav[aria-pressed="true"] { background: #e85d04; color: white; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const API = 'https://dummyjson.com/recipes';
+
+          const form = document.querySelector('#search-form');   // חדש
+          const input = document.querySelector('#search-input'); // חדש
+          const results = document.querySelector('#results');
+          const statusEl = document.querySelector('#status');
+
+          function createCard(recipe) {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            const img = document.createElement('img');
+            img.src = recipe.image;
+            img.alt = recipe.name;
+
+            const title = document.createElement('h3');
+            title.textContent = recipe.name;
+
+            const meta = document.createElement('p');
+            meta.className = 'meta';
+            const minutes = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+            meta.textContent = `${recipe.cuisine} · ${recipe.difficulty} · ${minutes} דק׳`;
+
+            card.append(img, title, meta);
+            return card;
+          }
+
+          function render(list) {
+            results.replaceChildren(...list.map(createCard));
+            if (list.length === 0) { // חדש
+              statusEl.textContent = 'לא נמצאו מתכונים. נסו מילה אחרת.';
+            } else {
+              statusEl.textContent = `מציגים ${list.length} מתכונים`;
+            }
+          }
+
+          async function loadRecipes(url) {
+            statusEl.textContent = 'טוען מתכונים...';
+            results.replaceChildren();
+            try {
+              const res = await fetch(url);
+              if (!res.ok) {
+                throw new Error(`השרת החזיר שגיאה ${res.status}`);
+              }
+              const data = await res.json();
+              render(data.recipes);
+            } catch (err) {
+              statusEl.textContent = `אופס, משהו השתבש: ${err.message}`;
+            }
+          }
+
+          // חדש: חיפוש בשליחת הטופס (כפתור או Enter)
+          form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const query = input.value.trim();
+            console.log('מחפשים:', query || '(הכול)');
+            if (query === '') {
+              loadRecipes(`${API}?limit=12`);
+            } else {
+              loadRecipes(`${API}/search?q=${encodeURIComponent(query)}`);
+            }
+          });
+
+          loadRecipes(`${API}?limit=12`);
+        </script>
+      </div>
+      <p>נסו לחפש: <code>pasta</code>, ‏<code>chicken</code>, ‏<code>cake</code>. ואחר כך משהו שלא קיים, כמו <code>zzzz</code>. נסו גם לחפש ואז למחוק את הטקסט ולחפש שוב. האם חוזרים 12 המתכונים הראשונים?</p>
+      <p>ניסוי חשוב: הוסיפו <code>//</code> בתחילת השורה <code>event.preventDefault();</code> והריצו. חפשו משהו. מה קרה לתוצאות? (הדף נטען מחדש, וכל ה-JavaScript התחיל מאפס.) החזירו את השורה.</p>
+
+      <div class="box tip">
+        <p><strong>מה זה <code>encodeURIComponent</code>?</strong> בכתובת אינטרנט יש תווים עם משמעות מיוחדת: רווח, <code>&amp;</code>, <code>?</code>, <code>#</code>. אם משתמש יחפש <code>mac &amp; cheese</code>, ה-<code>&amp;</code> ישבור את הכתובת. ‏<code>encodeURIComponent('mac &amp; cheese')</code> מחזירה <code>'mac%20%26%20cheese'</code>, שזה בדיוק אותו טקסט בצורה שבטוח לשים בכתובת. כלל אצבע: כל טקסט שמגיע מהמשתמש ונכנס לכתובת עובר דרך הפונקציה הזו.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>הטעות הנפוצה: <code>addEventListener('click', ...)</code> על הכפתור במקום <code>submit</code> על הטופס, ואז Enter לא עובד או טוען את הדף מחדש. שווה לשאול את הכיתה: "איך הייתם רוצים שזה יתנהג כשלוחצים Enter?" ומשם להגיע ל-<code>submit</code>.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="step-filter">שלב 5: סינון לפי קושי, והתבנית state + render</h2>
+      <p>עכשיו נוסיף רשימה נפתחת (<code>&lt;select&gt;</code>) לסינון לפי רמת קושי. השאלה המעניינת היא <em>איך</em>. אפשר לשלוח עוד בקשה לשרת בכל שינוי, אבל אין בזה צורך: המתכונים כבר אצלנו. מספיק לסנן אותם עם <code>filter</code>.</p>
+      <p>אבל כאן מתגלה בעיה. כרגע המערך של המתכונים לא נשמר בשום מקום: הוא נכנס ל-<code>render</code> ונעלם. כשהמשתמש יבחר "קל", מאיפה נביא את המתכונים כדי לסנן?</p>
+      <p>הפתרון הוא שינוי קטן בקוד, אבל שינוי גדול בדרך החשיבה. במקום להעביר נתונים ל-<code>render</code>, שומרים את כל מה שהאפליקציה צריכה לזכור ב<strong>משתנים ברמה העליונה</strong>, ה-<strong>state</strong>:</p>
+      <pre><code class="language-js">let recipes = [];       // המתכונים שהגיעו מהשרת
+let status = '';        // 'טוען...' או הודעת שגיאה. מחרוזת ריקה = אין הודעה
+let difficulty = 'all'; // מה נבחר ברשימה</code></pre>
+      <p>ומעכשיו יש רק כלל אחד: <strong>כל פעם שמשנים משתנה של state, קוראים ל-<code>render()</code></strong>. ‏<code>render</code> לא מקבלת שום דבר. היא קוראת את ה-state, מחליטה מה להציג, ובונה את הדף. בואו נראה את זה בפעולה:</p>
+      <div class="playground wide" id="pg-step5" data-height="640" data-wait="3000">
+        <script type="text/plain" data-lang="html">
+          <header class="app-header">
+            <h1>🍳 חיפוש מתכונים</h1>
+          </header>
+
+          <form id="search-form" class="controls">
+            <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta">
+            <button type="submit">חיפוש</button>
+            <!-- חדש -->
+            <select id="difficulty" aria-label="רמת קושי">
+              <option value="all">כל הרמות</option>
+              <option value="Easy">קל</option>
+              <option value="Medium">בינוני</option>
+            </select>
+          </form>
+
+          <p id="status"></p>
+
+          <main id="results"></main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; }
+          body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+          .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+          .app-header h1 { margin: 0; font-size: 1.3rem; }
+
+          .controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+          .controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+          #status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+          #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+          .card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+          .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+          .card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+          .card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+          .card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+          .card .fav[aria-pressed="true"] { background: #e85d04; color: white; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const API = 'https://dummyjson.com/recipes';
+
+          const form = document.querySelector('#search-form');
+          const input = document.querySelector('#search-input');
+          const difficultySelect = document.querySelector('#difficulty'); // חדש
+          const results = document.querySelector('#results');
+          const statusEl = document.querySelector('#status');
+
+          // חדש: ה-state. כל מה שהאפליקציה זוכרת
+          let recipes = [];
+          let status = '';
+          let difficulty = 'all';
+
+          function createCard(recipe) {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            const img = document.createElement('img');
+            img.src = recipe.image;
+            img.alt = recipe.name;
+
+            const title = document.createElement('h3');
+            title.textContent = recipe.name;
+
+            const meta = document.createElement('p');
+            meta.className = 'meta';
+            const minutes = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+            meta.textContent = `${recipe.cuisine} · ${recipe.difficulty} · ${minutes} דק׳`;
+
+            card.append(img, title, meta);
+            return card;
+          }
+
+          // חדש: מחשבת מה להציג, לפי ה-state
+          function visibleRecipes() {
+            if (difficulty === 'all') return recipes;
+            return recipes.filter((recipe) => recipe.difficulty === difficulty);
+          }
+
+          // חדש: בלי פרמטרים. בונה את הדף מתוך ה-state
+          function render() {
+            const list = visibleRecipes();
+            results.replaceChildren(...list.map(createCard));
+            if (status) {
+              statusEl.textContent = status;
+            } else if (list.length === 0) {
+              statusEl.textContent = 'לא נמצאו מתכונים. נסו מילה אחרת.';
+            } else {
+              statusEl.textContent = `מציגים ${list.length} מתכונים`;
+            }
+          }
+
+          // שינוי: מעדכנת את ה-state וקוראת ל-render, במקום לגעת בדף בעצמה
+          async function loadRecipes(url) {
+            status = 'טוען מתכונים...';
+            recipes = [];
+            render();
+            try {
+              const res = await fetch(url);
+              if (!res.ok) {
+                throw new Error(`השרת החזיר שגיאה ${res.status}`);
+              }
+              const data = await res.json();
+              recipes = data.recipes;
+              status = '';
+            } catch (err) {
+              status = `אופס, משהו השתבש: ${err.message}`;
+            }
+            render();
+          }
+
+          form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const query = input.value.trim();
+            if (query === '') {
+              loadRecipes(`${API}?limit=12`);
+            } else {
+              loadRecipes(`${API}/search?q=${encodeURIComponent(query)}`);
+            }
+          });
+
+          // חדש: בחירה ברשימה משנה את ה-state, ואז render
+          difficultySelect.addEventListener('change', () => {
+            difficulty = difficultySelect.value;
+            console.log('difficulty =', difficulty, '| מציגים', visibleRecipes().length, 'מתוך', recipes.length);
+            render();
+          });
+
+          loadRecipes(`${API}?limit=12`);
+        </script>
+      </div>
+      <p>בחרו "קל" ו"בינוני" ברשימה, וצפו בקונסול. שימו לב שלא נשלחת אף בקשה חדשה לשרת: <code>recipes</code> לא משתנה, רק <code>difficulty</code>. נסו גם לחפש <code>chicken</code> ואז לבחור "קל". הסינון עובד גם על תוצאות החיפוש, בלי שכתבנו לזה שום קוד מיוחד.</p>
+
+      <h3>למה זה טוב יותר?</h3>
+      <p>השוו את <code>loadRecipes</code> לפני ואחרי. קודם היא נגעה בדף בעצמה: כתבה ל-<code>statusEl</code>, ריקנה את <code>results</code>, וקראה ל-<code>render</code> עם נתונים. עכשיו היא רק <strong>מעדכנת משתנים</strong>. רק פונקציה אחת בכל הקוד נוגעת בדף: <code>render</code>.</p>
+      <table>
+        <tr><th></th><th>בלי state (שלבים 2–4)</th><th>עם state + render (מעכשיו)</th></tr>
+        <tr><td>מי משנה את הדף?</td><td>כל פונקציה, כל אחת חלק אחר</td><td>רק <code>render</code></td></tr>
+        <tr><td>הוספת פיצ׳ר חדש</td><td>צריך לזכור את כל המקומות שצריך לעדכן</td><td>מוסיפים משתנה, ומשתמשים בו ב-<code>render</code></td></tr>
+        <tr><td>"למה הדף מציג X?"</td><td>צריך לעקוב אחרי כל מה שקרה עד עכשיו</td><td>מסתכלים על ערכי ה-state ועל <code>render</code></td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>זה React, בלי React.</strong> ב-React המשתנים האלה נקראים <code>useState</code>, ו-<code>render</code> היא הקומפוננטה. ההבדל העיקרי: React קוראת ל-render <em>בשבילכם</em> בכל פעם שה-state משתנה. כאן אנחנו צריכים לזכור לעשות את זה בעצמנו. נסו למחוק את השורה <code>render();</code> מתוך ה-<code>change</code>, ובחרו ברשימה. הקונסול מראה שה-state השתנה, אבל המסך לא. זה הבאג הכי נפוץ בגישה הזו, ו-React פשוט מבטלת אותו.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>זה השלב הכי חשוב בפרויקט מבחינה רעיונית, כי הוא הגשר לשיעור 4. כדאי לצייר על הלוח: <strong>אירוע → שינוי state → render() → DOM</strong>, בחץ אחד שהולך רק לכיוון אחד. ולהדגיש שאף אחד חוץ מ-render לא כותב ל-DOM. בשיעור 4 מציירים את אותו ציור, ומחליפים את <code>render()</code> במילה "React".</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="step-favorites">שלב 6: מועדפים ⭐</h2>
+      <p>עכשיו נוסיף לכל כרטיס כפתור "למועדפים", ומונה של המועדפים בכותרת. לפי התבנית משלב 5, השאלה הראשונה היא: <strong>מה צריך להוסיף ל-state?</strong> מספיק מערך של מספרים: ה-<code>id</code> של כל מתכון מועדף.</p>
+      <pre><code class="language-js">let favorites = []; // למשל [3, 7] = מתכונים 3 ו-7 במועדפים</code></pre>
+      <p>למה לשמור רק את ה-<code>id</code> ולא את כל האובייקט? כי ה-<code>id</code> לא משתנה, הוא קצר, וקל לבדוק אותו עם <code>favorites.includes(recipe.id)</code>. ויש עוד סיבה, שנראה בשלב 7: קל לשמור אותו בדפדפן.</p>
+
+      <h3>עדכון בלי לשנות (immutable update)</h3>
+      <p>כשלוחצים על הכפתור, צריך להוסיף את ה-<code>id</code> למערך, או להוציא אותו אם הוא כבר שם. אפשר לעשות את זה עם <code>push</code> ו-<code>splice</code>, שמשנים את המערך הקיים. אבל אנחנו נעשה את זה בדרך אחרת: ניצור <strong>מערך חדש</strong> ונשים אותו במשתנה.</p>
+      <pre><code class="language-js">// להוציא: מערך חדש עם כל ה-id חוץ מזה
+favorites = favorites.filter((favId) =&gt; favId !== id);
+
+// להוסיף: מערך חדש עם כל מה שהיה, ועוד ה-id בסוף
+favorites = [...favorites, id];</code></pre>
+      <p>זה נראה כמו עבודה מיותרת, אבל זו בדיוק הדרך שבה מעדכנים state ב-React. ב-React, <code>push</code> על מערך של state הוא באג: React משווה את המערך הישן לחדש, רואה שזה אותו מערך, ולא מעדכנת את המסך. אז כדאי להתרגל כבר עכשיו.</p>
+      <div class="playground wide" id="pg-step6" data-height="640" data-wait="3000">
+        <script type="text/plain" data-lang="html">
+          <header class="app-header">
+            <h1>🍳 חיפוש מתכונים</h1>
+            <span id="fav-count"></span> <!-- חדש -->
+          </header>
+
+          <form id="search-form" class="controls">
+            <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta">
+            <button type="submit">חיפוש</button>
+            <select id="difficulty" aria-label="רמת קושי">
+              <option value="all">כל הרמות</option>
+              <option value="Easy">קל</option>
+              <option value="Medium">בינוני</option>
+            </select>
+          </form>
+
+          <p id="status"></p>
+
+          <main id="results"></main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; }
+          body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+          .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+          .app-header h1 { margin: 0; font-size: 1.3rem; }
+
+          .controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+          .controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+          #status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+          #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+          .card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+          .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+          .card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+          .card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+          .card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+          .card .fav[aria-pressed="true"] { background: #e85d04; color: white; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const API = 'https://dummyjson.com/recipes';
+
+          const form = document.querySelector('#search-form');
+          const input = document.querySelector('#search-input');
+          const difficultySelect = document.querySelector('#difficulty');
+          const results = document.querySelector('#results');
+          const statusEl = document.querySelector('#status');
+          const favCount = document.querySelector('#fav-count'); // חדש
+
+          let recipes = [];
+          let status = '';
+          let difficulty = 'all';
+          let favorites = []; // חדש: מערך של id
+
+          // חדש: מוסיפה או מוציאה id, ובונה מערך חדש בכל פעם
+          function toggleFavorite(id) {
+            if (favorites.includes(id)) {
+              favorites = favorites.filter((favId) => favId !== id);
+            } else {
+              favorites = [...favorites, id];
+            }
+            console.log('favorites =', favorites);
+            render();
+          }
+
+          function createCard(recipe) {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            const img = document.createElement('img');
+            img.src = recipe.image;
+            img.alt = recipe.name;
+
+            const title = document.createElement('h3');
+            title.textContent = recipe.name;
+
+            const meta = document.createElement('p');
+            meta.className = 'meta';
+            const minutes = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+            meta.textContent = `${recipe.cuisine} · ${recipe.difficulty} · ${minutes} דק׳`;
+
+            // חדש: כפתור מועדפים
+            const isFavorite = favorites.includes(recipe.id);
+            const favButton = document.createElement('button');
+            favButton.type = 'button';
+            favButton.className = 'fav';
+            favButton.textContent = isFavorite ? '⭐ במועדפים' : '☆ למועדפים';
+            favButton.setAttribute('aria-pressed', String(isFavorite));
+            favButton.addEventListener('click', () => toggleFavorite(recipe.id));
+
+            card.append(img, title, meta, favButton);
+            return card;
+          }
+
+          function visibleRecipes() {
+            if (difficulty === 'all') return recipes;
+            return recipes.filter((recipe) => recipe.difficulty === difficulty);
+          }
+
+          function render() {
+            const list = visibleRecipes();
+            results.replaceChildren(...list.map(createCard));
+            favCount.textContent = `⭐ ${favorites.length} מועדפים`; // חדש
+            if (status) {
+              statusEl.textContent = status;
+            } else if (list.length === 0) {
+              statusEl.textContent = 'לא נמצאו מתכונים. נסו מילה אחרת.';
+            } else {
+              statusEl.textContent = `מציגים ${list.length} מתכונים`;
+            }
+          }
+
+          async function loadRecipes(url) {
+            status = 'טוען מתכונים...';
+            recipes = [];
+            render();
+            try {
+              const res = await fetch(url);
+              if (!res.ok) {
+                throw new Error(`השרת החזיר שגיאה ${res.status}`);
+              }
+              const data = await res.json();
+              recipes = data.recipes;
+              status = '';
+            } catch (err) {
+              status = `אופס, משהו השתבש: ${err.message}`;
+            }
+            render();
+          }
+
+          form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const query = input.value.trim();
+            if (query === '') {
+              loadRecipes(`${API}?limit=12`);
+            } else {
+              loadRecipes(`${API}/search?q=${encodeURIComponent(query)}`);
+            }
+          });
+
+          difficultySelect.addEventListener('change', () => {
+            difficulty = difficultySelect.value;
+            render();
+          });
+
+          loadRecipes(`${API}?limit=12`);
+        </script>
+      </div>
+      <p>לחצו על ☆ בכמה כרטיסים, וצפו במונה ובקונסול. לחצו שוב על אותו כרטיס כדי להוציא אותו. אחר כך חפשו משהו אחר וחזרו (חיפוש ריק). המתכונים שסימנתם עדיין מסומנים, כי <code>favorites</code> לא קשור לחיפוש.</p>
+
+      <h3>שימו לב לשני פרטים</h3>
+      <ul>
+        <li><strong>הכפתור לא משנה את עצמו.</strong> בלחיצה לא כתבנו <code>favButton.textContent = '⭐ במועדפים'</code>. ‏<code>toggleFavorite</code> רק משנה את ה-state וקוראת ל-<code>render</code>, ו-<code>render</code> בונה את כל הכרטיסים מחדש, כל אחד עם הטקסט הנכון. זו אותה תבנית בדיוק: <strong>אירוע → state → render</strong>.</li>
+        <li><strong>‏<code>aria-pressed</code>.</strong> המאפיין הזה אומר לקורא מסך (תוכנה שמקריאה את הדף לאנשים עיוורים) שזה כפתור מסוג "מתג", ואם הוא לחוץ עכשיו. ה-CSS משתמש באותו מאפיין כדי לצבוע כפתור לחוץ בכתום: <code>.card .fav[aria-pressed="true"]</code>. ככה מצב אחד משמש גם לנגישות וגם לעיצוב.</li>
+      </ul>
+
+      <div class="box warn">
+        <p><strong>יש כאן בעיה:</strong> רעננו את העמוד (או לחצו ▶ הרצה שוב). כל המועדפים נעלמו. משתנים ב-JavaScript חיים רק כל עוד הדף פתוח. בשלב הבא נשמור אותם.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-storage">שלב 7: שומרים מועדפים ב-localStorage</h2>
+      <p>‏<code>localStorage</code> הוא "מחסן" קטן שכל אתר מקבל בדפדפן. מה ששמים בו נשאר גם אחרי רענון, סגירת הלשונית, ואפילו כיבוי של המחשב. יש לו שלוש פעולות עיקריות:</p>
+      <table>
+        <tr><th>פעולה</th><th>מה היא עושה</th></tr>
+        <tr><td><code>localStorage.setItem(key, value)</code></td><td>שומרת ערך תחת מפתח</td></tr>
+        <tr><td><code>localStorage.getItem(key)</code></td><td>מחזירה את הערך, או <code>null</code> אם אין כזה מפתח</td></tr>
+        <tr><td><code>localStorage.removeItem(key)</code></td><td>מוחקת את המפתח</td></tr>
+      </table>
+      <p>יש מגבלה אחת חשובה: <strong><code>localStorage</code> שומר רק מחרוזות</strong>. אם ננסה לשמור את המערך <code>[3, 7]</code> ישירות, נקבל את המחרוזת <code>"3,7"</code>, ולא נוכל להחזיר ממנה מערך. לכן ממירים ל-JSON בשמירה, ובחזרה בטעינה:</p>
+      <pre><code class="language-js">localStorage.setItem('recipe-finder:favorites', JSON.stringify([3, 7])); // נשמר: "[3,7]"
+JSON.parse(localStorage.getItem('recipe-finder:favorites'));            // חוזר: [3, 7]</code></pre>
+      <p>שימו לב לשם המפתח: <code>'recipe-finder:favorites'</code> ולא סתם <code>'favorites'</code>. כל הדפים באותו אתר חולקים את אותו <code>localStorage</code>. אם לשני פרויקטים יהיה מפתח בשם <code>favorites</code>, הם ידרסו זה את זה. כדאי להוסיף לשם המפתח קידומת עם שם האפליקציה. (גם האתר של הקורס שומר כך את הקוד שלכם בעורכים.)</p>
+      <p>מה משתנה בקוד:</p>
+      <ol>
+        <li>‏<code>loadFavorites()</code> קוראת את המועדפים פעם אחת, בהתחלה. אם אין כלום שמור, <code>getItem</code> מחזירה <code>null</code>, ו-<code>JSON.parse(null)</code> מחזירה <code>null</code>. האופרטור <code>?? []</code> הופך את זה למערך ריק. ואם מישהו שמר שם משהו שבור, ה-<code>try/catch</code> מחזיר מערך ריק במקום שהאפליקציה תקרוס.</li>
+        <li>‏<code>saveFavorites()</code> נקראת בכל פעם ש-<code>favorites</code> משתנה, כלומר ב-<code>toggleFavorite</code>.</li>
+        <li>‏<code>let favorites = loadFavorites();</code> במקום <code>[]</code>.</li>
+      </ol>
+      <div class="playground wide" id="pg-step7" data-height="640" data-wait="3000">
+        <script type="text/plain" data-lang="html">
+          <header class="app-header">
+            <h1>🍳 חיפוש מתכונים</h1>
+            <span id="fav-count"></span>
+          </header>
+
+          <form id="search-form" class="controls">
+            <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta">
+            <button type="submit">חיפוש</button>
+            <select id="difficulty" aria-label="רמת קושי">
+              <option value="all">כל הרמות</option>
+              <option value="Easy">קל</option>
+              <option value="Medium">בינוני</option>
+            </select>
+          </form>
+
+          <p id="status"></p>
+
+          <main id="results"></main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; }
+          body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+          .app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+          .app-header h1 { margin: 0; font-size: 1.3rem; }
+
+          .controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+          .controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+          .controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+          #status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+          #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+          .card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+          .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+          .card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+          .card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+          .card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+          .card .fav[aria-pressed="true"] { background: #e85d04; color: white; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const API = 'https://dummyjson.com/recipes';
+          const FAVORITES_KEY = 'recipe-finder:favorites'; // חדש: מפתח ייחודי לאפליקציה
+
+          const form = document.querySelector('#search-form');
+          const input = document.querySelector('#search-input');
+          const difficultySelect = document.querySelector('#difficulty');
+          const results = document.querySelector('#results');
+          const statusEl = document.querySelector('#status');
+          const favCount = document.querySelector('#fav-count');
+
+          // חדש: קריאה ושמירה של המועדפים בדפדפן
+          function loadFavorites() {
+            try {
+              return JSON.parse(localStorage.getItem(FAVORITES_KEY)) ?? [];
+            } catch {
+              return [];
+            }
+          }
+
+          function saveFavorites() {
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+          }
+
+          let recipes = [];
+          let status = '';
+          let difficulty = 'all';
+          let favorites = loadFavorites(); // שינוי: מתחילים ממה שנשמר
+          console.log('נטענו מהדפדפן:', favorites);
+
+          function toggleFavorite(id) {
+            if (favorites.includes(id)) {
+              favorites = favorites.filter((favId) => favId !== id);
+            } else {
+              favorites = [...favorites, id];
+            }
+            saveFavorites(); // חדש
+            render();
+          }
+
+          function createCard(recipe) {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            const img = document.createElement('img');
+            img.src = recipe.image;
+            img.alt = recipe.name;
+
+            const title = document.createElement('h3');
+            title.textContent = recipe.name;
+
+            const meta = document.createElement('p');
+            meta.className = 'meta';
+            const minutes = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+            meta.textContent = `${recipe.cuisine} · ${recipe.difficulty} · ${minutes} דק׳`;
+
+            const isFavorite = favorites.includes(recipe.id);
+            const favButton = document.createElement('button');
+            favButton.type = 'button';
+            favButton.className = 'fav';
+            favButton.textContent = isFavorite ? '⭐ במועדפים' : '☆ למועדפים';
+            favButton.setAttribute('aria-pressed', String(isFavorite));
+            favButton.addEventListener('click', () => toggleFavorite(recipe.id));
+
+            card.append(img, title, meta, favButton);
+            return card;
+          }
+
+          function visibleRecipes() {
+            if (difficulty === 'all') return recipes;
+            return recipes.filter((recipe) => recipe.difficulty === difficulty);
+          }
+
+          function render() {
+            const list = visibleRecipes();
+            results.replaceChildren(...list.map(createCard));
+            favCount.textContent = `⭐ ${favorites.length} מועדפים`;
+            if (status) {
+              statusEl.textContent = status;
+            } else if (list.length === 0) {
+              statusEl.textContent = 'לא נמצאו מתכונים. נסו מילה אחרת.';
+            } else {
+              statusEl.textContent = `מציגים ${list.length} מתכונים`;
+            }
+          }
+
+          async function loadRecipes(url) {
+            status = 'טוען מתכונים...';
+            recipes = [];
+            render();
+            try {
+              const res = await fetch(url);
+              if (!res.ok) {
+                throw new Error(`השרת החזיר שגיאה ${res.status}`);
+              }
+              const data = await res.json();
+              recipes = data.recipes;
+              status = '';
+            } catch (err) {
+              status = `אופס, משהו השתבש: ${err.message}`;
+            }
+            render();
+          }
+
+          form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const query = input.value.trim();
+            if (query === '') {
+              loadRecipes(`${API}?limit=12`);
+            } else {
+              loadRecipes(`${API}/search?q=${encodeURIComponent(query)}`);
+            }
+          });
+
+          difficultySelect.addEventListener('change', () => {
+            difficulty = difficultySelect.value;
+            render();
+          });
+
+          loadRecipes(`${API}?limit=12`);
+        </script>
+      </div>
+      <p>סמנו כמה מועדפים, ולחצו ▶ הרצה שוב (או רעננו את כל העמוד). המועדפים נשארו, והקונסול מראה מה נטען מהדפדפן.</p>
+      <p>רוצים לראות את המחסן עצמו? פתחו את כלי המפתחים (<kbd>F12</kbd>), עברו ללשונית <strong>Application</strong> (ב-Firefox: <strong>Storage</strong>), ובצד בחרו <strong>Local Storage</strong>. תמצאו שם את המפתח <code>recipe-finder:favorites</code> עם הערך <code>[1,3]</code> או דומה. אפשר למחוק אותו משם, ולהריץ שוב.</p>
+
+      <div class="box tip">
+        <p><strong>זו האפליקציה המלאה.</strong> הקוד בשלב הזה עושה בדיוק מה שעושה <a href="../../examples/lesson-03/recipes/index.html" target="_blank">האפליקציה הסופית</a>. בקובץ <code>app.js</code> שלה הפונקציות מסודרות לפי נושאים, ויש כמה קיצורים (למשל <code>? :</code> במקום <code>if</code>), אבל זה אותו קוד. בשלב הבא נעביר אותו לקבצים במחשב שלכם, ונעלה אותו לאינטרנט.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>שאלה טובה לכיתה: "למה לא לשמור ב-localStorage גם את <code>recipes</code>?" התשובה: אפשר (זה נקרא cache), אבל אז צריך להחליט מתי הנתונים "ישנים". כלל אצבע: שומרים מה שהמשתמש <em>יצר</em> (מועדפים, הגדרות), ולא מה שאפשר להביא שוב מהשרת.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="step-deploy">שלב 8: VS Code, ‏GitHub ו-Netlify</h2>
+      <p>האפליקציה עובדת בעורך. עכשיו נעביר אותה לשלושה קבצים במחשב, נשמור ב-Git, ונפרסם באינטרנט כדי שתוכלו לשלוח קישור לכל אחד.</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>יוצרים תיקייה ופותחים אותה ב-VS Code</h4>
+          <pre class="terminal"><code class="nohighlight">$ mkdir recipe-finder
+$ cd recipe-finder
+$ code .</code></pre>
+          <p>אם הפקודה <code>code</code> לא מוכרת, פתחו את VS Code ובחרו בתפריט <strong>File ← Open Folder</strong>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>יוצרים שלושה קבצים</h4>
+          <p>מכל לשונית בעורך של שלב 7 נוצר קובץ אחד:</p>
+          <table>
+            <tr><th>קובץ</th><th>מה שמים בו</th></tr>
+            <tr><td><code>index.html</code></td><td>השלד הבסיסי של HTML (‏<code>!</code> ואז <kbd>Tab</kbd> ב-VS Code), ובתוך <code>&lt;body&gt;</code> את התוכן של לשונית HTML</td></tr>
+            <tr><td><code>style.css</code></td><td>התוכן של לשונית CSS, כמו שהוא</td></tr>
+            <tr><td><code>app.js</code></td><td>התוכן של לשונית JS, כמו שהוא. בלי תגית <code>&lt;script&gt;</code></td></tr>
+          </table>
+          <p>ה-<code>&lt;head&gt;</code> של <code>index.html</code> צריך לחבר את שני הקבצים האחרים:</p>
+          <p class="file-name">index.html</p>
+          <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="he" dir="rtl"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;חיפוש מתכונים&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+  &lt;script src="app.js" defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header class="app-header"&gt;
+    ...כל התוכן מלשונית HTML...
+  &lt;/header&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          <p>הפעם ה-<code>defer</code> קריטי. הקוד ב-<code>app.js</code> מתחיל ב-<code>document.querySelector('#search-form')</code>. בלי <code>defer</code>, הסקריפט ירוץ <em>לפני</em> שהדפדפן קרא את ה-<code>&lt;body&gt;</code>, הטופס עוד לא יהיה קיים, ונקבל <code>null</code>. השגיאה שתופיע: <code>Cannot read properties of null (reading 'addEventListener')</code>.</p>
+          <p>אפשר להשוות לקבצים של האפליקציה הסופית: <a href="../../examples/lesson-03/recipes/index.html" target="_blank">index.html</a> (בדפדפן: לחיצה ימנית ← View Page Source), <a href="../../examples/lesson-03/recipes/style.css" target="_blank">style.css</a>, <a href="../../examples/lesson-03/recipes/app.js" target="_blank">app.js</a>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>מריצים עם Live Server</h4>
+          <p>לחיצה ימנית על <code>index.html</code> ← <strong>Open with Live Server</strong>. הדפדפן ייפתח בכתובת כמו <code>http://127.0.0.1:5500</code>, והאפליקציה תעבוד בדיוק כמו בעורך. מעכשיו, כל שמירה של קובץ (<kbd>Ctrl</kbd>+<kbd>S</kbd>) מרעננת את הדפדפן לבד.</p>
+          <p>למה לא פשוט ללחוץ פעמיים על הקובץ? אז הכתובת מתחילה ב-<code>file://</code>, ולדפדפנים יש הגבלות על <code>fetch</code> ו-<code>localStorage</code> בדפים כאלה. Live Server מריץ שרת קטן במחשב שלכם, והדף מתנהג כמו אתר אמיתי.</p>
+          <p>אם משהו לא עובד, פתחו את הקונסול (<kbd>F12</kbd>). שגיאה <code>404</code> על <code>app.js</code> או <code>style.css</code> אומרת ששם הקובץ ב-HTML לא תואם לשם הקובץ בתיקייה.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>שומרים ב-Git ומעלים ל-GitHub</h4>
+          <p>כמו בשיעורים הקודמים. יוצרים ב-GitHub ריפו ריק בשם <code>recipe-finder</code>, ואז:</p>
+          <pre class="terminal"><code class="nohighlight">$ git init
+$ git add index.html style.css app.js
+$ git commit -m "Add recipe finder with search, filter and favorites"
+$ git branch -M main
+$ git remote add origin https://github.com/USERNAME/recipe-finder.git
+$ git push -u origin main</code></pre>
+          <p>‏<code>USERNAME</code> מחליפים בשם המשתמש שלכם ב-GitHub. אחרי ה-push, רעננו את דף הריפו. שלושת הקבצים אמורים להופיע שם.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>מפרסמים ב-Netlify</h4>
+          <p>בדיוק כמו בשיעור 1 (<a href="../lesson-01/git.html#netlify">פרסום האתר ב-Netlify</a>): ב-<a href="https://app.netlify.com/" target="_blank" rel="noopener">app.netlify.com</a> בוחרים <strong>Add new site ← Import an existing project ← GitHub</strong>, בוחרים את הריפו <code>recipe-finder</code>, משאירים את כל ההגדרות ריקות, ולוחצים <strong>Deploy</strong>.</p>
+          <p>אחרי כמה שניות תקבלו כתובת כמו <code>https://recipe-finder-123.netlify.app</code>. פתחו אותה גם בטלפון. מעכשיו כל <code>git push</code> מעדכן את האתר לבד.</p>
+          <p>שימו לב: המועדפים שסימנתם ב-Live Server <strong>לא</strong> יופיעו באתר ב-Netlify. ‏<code>localStorage</code> שייך לכתובת מסוימת, ו-<code>127.0.0.1:5500</code> ו-<code>netlify.app</code> הם שני אתרים שונים.</p>
+        </div>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>בעיות נפוצות בשלב הזה: <code>script</code> בלי <code>defer</code> (ושגיאת <code>null</code>), קובץ CSS שלא נטען בגלל <code>href="styles.css"</code> כשהקובץ נקרא <code>style.css</code>, ו-Netlify שמציג "Page not found" כי הקבצים נמצאים בתוך תת-תיקייה בריפו ולא בשורש שלו. במקרה האחרון: לשנות את <strong>Base directory</strong> בהגדרות של Netlify, או להעביר את הקבצים.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="reflection">שלב 9: מה היה מייגע? (ולמה React)</h2>
+      <p>בניתם אפליקציה אמיתית ב-JavaScript "רגילה", מה שנקרא <strong>vanilla JavaScript</strong> (‏vanilla = "בטעם הבסיסי", בלי ספריות). זה הישג גדול. לפני שממשיכים, עצרו לחמש דקות וחשבו: <strong>מה היה מסורבל?</strong> איפה הרגשתם שאתם כותבים את אותו דבר שוב ושוב, או שקל לשכוח משהו?</p>
+      <p>כתבו לעצמכם רשימה, ורק אז השוו לרשימה שלנו:</p>
+      <table>
+        <tr><th>מה היה מייגע ב-vanilla JS</th><th>איך זה ייראה ב-React (שיעור 4)</th></tr>
+        <tr><td><code>createCard</code> לוקחת 25 שורות של <code>createElement</code>, ‏<code>className</code> ו-<code>append</code>. קשה לראות מהקוד איך הכרטיס ייראה.</td><td>כותבים את הכרטיס ב-<strong>JSX</strong>, תחביר שנראה כמו HTML, ישר בתוך JavaScript.</td></tr>
+        <tr><td>צריך לזכור לקרוא ל-<code>render()</code> אחרי <em>כל</em> שינוי של state. שוכחים פעם אחת, והמסך לא מתעדכן.</td><td>‏<code>useState</code>: כשמשנים state, React מציירת מחדש <strong>לבד</strong>.</td></tr>
+        <tr><td><code>render</code> מוחקת ובונה מחדש את <em>כל</em> הכרטיסים, גם כשרק כפתור אחד השתנה. ברשימה של 1,000 מתכונים זה איטי, ותמונות עלולות להבהב.</td><td>React משווה את הגרסה החדשה לקודמת, ומעדכנת ב-DOM <strong>רק מה שבאמת השתנה</strong>.</td></tr>
+        <tr><td>כל הקוד בקובץ אחד, עם משתנים גלובליים. אם נרצה להשתמש בכרטיס במסך אחר, נצטרך להעתיק.</td><td><strong>קומפוננטות</strong>: <code>&lt;RecipeCard /&gt;</code>, ‏<code>&lt;SearchForm /&gt;</code>. כל חלק בקובץ משלו, ואפשר להשתמש בו בכל מקום.</td></tr>
+        <tr><td>חמש שורות של <code>querySelector</code> בהתחלה, ו-<code>id</code> שצריך להתאים בדיוק בין ה-HTML ל-JS.</td><td>אין צורך לחפש אלמנטים. ה-JSX <em>הוא</em> האלמנט, והאירועים כתובים עליו ישירות: <code>onClick={...}</code>.</td></tr>
+      </table>
+
+      <p>הנה טעימה. כך תיראה <code>createCard</code> בשיעור 4. אל תנסו להריץ את זה עדיין, רק להשוות:</p>
+      <pre><code class="language-js">function RecipeCard({ recipe, isFavorite, onToggle }) {
+  return (
+    &lt;article className="card"&gt;
+      &lt;img src={recipe.image} alt={recipe.name} /&gt;
+      &lt;h3&gt;{recipe.name}&lt;/h3&gt;
+      &lt;p className="meta"&gt;{recipe.cuisine} · {recipe.difficulty} · {recipe.prepTimeMinutes + recipe.cookTimeMinutes} דק׳&lt;/p&gt;
+      &lt;button className="fav" aria-pressed={isFavorite} onClick={() =&gt; onToggle(recipe.id)}&gt;
+        {isFavorite ? '⭐ במועדפים' : '☆ למועדפים'}
+      &lt;/button&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+      <p>אותו כרטיס, אותם נתונים, אותו CSS. אבל רואים את המבנה במבט אחד.</p>
+
+      <div class="box tip">
+        <p><strong>ומה לא ישתנה?</strong> כמעט כל השאר. ‏<code>fetch</code>, ‏<code>async/await</code>, ‏<code>try/catch</code>, ‏<code>map</code>, ‏<code>filter</code>, ‏<code>...spread</code>, ‏<code>localStorage</code>, וגם הרעיון של state שממנו בונים את המסך. כל מה שכתבתם כאן עובר ל-React כמו שהוא. React לא מחליפה את JavaScript. היא מחליפה רק את החלק שבו <em>אתם</em> בונים את ה-DOM ביד. ומתחת לפני השטח, גם React קוראת ל-<code>createElement</code> ול-<code>append</code>, בדיוק כמו שעשיתם כאן.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>לעשות את זה כדיון בכיתה, לא כהרצאה. לבקש מהסטודנטים לקרוא בקול מה היה להם מייגע, ולכתוב על הלוח (או בקובץ משותף). בדרך כלל עולים לבד "יותר מדי createElement" ו"שכחתי render". לשמור את הרשימה: שיעור 4 נפתח בה, ובונים את אותה אפליקציה ב-React תוך מחיקת סעיף אחרי סעיף.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="challenges">אתגרים</h2>
+      <p>ארבעה אתגרים, מהקל לקשה. כל אחד מהם הוא אפליקציה קטנה בתבנית של הפרויקט: HTML עם <code>id</code>, ‏state במשתנים, ופונקציה שבונה את הדף. כתבו את הקוד, לחצו "▶ הרצה" כדי לנסות בעצמכם, ואז "✓ בדיקה". הבדיקה לוחצת על הכפתורים שלכם ובודקת מה מופיע בדף.</p>
+      <div class="box warn">
+        <p><strong>כלל לכל האתגרים:</strong> בונים אלמנטים עם <code>createElement</code> ו-<code>textContent</code>, בלי <code>innerHTML</code>. ואם העמוד נתקע (למשל לולאה אינסופית), רעננו אותו. הקוד שלכם נשמר, והוא לא ירוץ שוב עד שתלחצו "▶ הרצה".</p>
+      </div>
+
+      <h3>אתגר 1: טבלת משתמשים מהשרת <span class="level easy">קל</span></h3>
+      <p>ה-API ‏<a href="https://jsonplaceholder.typicode.com/users" target="_blank" rel="noopener">jsonplaceholder.typicode.com/users</a> מחזיר מערך של 10 משתמשים. לכל משתמש יש <code>name</code>, ‏<code>email</code>, ואובייקט <code>address</code> שבתוכו <code>city</code>. פתחו את הכתובת בלשונית חדשה כדי לראות את המבנה.</p>
+      <p>השלימו את <code>loadUsers</code>, כך שתוסיף ל-<code>tbody#users</code> שורה (<code>tr</code>) לכל משתמש, עם שלושה תאים (<code>td</code>): שם, אימייל ועיר. בסוף הטעינה, הודעת "טוען..." צריכה להיעלם. ואם יש שגיאה, הציגו אותה ב-<code>#status</code>.</p>
+      <p>רמז: <code>user.address.city</code>. ולשלושה תאים כמעט זהים, לולאת <code>for...of</code> על מערך <code>[user.name, user.email, user.address.city]</code> חוסכת קוד.</p>
+      <div class="playground challenge" id="ch-users" data-check="ch-users" data-height="560" data-wait="2500">
+        <script type="text/plain" data-lang="html">
+          <h1>👥 משתמשים</h1>
+          <p id="status"></p>
+          <table>
+            <thead>
+              <tr><th>שם</th><th>אימייל</th><th>עיר</th></tr>
+            </thead>
+            <tbody id="users"></tbody>
+          </table>
+        </script>
+        <script type="text/plain" data-lang="css">
+          body { font-family: system-ui, sans-serif; margin: 16px; }
+          h1 { margin: 0 0 8px; font-size: 1.3rem; }
+          #status { color: #6b625a; }
+          table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+          th, td { border-bottom: 1px solid #ddd; padding: 6px 8px; text-align: start; }
+          th { background: #f3f0ec; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const tbody = document.querySelector('#users');
+          const statusEl = document.querySelector('#status');
+
+          async function loadUsers() {
+            statusEl.textContent = 'טוען משתמשים...';
+            // 1. fetch ל-https://jsonplaceholder.typicode.com/users
+            // 2. בדקו את res.ok, והמירו את התשובה ל-JSON
+            // 3. לכל משתמש: צרו tr עם שלושה td (שם, אימייל, עיר), והוסיפו ל-tbody
+            // 4. נקו את הודעת הטעינה. במקרה של שגיאה, הציגו אותה ב-statusEl
+
+          }
+
+          loadUsers();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const tbody = document.querySelector('#users');
+          const statusEl = document.querySelector('#status');
+
+          async function loadUsers() {
+            statusEl.textContent = 'טוען משתמשים...';
+            try {
+              const res = await fetch('https://jsonplaceholder.typicode.com/users');
+              if (!res.ok) throw new Error(`השרת החזיר שגיאה ${res.status}`);
+              const users = await res.json();
+
+              const rows = users.map((user) => {
+                const tr = document.createElement('tr');
+                for (const value of [user.name, user.email, user.address.city]) {
+                  const td = document.createElement('td');
+                  td.textContent = value;
+                  tr.append(td);
+                }
+                return tr;
+              });
+              tbody.replaceChildren(...rows);
+              statusEl.textContent = '';
+            } catch (err) {
+              statusEl.textContent = `אופס, משהו השתבש: ${err.message}`;
+            }
+          }
+
+          loadUsers();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-users': (out, win) => {
+            const d = win.document;
+            const rows = [...d.querySelectorAll('#users tr')];
+            const cells = rows[0] ? [...rows[0].querySelectorAll('td')].map((td) => td.textContent.trim()) : [];
+            const status = d.querySelector('#status')?.textContent ?? '';
+            return [
+              [rows.length === 10, `ב-#users צריכות להיות 10 שורות tr, אחת לכל משתמש (יש ${rows.length}). אם יש 0, אולי הטעינה עוד לא הסתיימה או שיש שגיאה בפלט`],
+              [cells.length === 3, 'בכל שורה צריכים להיות בדיוק שלושה תאים td'],
+              [cells[0] === 'Leanne Graham', 'התא הראשון בשורה הראשונה צריך להיות השם: Leanne Graham'],
+              [cells[1] === 'Sincere@april.biz', 'התא השני צריך להיות האימייל: Sincere@april.biz'],
+              [cells[2] === 'Gwenborough', 'התא השלישי צריך להיות העיר (user.address.city): Gwenborough'],
+              [!status.includes('טוען'), 'אחרי שהטעינה מסתיימת, הודעת "טוען..." צריכה להיעלם'],
+              [!/innerHTML/.test(out.code), 'בנו את השורות עם createElement ו-textContent, בלי innerHTML'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>אתגר 2: כפתור "טענו עוד" <span class="level medium">בינוני</span></h3>
+      <p>הרבה אתרים לא מציגים את כל הרשימה בבת אחת, אלא 5 פריטים, וכפתור "טענו עוד" שמוסיף עוד 5. נבנה את זה עם מערך של 23 פריטים שכבר נמצא בקוד.</p>
+      <p>ה-state הוא משתנה אחד: <code>shown</code>, כמה פריטים מציגים עכשיו. השלימו:</p>
+      <ul>
+        <li>‏<code>render()</code>: מציגה ב-<code>ul#list</code> את <code>shown</code> הפריטים הראשונים, כל אחד ב-<code>li</code>. רמז: <code>items.slice(0, shown)</code> מחזירה מערך חדש עם הפריטים מהמקום 0 עד (לא כולל) <code>shown</code>.</li>
+        <li>‏<code>p#counter</code> מציג <code>מציגים 5 מתוך 23</code>. בסוף: <code>מציגים 23 מתוך 23</code>, ולא 25!</li>
+        <li>כשכל הפריטים מוצגים, הכפתור <code>#more</code> צריך להיות לא זמין: <code>more.disabled = true</code>.</li>
+        <li>לחיצה על הכפתור מגדילה את <code>shown</code> ב-<code>PAGE_SIZE</code>, ואז קוראת ל-<code>render()</code>.</li>
+      </ul>
+      <p>רמז ל-25: <code>Math.min(shown, items.length)</code> מחזירה את הקטן מבין השניים.</p>
+      <div class="playground challenge" id="ch-load-more" data-check="ch-load-more" data-height="560">
+        <script type="text/plain" data-lang="html">
+          <h1>📋 רשימה ארוכה</h1>
+          <ul id="list"></ul>
+          <p id="counter"></p>
+          <button id="more" type="button">טענו עוד</button>
+        </script>
+        <script type="text/plain" data-lang="css">
+          body { font-family: system-ui, sans-serif; margin: 16px; }
+          h1 { margin: 0 0 8px; font-size: 1.3rem; }
+          #list { padding-inline-start: 20px; }
+          #counter { color: #6b625a; }
+          #more { padding: 8px 14px; border: none; border-radius: 8px; background: #e85d04; color: white; font: inherit; cursor: pointer; }
+          #more:disabled { background: #ccc; cursor: not-allowed; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          // 23 פריטים: 'פריט 1', 'פריט 2', ... 'פריט 23'
+          const items = Array.from({ length: 23 }, (_, i) => `פריט ${i + 1}`);
+          const PAGE_SIZE = 5;
+
+          const list = document.querySelector('#list');
+          const counter = document.querySelector('#counter');
+          const more = document.querySelector('#more');
+
+          let shown = PAGE_SIZE; // ה-state: כמה פריטים מציגים
+
+          function render() {
+            // 1. הציגו ב-list את הפריטים הראשונים (slice), כל אחד ב-li
+            // 2. עדכנו את counter: "מציגים X מתוך 23"
+            // 3. אם כל הפריטים מוצגים, הפכו את more ל-disabled
+
+          }
+
+          // 4. בלחיצה על more: הגדילו את shown וקראו ל-render
+
+          render();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          // 23 פריטים: 'פריט 1', 'פריט 2', ... 'פריט 23'
+          const items = Array.from({ length: 23 }, (_, i) => `פריט ${i + 1}`);
+          const PAGE_SIZE = 5;
+
+          const list = document.querySelector('#list');
+          const counter = document.querySelector('#counter');
+          const more = document.querySelector('#more');
+
+          let shown = PAGE_SIZE; // ה-state: כמה פריטים מציגים
+
+          function render() {
+            const visible = items.slice(0, shown);
+            list.replaceChildren(...visible.map((item) => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              return li;
+            }));
+            counter.textContent = `מציגים ${visible.length} מתוך ${items.length}`;
+            more.disabled = shown >= items.length;
+          }
+
+          more.addEventListener('click', () => {
+            shown = shown + PAGE_SIZE;
+            render();
+          });
+
+          render();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-load-more': (out, win) => {
+            const d = win.document;
+            const count = () => d.querySelectorAll('#list li').length;
+            const counterText = () => d.querySelector('#counter')?.textContent ?? '';
+            const more = d.querySelector('#more');
+            const first = count();
+            const firstText = counterText();
+            more?.click();
+            const second = count();
+            for (let i = 0; i < 10; i++) more?.click();
+            const last = count();
+            return [
+              [first === 5, `בהתחלה צריכים להופיע 5 פריטי li ב-#list (יש ${first})`],
+              [second === 10, `אחרי לחיצה אחת על "טענו עוד" צריכים להופיע 10 פריטים (יש ${second})`],
+              [last === 23, `אחרי הרבה לחיצות צריכים להופיע כל 23 הפריטים, ולא יותר (יש ${last})`],
+              [d.querySelector('#list li')?.textContent.trim() === 'פריט 1', 'הפריט הראשון ברשימה צריך להיות "פריט 1"'],
+              [firstText.includes('5 מתוך 23'), 'בהתחלה המונה צריך להראות "מציגים 5 מתוך 23"'],
+              [counterText().includes('23 מתוך 23'), 'בסוף המונה צריך להראות "מציגים 23 מתוך 23" (ולא 25)'],
+              [more?.disabled === true, 'כשכל הפריטים מוצגים, הכפתור #more צריך להיות disabled'],
+            ];
+          },
+        });
+      </script>
+      <div class="box tip">
+        <p><strong>ובעולם האמיתי?</strong> כאן כל 23 הפריטים כבר היו בזיכרון, וחילקנו אותם רק בתצוגה. כשיש אלפי פריטים, מבקשים מהשרת רק את החלק הבא. ב-DummyJSON עושים את זה עם <code>?limit=</code> ו-<code>?skip=</code>: הכתובת <code>https://dummyjson.com/recipes?limit=5&amp;skip=10</code> מחזירה את מתכונים 11–15. זה רעיון טוב לבונוס בפרויקט.</p>
+      </div>
+
+      <h3>אתגר 3: חידון <span class="level medium">בינוני</span></h3>
+      <p>במערך <code>questions</code> יש שלוש שאלות. לכל שאלה יש טקסט (<code>text</code>), מערך של תשובות אפשריות (<code>options</code>), ו-<code>answer</code>: המיקום (index) של התשובה הנכונה במערך <code>options</code>.</p>
+      <p>ה-state הוא שני מספרים: <code>current</code> (באיזו שאלה אנחנו) ו-<code>score</code> (כמה תשובות נכונות היו). השלימו את <code>render()</code> ואת <code>choose(index)</code>:</p>
+      <ul>
+        <li>כל עוד יש שאלות, <code>render</code> מציגה ב-<code>#quiz</code> כותרת <code>h2</code> עם טקסט השאלה, וכפתור לכל תשובה.</li>
+        <li>לחיצה על כפתור קוראת ל-<code>choose</code> עם ה-index של התשובה. אם היא נכונה, <code>score</code> גדל ב-1. בכל מקרה עוברים לשאלה הבאה, וקוראים ל-<code>render</code>.</li>
+        <li>אחרי השאלה האחרונה, <code>render</code> מציגה <code>סיימתם! ניקוד: 2/3</code>, וכפתור "שחקו שוב" עם <code>id="restart"</code>, שמאפס את ה-state.</li>
+      </ul>
+      <p>רמז: <code>map</code> מעבירה לפונקציה גם את ה-index, כפרמטר שני: <code>q.options.map((option, index) =&gt; ...)</code>.</p>
+      <div class="playground challenge" id="ch-quiz" data-check="ch-quiz" data-height="480">
+        <script type="text/plain" data-lang="html">
+          <h1>🧠 חידון JavaScript</h1>
+          <div id="quiz"></div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          body { font-family: system-ui, sans-serif; margin: 16px; }
+          h1 { margin: 0 0 8px; font-size: 1.3rem; }
+          #quiz h2 { font-size: 1.05rem; }
+          #quiz button { display: block; width: 100%; margin: 6px 0; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background: white; font: inherit; text-align: start; cursor: pointer; }
+          #quiz button:hover { border-color: #e85d04; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const questions = [
+            { text: 'איזו מתודה יוצרת מערך חדש מתוצאה של כל איבר?', options: ['forEach', 'map', 'push'], answer: 1 },
+            { text: 'מה fetch מחזירה?', options: ['Promise', 'אובייקט JSON', 'מחרוזת'], answer: 0 },
+            { text: 'איך מונעים מטופס לטעון את הדף מחדש?', options: ['return false', 'event.stop()', 'event.preventDefault()'], answer: 2 },
+          ];
+
+          const quiz = document.querySelector('#quiz');
+
+          let current = 0; // איזו שאלה מוצגת
+          let score = 0;   // כמה תשובות נכונות
+
+          function choose(index) {
+            // 1. אם index שווה ל-questions[current].answer, הגדילו את score
+            // 2. עברו לשאלה הבאה, וקראו ל-render
+
+          }
+
+          function render() {
+            // אם current < questions.length:
+            //   h2 עם טקסט השאלה, וכפתור לכל תשובה שקורא ל-choose(index)
+            // אחרת:
+            //   "סיימתם! ניקוד: X/3", וכפתור #restart שמאפס ומצייר מחדש
+
+          }
+
+          render();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const questions = [
+            { text: 'איזו מתודה יוצרת מערך חדש מתוצאה של כל איבר?', options: ['forEach', 'map', 'push'], answer: 1 },
+            { text: 'מה fetch מחזירה?', options: ['Promise', 'אובייקט JSON', 'מחרוזת'], answer: 0 },
+            { text: 'איך מונעים מטופס לטעון את הדף מחדש?', options: ['return false', 'event.stop()', 'event.preventDefault()'], answer: 2 },
+          ];
+
+          const quiz = document.querySelector('#quiz');
+
+          let current = 0; // איזו שאלה מוצגת
+          let score = 0;   // כמה תשובות נכונות
+
+          function choose(index) {
+            if (index === questions[current].answer) {
+              score = score + 1;
+            }
+            current = current + 1;
+            render();
+          }
+
+          function render() {
+            if (current < questions.length) {
+              const q = questions[current];
+              const title = document.createElement('h2');
+              title.textContent = q.text;
+              const buttons = q.options.map((option, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = option;
+                button.addEventListener('click', () => choose(index));
+                return button;
+              });
+              quiz.replaceChildren(title, ...buttons);
+            } else {
+              const result = document.createElement('p');
+              result.textContent = `סיימתם! ניקוד: ${score}/${questions.length}`;
+              const restart = document.createElement('button');
+              restart.type = 'button';
+              restart.id = 'restart';
+              restart.textContent = 'שחקו שוב';
+              restart.addEventListener('click', () => {
+                current = 0;
+                score = 0;
+                render();
+              });
+              quiz.replaceChildren(result, restart);
+            }
+          }
+
+          render();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-quiz': (out, win) => {
+            const d = win.document;
+            const qs = win.eval('typeof questions !== "undefined" ? questions : []');
+            const quizText = () => d.querySelector('#quiz')?.textContent ?? '';
+            const buttons = () => [...d.querySelectorAll('#quiz button')];
+            // עונים על כל השאלות. pick בוחר איזו תשובה ללחוץ
+            const play = (pick) => {
+              let shownAll = true;
+              let rightCount = true;
+              for (const q of qs) {
+                shownAll = shownAll && quizText().includes(q.text);
+                rightCount = rightCount && buttons().length === q.options.length;
+                buttons()[pick(q)]?.click();
+              }
+              return { shownAll, rightCount };
+            };
+            const good = play((q) => q.answer);
+            const goodEnd = quizText();
+            d.querySelector('#restart')?.click();
+            const afterRestart = quizText().includes(qs[0]?.text);
+            const bad = play((q) => (q.answer + 1) % q.options.length);
+            const badEnd = quizText();
+            return [
+              [qs.length === 3, 'המערך questions צריך להישאר עם שלוש השאלות'],
+              [good.shownAll, 'כל שאלה צריכה להופיע ב-#quiz (הטקסט של השאלה, למשל ב-h2)'],
+              [good.rightCount, 'לכל שאלה צריך להיות כפתור אחד לכל תשובה ב-options, ולא יותר'],
+              [goodEnd.includes('3/3'), 'כשעונים נכון על הכול, צריך להופיע "סיימתם! ניקוד: 3/3"'],
+              [afterRestart, 'כפתור #restart צריך להחזיר לשאלה הראשונה'],
+              [badEnd.includes('0/3'), 'אחרי "שחקו שוב" הניקוד צריך להתאפס: כשעונים לא נכון על הכול, צריך להופיע 0/3'],
+              [!/innerHTML/.test(out.code), 'בנו את החידון עם createElement ו-textContent, בלי innerHTML'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>אתגר 4: סטופר <span class="level hard">קשה</span></h3>
+      <p>בנו סטופר שסופר עשיריות שנייה. הפעם אין fetch, אבל יש סוג אחר של קוד אסינכרוני: <code>setInterval(fn, 100)</code> קוראת לפונקציה <code>fn</code> כל 100 מילישניות (עשירית שנייה), ומחזירה מספר מזהה. ‏<code>clearInterval(id)</code> עוצרת אותה.</p>
+      <p>ה-state: <code>tenths</code> (כמה עשיריות עברו) ו-<code>intervalId</code> (המזהה של הטיימר שרץ, או <code>null</code> אם הוא עצור). דרישות:</p>
+      <ul>
+        <li>‏<code>#display</code> מציג את הזמן בשניות, עם ספרה אחת אחרי הנקודה: <code>0.0</code>, ‏<code>0.1</code>, ... ‏<code>12.3</code>. רמז: <code>(tenths / 10).toFixed(1)</code>.</li>
+        <li><strong>התחל</strong> (<code>#start</code>): מפעיל <code>setInterval</code> שבכל פעם מגדיל את <code>tenths</code> ב-1 וקורא ל-<code>render</code>.</li>
+        <li><strong>עצור</strong> (<code>#stop</code>): עוצר עם <code>clearInterval</code>, ומחזיר את <code>intervalId</code> ל-<code>null</code>.</li>
+        <li><strong>אפס</strong> (<code>#reset</code>): עוצר, ומחזיר את התצוגה ל-<code>0.0</code>.</li>
+        <li><strong>החלק הקשה:</strong> לחיצה כפולה על "התחל" לא יכולה ליצור שני טיימרים. אחרת הסטופר ירוץ פי 2 מהר, ו"עצור" יעצור רק אחד מהם. בדקו בתחילת הפונקציה אם כבר יש <code>intervalId</code>.</li>
+      </ul>
+      <div class="playground challenge" id="ch-stopwatch" data-check="ch-stopwatch" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <h1>⏱️ סטופר</h1>
+          <p id="display">0.0</p>
+          <button id="start" type="button">התחל</button>
+          <button id="stop" type="button">עצור</button>
+          <button id="reset" type="button">אפס</button>
+        </script>
+        <script type="text/plain" data-lang="css">
+          body { font-family: system-ui, sans-serif; margin: 16px; text-align: center; }
+          h1 { margin: 0; font-size: 1.3rem; }
+          #display { font-size: 3rem; font-variant-numeric: tabular-nums; margin: 12px 0; }
+          button { padding: 8px 16px; margin: 0 4px; border: 1px solid #ccc; border-radius: 8px; background: white; font: inherit; cursor: pointer; }
+          #start { background: #2b9348; border-color: #2b9348; color: white; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const display = document.querySelector('#display');
+          const startBtn = document.querySelector('#start');
+          const stopBtn = document.querySelector('#stop');
+          const resetBtn = document.querySelector('#reset');
+
+          let tenths = 0;        // כמה עשיריות שנייה עברו
+          let intervalId = null; // הטיימר שרץ עכשיו, או null
+
+          function render() {
+            display.textContent = (tenths / 10).toFixed(1);
+          }
+
+          function start() {
+            // אם כבר רץ טיימר, לא עושים כלום
+            // אחרת: setInterval שכל 100ms מגדיל את tenths וקורא ל-render
+
+          }
+
+          function stop() {
+            // clearInterval, והחזרת intervalId ל-null
+
+          }
+
+          function reset() {
+            // עוצרים, מאפסים את tenths, ומציירים
+
+          }
+
+          startBtn.addEventListener('click', start);
+          stopBtn.addEventListener('click', stop);
+          resetBtn.addEventListener('click', reset);
+          render();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const display = document.querySelector('#display');
+          const startBtn = document.querySelector('#start');
+          const stopBtn = document.querySelector('#stop');
+          const resetBtn = document.querySelector('#reset');
+
+          let tenths = 0;        // כמה עשיריות שנייה עברו
+          let intervalId = null; // הטיימר שרץ עכשיו, או null
+
+          function render() {
+            display.textContent = (tenths / 10).toFixed(1);
+          }
+
+          function start() {
+            if (intervalId !== null) return; // כבר רץ
+            intervalId = setInterval(() => {
+              tenths = tenths + 1;
+              render();
+            }, 100);
+          }
+
+          function stop() {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
+
+          function reset() {
+            stop();
+            tenths = 0;
+            render();
+          }
+
+          startBtn.addEventListener('click', start);
+          stopBtn.addEventListener('click', stop);
+          resetBtn.addEventListener('click', reset);
+          render();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-stopwatch': (out, win) => {
+            const d = win.document;
+            const display = () => d.querySelector('#display')?.textContent.trim();
+            const click = (sel) => d.querySelector(sel)?.click();
+            // מחליפים זמנית את setInterval בגרסה מזויפת, כדי לבדוק בלי לחכות
+            const timers = [];
+            const cleared = [];
+            const realSet = win.setInterval;
+            const realClear = win.clearInterval;
+            win.setInterval = (fn, ms) => { timers.push({ fn, ms }); return 1000 + timers.length; };
+            win.clearInterval = (id) => { cleared.push(id); };
+            try {
+              const initial = display();
+              click('#start');
+              click('#start');
+              const startedCount = timers.length;
+              const ms = timers[0]?.ms;
+              for (let i = 0; i < 3; i++) timers[0]?.fn();
+              const afterThree = display();
+              for (let i = 0; i < 120; i++) timers[0]?.fn();
+              const afterMore = display();
+              click('#stop');
+              const stopped = cleared.includes(1001);
+              click('#start');
+              const restarted = timers.length === 2;
+              click('#reset');
+              const resetStops = cleared.includes(1002);
+              const afterReset = display();
+              return [
+                [initial === '0.0', 'בהתחלה #display צריך להציג 0.0'],
+                [startedCount >= 1, 'לחיצה על "התחל" צריכה להפעיל setInterval'],
+                [ms === 100, 'הטיימר צריך לרוץ כל 100 מילישניות: setInterval(fn, 100)'],
+                [afterThree === '0.3', `אחרי 3 פעימות של הטיימר התצוגה צריכה להיות 0.3 (היא ${afterThree})`],
+                [afterMore === '12.3', `אחרי 123 פעימות התצוגה צריכה להיות 12.3 (היא ${afterMore})`],
+                [startedCount === 1, 'לחיצה כפולה על "התחל" לא יכולה ליצור שני טיימרים. בדקו אם intervalId כבר קיים'],
+                [stopped, '"עצור" צריך לקרוא ל-clearInterval עם המזהה שהחזירה setInterval'],
+                [restarted, 'אחרי "עצור", לחיצה על "התחל" צריכה להפעיל טיימר חדש (האם intervalId חזר ל-null?)'],
+                [resetStops, '"אפס" צריך גם לעצור את הטיימר'],
+                [afterReset === '0.0', 'אחרי "אפס" התצוגה צריכה לחזור ל-0.0'],
+              ];
+            } finally {
+              win.setInterval = realSet;
+              win.clearInterval = realClear;
+            }
+          },
+        });
+      </script>
+      <p>שימו לב: <code>setInterval</code> לא מדויקת לגמרי. אם הדפדפן עסוק, פעימה יכולה להתאחר, ואחרי דקה הסטופר יפגר בכמה עשיריות. סטופרים אמיתיים שומרים את <code>Date.now()</code> של ההתחלה, ומחשבים את הזמן שעבר מתוכו. זה רעיון טוב לשדרוג.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="homework">משימת הגשה: מחפש מוצרים עם עגלת קניות</h2>
+      <div class="box goals">
+        <h3>מה מגישים</h3>
+        <p>אפליקציה שמחפשת מוצרים בחנות, מסננת לפי קטגוריה, ומאפשרת להוסיף מוצרים לעגלה עם סכום כולל. האפליקציה נמצאת בריפו ב-GitHub בשם <code>product-finder</code>, עם <code>index.html</code>, ‏<code>style.css</code> ו-<code>app.js</code>, ומפורסמת ב-Netlify. מגישים <strong>שני קישורים</strong>: לריפו ולאתר.</p>
+      </div>
+      <p>זו אותה תבנית כמו בפרויקט, עם נתונים אחרים ופיצ׳ר חדש אחד (העגלה). לפני שמתחילים, עשו את שלב 0: פתחו את הכתובות שבטבלה למטה בדפדפן, ובדקו איך נראים הנתונים. וכתבו לעצמכם טבלת state.</p>
+
+      <h3>ה-API</h3>
+      <table>
+        <tr><th>מה רוצים</th><th>כתובת</th><th>מה חוזר</th></tr>
+        <tr><td>20 המוצרים הראשונים</td><td dir="ltr"><code>https://dummyjson.com/products?limit=20</code></td><td>אובייקט עם <code>products</code>: מערך של מוצרים</td></tr>
+        <tr><td>חיפוש</td><td dir="ltr"><code>https://dummyjson.com/products/search?q=phone</code></td><td>אותו מבנה</td></tr>
+        <tr><td>רשימת הקטגוריות</td><td dir="ltr"><code>https://dummyjson.com/products/categories</code></td><td>מערך של אובייקטים: <code>{ slug, name, url }</code></td></tr>
+      </table>
+      <p>לכל מוצר יש בין השאר <code>id</code>, ‏<code>title</code>, ‏<code>price</code> (בדולרים), ‏<code>category</code> (ה-slug של הקטגוריה, למשל <code>'beauty'</code>) ו-<code>thumbnail</code> (תמונה קטנה).</p>
+
+      <h3>הדרישות</h3>
+      <ol>
+        <li><strong>טעינה:</strong> בפתיחת הדף נטענים 20 מוצרים, ומוצגים בכרטיסים: תמונה, שם, קטגוריה ומחיר בפורמט <code>$9.99</code>. בזמן הטעינה מופיעה הודעת טעינה, ואם יש שגיאה מופיעה הודעה ברורה (<code>try/catch</code> ו-<code>res.ok</code>).</li>
+        <li><strong>חיפוש:</strong> טופס עם שדה טקסט. שליחה (כפתור או <kbd>Enter</kbd>) מחפשת בשרת עם <code>search?q=</code>. חיפוש ריק מחזיר את 20 המוצרים הראשונים. אם אין תוצאות, מופיעה הודעה "לא נמצאו מוצרים".</li>
+        <li><strong>קטגוריות:</strong> רשימה נפתחת (<code>&lt;select&gt;</code>) עם "כל הקטגוריות" ואחריה כל הקטגוריות מה-API. את ה-<code>&lt;option&gt;</code> בונים ב-JavaScript, אחרי שהקטגוריות נטענות. הסינון נעשה <strong>בצד הלקוח</strong>, עם <code>filter</code> על <code>product.category</code>, בלי בקשה חדשה לשרת.</li>
+        <li><strong>עגלה:</strong> בכל כרטיס כפתור "🛒 הוספה לעגלה", שהופך ל-"✓ בעגלה" כשהמוצר כבר בעגלה. לחיצה נוספת מוציאה אותו. העגלה היא מערך של אובייקטים <code>{ id, title, price }</code>. כך אפשר לחשב את הסכום גם כשהמוצר לא מופיע בתוצאות החיפוש הנוכחיות.</li>
+        <li><strong>סכום:</strong> בכותרת מופיע <code>🛒 3 פריטים · $57.97</code>. את הסכום מחשבים עם <code>reduce</code>, ומציגים עם <code>toFixed(2)</code>.</li>
+        <li><strong>שמירה:</strong> העגלה נשמרת ב-<code>localStorage</code> במפתח <code>'product-finder:cart'</code>, ונשארת אחרי רענון.</li>
+      </ol>
+
+      <h3>רשימת בדיקה לפני הגשה</h3>
+      <table>
+        <tr><th>נושא</th><th>דרישה</th></tr>
+        <tr><td>state + render</td><td>כל המידע שמשתנה (מוצרים, הודעה, קטגוריה, עגלה) שמור במשתנים בראש הקובץ. רק <code>render()</code> כותבת לדף, ונקראת אחרי כל שינוי</td></tr>
+        <tr><td>DOM</td><td>כל האלמנטים נבנים עם <code>createElement</code> ו-<code>textContent</code>. <strong>אין <code>innerHTML</code> בכלל</strong> בקוד</td></tr>
+        <tr><td>מתודות מערך</td><td>‏<code>map</code> לבניית הכרטיסים וה-<code>option</code>, ‏<code>filter</code> לסינון ולהוצאה מהעגלה, ‏<code>reduce</code> לסכום, ‏<code>some</code> או <code>find</code> לבדיקה אם מוצר בעגלה</td></tr>
+        <tr><td>עדכון בלי לשנות</td><td>העגלה מתעדכנת עם <code>[...cart, item]</code> ו-<code>filter</code>. אין <code>push</code> או <code>splice</code> על ה-state</td></tr>
+        <tr><td>אסינכרוני</td><td>‏<code>async/await</code>, ‏<code>try/catch</code>, בדיקת <code>res.ok</code>. ‏<code>encodeURIComponent</code> על טקסט החיפוש</td></tr>
+        <tr><td>טופס</td><td>‏<code>submit</code> על הטופס (לא <code>click</code> על הכפתור) עם <code>preventDefault</code></td></tr>
+        <tr><td>localStorage</td><td>‏<code>JSON.stringify</code> בשמירה, ‏<code>JSON.parse</code> בטעינה, עם ברירת מחדל של מערך ריק ו-<code>try/catch</code></td></tr>
+        <tr><td>Git ו-Netlify</td><td>לפחות <strong>5 commits</strong>, אחד לכל דרישה בערך, עם הודעות שמתארות את השינוי. האתר ב-Netlify עובד, ואין שגיאות אדומות בקונסול</td></tr>
+      </table>
+
+      <div class="exercise">
+        <h3>בונוס <span class="level hard">אתגר</span></h3>
+        <ul>
+          <li><strong>כמויות:</strong> במקום "בעגלה / לא בעגלה", אפשר להוסיף את אותו מוצר כמה פעמים. כל פריט בעגלה הוא <code>{ id, title, price, quantity }</code>, עם כפתורי <code>+</code> ו-<code>−</code>. רמז: עדכון כמות בלי לשנות את המערך נעשה עם <code>map</code>, שמחזירה <code>{ ...item, quantity: item.quantity + 1 }</code> רק לפריט המתאים.</li>
+          <li><strong>"טענו עוד":</strong> כמו באתגר 2, אבל מהשרת: <code>?limit=20&amp;skip=20</code> מחזירה את המוצרים 21–40. המוצרים החדשים מצטרפים לסוף הרשימה, עם <code>[...products, ...data.products]</code>.</li>
+          <li><strong>מיון:</strong> רשימה נפתחת נוספת: לפי מחיר (עולה ויורד) או לפי שם. רמז: <code>toSorted</code>, או <code>[...list].sort(...)</code>, כדי לא לשנות את המערך המקורי.</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>מחוון מוצע (100 נק׳):</strong> טעינה, הודעת טעינה וטיפול בשגיאות 15, חיפוש עם טופס (<code>submit</code>, ‏<code>preventDefault</code>, ‏<code>encodeURIComponent</code>, הודעת "לא נמצאו") 15, קטגוריות (בניית ה-<code>option</code> מה-API וסינון בצד הלקוח) 15, עגלה וסכום עם <code>reduce</code> 20, ‏localStorage 10, מבנה state + render ובלי <code>innerHTML</code> 15, ‏Git ו-Netlify 10. בונוס: עד 10 נק׳.</p>
+        <p>בדיקה מהירה: לפתוח את האתר ב-Netlify, להוסיף שלושה מוצרים לעגלה, לחפש מילה שלא קיימת (<code>zzzz</code>), לבחור קטגוריה, ולרענן. העגלה והסכום צריכים להישאר. אחר כך לחפש <code>innerHTML</code> ו-<code>push</code> בקוד ב-GitHub (מקש <kbd>t</kbd> בריפו, או חיפוש בתוך הקובץ). הטעויות הנפוצות: סכום שמוצג כ-<code>57.970000001</code> (שכחו <code>toFixed</code>), סינון קטגוריה שנשבר אחרי חיפוש (הסינון נעשה על התוצאות ולא על ה-state), ועגלה שנשמרת כ-<code>[object Object]</code> (שכחו <code>JSON.stringify</code>).</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="self-check">בדקו את עצמכם לפני שממשיכים</h2>
+      <p>לפני שעוברים לשיעור 4 ול-React, ודאו שאתם יכולים לעשות את כל אלה <strong>בלי להסתכל בחומר</strong>. React בנויה על כל אחד מהם. אם משהו עדיין לא ברור, חזרו לחלק המתאים:</p>
+      <table>
+        <tr><th>מה צריך לדעת לעשות</th><th>איפה לחזור</th></tr>
+        <tr><td>ליצור מערך של אובייקטים, ולקרוא שדה מתוך אובייקט בתוך מערך (<code>recipes[0].name</code>)</td><td><a href="data.html">חלק א׳</a></td></tr>
+        <tr><td>להשתמש ב-destructuring וב-spread: <code>const { name } = recipe</code> ו-<code>[...list, item]</code></td><td><a href="data.html">חלק א׳</a></td></tr>
+        <tr><td>להמיר בין אובייקט ל-JSON עם <code>JSON.stringify</code> ו-<code>JSON.parse</code></td><td><a href="data.html">חלק א׳</a></td></tr>
+        <tr><td>להסביר מה <code>map</code>, ‏<code>filter</code> ו-<code>reduce</code> מחזירות, ולכתוב כל אחת בשורה אחת</td><td><a href="methods.html">חלק ב׳</a></td></tr>
+        <tr><td>למצוא אלמנט, ליצור אלמנט חדש, ולהכניס אותו לדף בלי <code>innerHTML</code></td><td><a href="dom.html">חלק ג׳</a></td></tr>
+        <tr><td>להאזין ל-<code>click</code>, ‏<code>submit</code> ו-<code>change</code>, ולהסביר למה צריך <code>preventDefault</code> בטופס</td><td><a href="dom.html">חלק ג׳</a></td></tr>
+        <tr><td>להביא נתונים עם <code>fetch</code>, ‏<code>async/await</code>, ‏<code>try/catch</code> ו-<code>res.ok</code></td><td><a href="async.html">חלק ד׳</a></td></tr>
+        <tr><td>להסביר את התבנית state + render, ולמה רק פונקציה אחת כותבת לדף</td><td><a href="#step-filter">שלב 5 בעמוד הזה</a></td></tr>
+        <tr><td>לעדכן מערך בלי לשנות אותו, ולשמור אותו ב-<code>localStorage</code></td><td><a href="#step-favorites">שלבים 6</a> ו-<a href="#step-storage">7</a> בעמוד הזה</td></tr>
+      </table>
+
+      <!-- ===================================================== -->
+      <h2 id="summary">סיכום שיעור 3</h2>
+      <ul>
+        <li><strong>מערכים ואובייקטים:</strong> כמעט כל נתון באינטרנט הוא מערך של אובייקטים. ‏destructuring ו-spread הם הדרך המודרנית לקרוא ולהעתיק אותם.</li>
+        <li><strong>‏map, ‏filter ו-reduce:</strong> במקום לולאות, מתארים <em>מה</em> רוצים לקבל: מערך מומר, מערך מסונן, או ערך אחד. הן לא משנות את המערך המקורי.</li>
+        <li><strong>ה-DOM:</strong> הדף הוא עץ של אובייקטים ש-JavaScript יכולה למצוא, ליצור ולשנות. ‏<code>createElement</code> ו-<code>textContent</code> בונים אלמנטים בבטחה, ו-<code>addEventListener</code> מגיב למשתמש.</li>
+        <li><strong>‏async ו-fetch:</strong> בקשות לשרת לוקחות זמן, ו-<code>await</code> מחכה להן בלי לתקוע את הדף. תמיד בודקים <code>res.ok</code>, ותמיד עוטפים ב-<code>try/catch</code>.</li>
+        <li><strong>state + render:</strong> שומרים את כל מה שמשתנה במשתנים, ובונים את הדף מחדש מתוכם אחרי כל שינוי. זה הרעיון המרכזי של React.</li>
+      </ul>
+      <div class="box tip">
+        <p><strong>בשיעור הבא: React.</strong> נבנה מחדש את אותה אפליקציית חיפוש מתכונים, עם אותו API ואותו CSS, ונראה איך כל סעיף ברשימה של "מה היה מייגע" (<a href="#reflection">שלב 9</a>) נעלם. ‏<code>createCard</code> תהפוך לקומפוננטה <code>&lt;RecipeCard /&gt;</code>, המשתנים של ה-state יהפכו ל-<code>useState</code>, ואת <code>render()</code> כבר לא נצטרך לזכור לקרוא: React תעשה את זה בשבילנו. שמרו את הקוד של הפרויקט, נשווה אליו.</p>
+      </div>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+* { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; margin: 0; background: #fdf8f3; color: #2d2a26; }
+
+.app-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #e85d04; color: white; }
+.app-header h1 { margin: 0; font-size: 1.3rem; }
+
+.controls { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
+.controls input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+.controls button, .controls select { padding: 8px 14px; border: 1px solid #ccc; border-radius: 8px; font: inherit; }
+.controls button { background: #e85d04; color: white; border-color: #e85d04; cursor: pointer; }
+
+#status { margin: 0; padding: 0 16px 8px; color: #6b625a; }
+
+#results { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 0 16px 16px; }
+.card { display: flex; flex-direction: column; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+.card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #eee; }
+.card h3 { margin: 8px 10px 4px; font-size: 1rem; }
+.card .meta { margin: 0 10px 8px; font-size: 0.85rem; color: #6b625a; }
+.card .fav { margin: auto 10px 10px; padding: 6px; border: 1px solid #e85d04; border-radius: 8px; background: white; color: #e85d04; font: inherit; cursor: pointer; }
+.card .fav[aria-pressed="true"] { background: #e85d04; color: white; }

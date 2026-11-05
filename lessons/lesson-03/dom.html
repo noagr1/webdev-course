@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 3 · חלק ג׳: ה-DOM ואירועים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="3" data-part="dom" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 3 · חלק ג׳</span>
+      <h1>ה-DOM ואירועים</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 35 דק׳ בכיתה</span>
+        <span class="chip">📚 3–4 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: חלקים א׳ ו-ב׳ (מערכים, אובייקטים, map ו-filter)</span>
+      </div>
+
+      <p>עד עכשיו כל ה-JavaScript שכתבנו הדפיס לקונסול. משתמש אמיתי לא רואה את הקונסול. הוא רואה <strong>את הדף</strong>: כפתורים, טקסטים, רשימות וטפסים. בחלק הזה נחבר סוף סוף את JavaScript ל-HTML ול-CSS משיעור 1: נלמד לשנות טקסט בדף, להוסיף ולמחוק אלמנטים, ולהגיב כשהמשתמש לוחץ, מקליד או שולח טופס.</p>
+      <p>כשאומרים "<strong>Vanilla JavaScript</strong>" (JavaScript "וניל", כלומר בלי ספריות כמו React) ומדברים על דפי אינטרנט, מדברים בעיקר על <strong>ה-DOM</strong>. כך נבנו אתרים במשך שנים, וזה מה שקורה "מתחת למכסה המנוע" גם היום. בסוף החלק נבנה רשימת משימות שלמה בדרך הזו, ואז נבין בדיוק איזו בעיה React פותרת, ולמה כמעט כל אפליקציה מודרנית משתמשת בה או בספרייה דומה.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>להסביר מה זה ה-DOM ואיך הדפדפן הופך HTML לעץ של אובייקטים</li>
+          <li>לבחור אלמנטים מהדף עם <code>querySelector</code> ו-<code>querySelectorAll</code></li>
+          <li>לשנות טקסט, תכונות (attributes) ומחלקות CSS של אלמנטים</li>
+          <li>ליצור אלמנטים חדשים, להוסיף אותם לדף ולמחוק אותם</li>
+          <li>להציג רשימה מתוך מערך בעזרת פונקציית <code>render</code></li>
+          <li>להגיב לאירועים: לחיצה, הקלדה ושליחת טופס</li>
+          <li>לעבוד בתבנית "נתונים ← render": לשנות את המידע, ולצייר מחדש את הדף</li>
+          <li>להסביר למה הגישה הזו מסורבלת באפליקציות גדולות, ומה React עושה אחרת</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בעורכים של החלק הזה יש שתי לשוניות: <strong>HTML</strong> ו-<strong>JS</strong> (ולפעמים גם CSS). כשלוחצים ▶ הרצה, הדף מופיע בחלון "התוצאה", והקונסול מתחתיו. אפשר ללחוץ על כפתורים ולהקליד בתוך הדף שבתוצאה, ממש כמו באתר אמיתי. אם העורך צר מדי, הכפתור "⤢ הרחבה" שם את הקוד ואת התוצאה אחד מעל השני.</p>
+      </div>
+
+      <h2 id="what-is-dom">מה זה ה-DOM? <span class="time">5 דק׳</span></h2>
+      <p>כשהדפדפן מקבל קובץ HTML, הוא לא שומר אותו כטקסט. הוא קורא אותו ובונה ממנו בזיכרון <strong>עץ של אובייקטים</strong>: אובייקט לכל תגית, ואובייקט לכל קטע טקסט. העץ הזה נקרא <strong>DOM</strong>, ראשי תיבות של <em>Document Object Model</em>, כלומר "מודל האובייקטים של המסמך".</p>
+      <p>קחו למשל את הדף הקטן הזה:</p>
+      <pre><code class="language-html">&lt;body&gt;
+  &lt;h1&gt;הרשימה שלי&lt;/h1&gt;
+  &lt;ul&gt;
+    &lt;li&gt;חלב&lt;/li&gt;
+    &lt;li&gt;לחם&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;button&gt;הוספה&lt;/button&gt;
+&lt;/body&gt;</code></pre>
+      <p>הדפדפן בונה ממנו עץ כזה. כל "ענף" הוא אובייקט, שאפשר לקרוא אותו ולשנות אותו מ-JavaScript:</p>
+      <pre><code class="nohighlight">document
+ └── html
+      ├── head
+      └── body
+           ├── h1 ─── "הרשימה שלי"
+           ├── ul
+           │    ├── li ─── "חלב"
+           │    └── li ─── "לחם"
+           └── button ─── "הוספה"</code></pre>
+      <p>כמה מילים שנשתמש בהן כל הזמן:</p>
+      <table>
+        <tr><th>מונח</th><th>מה זה</th><th>בדוגמה</th></tr>
+        <tr><td><strong>צומת / node</strong></td><td>כל פריט בעץ: תגית או טקסט</td><td>ה-<code>ul</code>, וגם הטקסט "חלב"</td></tr>
+        <tr><td><strong>אלמנט / element</strong></td><td>צומת שהוא תגית</td><td><code>h1</code>, ‏<code>ul</code>, ‏<code>li</code>, ‏<code>button</code></td></tr>
+        <tr><td><strong>הורה / parent</strong></td><td>האלמנט שמכיל אלמנט אחר</td><td><code>ul</code> הוא ההורה של שני ה-<code>li</code></td></tr>
+        <tr><td><strong>ילדים / children</strong></td><td>האלמנטים שנמצאים ישירות בתוך אלמנט</td><td>הילדים של <code>body</code>: ‏<code>h1</code>, ‏<code>ul</code>, ‏<code>button</code></td></tr>
+        <tr><td><strong><code>document</code></strong></td><td>האובייקט שבראש העץ. דרכו מגיעים לכל השאר</td><td><code>document.body</code>, ‏<code>document.title</code></td></tr>
+      </table>
+      <p>הנקודה החשובה: <strong>מה שמוצג במסך הוא תמיד ה-DOM, ולא קובץ ה-HTML</strong>. אם JavaScript משנה את ה-DOM, המסך מתעדכן מיד, אבל הקובץ במחשב נשאר כמו שהוא. כשמרעננים את הדף, הדפדפן בונה את העץ מחדש מהקובץ, וכל השינויים נעלמים.</p>
+
+      <h3>לראות את ה-DOM בכלי המפתחים</h3>
+      <ol>
+        <li>פתחו כל אתר (גם את העמוד הזה) ולחצו <kbd>F12</kbd>, או <kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>I</kbd> ב-Mac.</li>
+        <li>עברו ללשונית <strong>Elements</strong>. מה שרואים שם הוא לא קובץ ה-HTML המקורי, אלא <strong>ה-DOM כמו שהוא עכשיו</strong>. אפשר לפתוח ולסגור ענפים עם החצים הקטנים.</li>
+        <li>לחצו פעמיים על טקסט כלשהו ב-Elements ושנו אותו. הוא משתנה מיד בדף. רעננו, והשינוי נעלם. בדיוק כך נעבוד מ-JavaScript.</li>
+        <li>עברו ללשונית <strong>Console</strong> והקלידו <code>document.title</code> ואחר כך <code>document.body</code>. הקונסול מראה לכם את האובייקטים עצמם.</li>
+      </ol>
+
+      <p>גם בעורך באתר יש <code>document</code>, והוא מייצג את הדף שבחלון התוצאה. הריצו, ואחר כך שנו את הכותרת בלשונית HTML והריצו שוב:</p>
+      <div class="playground" id="pg-document" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <h1>הרשימה שלי</h1>
+          <ul>
+            <li>חלב</li>
+            <li>לחם</li>
+          </ul>
+          <button>הוספה</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          // document הוא הדף שבחלון התוצאה
+          console.log('לדף יש', document.body.children.length, 'ילדים ישירים ב-body');
+
+          const heading = document.querySelector('h1');
+          console.log('הטקסט של הכותרת:', heading.textContent);
+
+          // שינוי ה-DOM: המסך מתעדכן מיד
+          heading.textContent = 'הרשימה שלי (שונתה מ-JavaScript!)';
+        </script>
+      </div>
+      <p>שימו לב: בלשונית HTML הכותרת היא עדיין "הרשימה שלי", אבל בדף שבתוצאה היא השתנתה. זה בדיוק ההבדל בין הקובץ (ה-HTML שכתבנו) לבין ה-DOM (מה שהדפדפן מציג עכשיו).</p>
+
+      <aside class="box lecturer-note">
+        <p><strong>5 דק׳.</strong> מומלץ להתחיל בהדגמה חיה בכלי המפתחים: לשנות טקסט באתר חדשות מוכר ב-Elements, ואז לרענן. הסטודנטים מבינים מיד ש"הדף" הוא משהו חי בזיכרון ולא קובץ. אחר כך לכתוב בקונסול <code>document.querySelector('h1').textContent = 'שלום'</code> על אותו אתר. זה רגע ה"וואו" של השיעור.</p>
+      </aside>
+
+      <h2 id="select">בחירת אלמנטים: querySelector <span class="time">5 דק׳</span></h2>
+      <p>לפני שמשנים משהו בדף, צריך "לתפוס" אותו: לקבל משתנה שמצביע על האלמנט. הדרך המודרנית והנוחה היא <code>document.querySelector</code>. היא מקבלת <strong>בורר CSS</strong>, בדיוק כמו אלה שכתבתם בשיעור 1, ומחזירה את <strong>האלמנט הראשון</strong> שמתאים לו:</p>
+      <table>
+        <tr><th>הקוד</th><th>מה הוא מחזיר</th></tr>
+        <tr><td><code>document.querySelector('h1')</code></td><td>ה-<code>h1</code> הראשון בדף</td></tr>
+        <tr><td><code>document.querySelector('.price')</code></td><td>האלמנט הראשון עם <code>class="price"</code></td></tr>
+        <tr><td><code>document.querySelector('#title')</code></td><td>האלמנט עם <code>id="title"</code></td></tr>
+        <tr><td><code>document.querySelector('nav a')</code></td><td>הקישור הראשון שנמצא בתוך <code>nav</code></td></tr>
+        <tr><td><code>document.querySelectorAll('li')</code></td><td><strong>כל</strong> ה-<code>li</code> בדף, ברשימה (NodeList)</td></tr>
+        <tr><td><code>document.getElementById('title')</code></td><td>האלמנט עם <code>id="title"</code> (דרך ישנה יותר, בלי <code>#</code>)</td></tr>
+      </table>
+      <div class="playground" id="pg-select" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <h1 id="title">חנות הפירות</h1>
+          <p class="intro">היום במבצע:</p>
+          <ul>
+            <li class="fruit">תפוח</li>
+            <li class="fruit">בננה</li>
+            <li class="fruit">אבטיח</li>
+          </ul>
+          <nav><a href="#">דף הבית</a> | <a href="#">צור קשר</a></nav>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const title = document.querySelector('#title');
+          console.log('כותרת:', title.textContent);
+
+          const intro = document.querySelector('.intro');
+          console.log('פסקה:', intro.textContent);
+
+          const firstFruit = document.querySelector('.fruit');
+          console.log('הפרי הראשון:', firstFruit.textContent);
+
+          // querySelectorAll מחזירה את כולם
+          const fruits = document.querySelectorAll('.fruit');
+          console.log('יש', fruits.length, 'פירות');
+          fruits.forEach((li) => console.log('-', li.textContent));
+
+          const link = document.querySelector('nav a');
+          console.log('הקישור הראשון:', link.textContent);
+        </script>
+      </div>
+      <p>נסו לשנות: הדפיסו את הקישור <em>השני</em> בעזרת <code>document.querySelectorAll('nav a')[1]</code>. ‏NodeList עובדת כמו מערך: יש לה <code>length</code>, גישה עם <code>[0]</code> ו-<code>forEach</code>.</p>
+
+      <div class="box tip">
+        <p><strong>NodeList היא לא בדיוק מערך.</strong> יש לה <code>forEach</code>, אבל אין לה <code>map</code> או <code>filter</code>. כשצריך אותם, הופכים אותה למערך: <code>[...document.querySelectorAll('li')]</code>. זה ה-spread מחלק א׳.</p>
+      </div>
+
+      <h3>כשהאלמנט לא נמצא: null</h3>
+      <p>אם אין בדף אלמנט שמתאים לבורר, <code>querySelector</code> לא זורקת שגיאה. היא מחזירה <code>null</code>, כלומר "כלום". השגיאה מגיעה רק בשורה הבאה, כשמנסים לעשות משהו עם ה"כלום" הזה. זו כנראה השגיאה הנפוצה ביותר בעבודה עם ה-DOM. הריצו וקראו את ההודעה:</p>
+      <div class="playground" id="pg-null" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <h1 class="main-title">שלום</h1>
+        </script>
+        <script type="text/plain" data-lang="js">
+          // שגיאת כתיב: בדף כתוב main-title, וכאן mainTitle
+          const heading = document.querySelector('.mainTitle');
+          console.log('מה מצאנו?', heading);
+
+          heading.textContent = 'היי';
+        </script>
+      </div>
+      <p>ההודעה <code>Cannot set properties of null</code> אומרת: "ניסית לשנות משהו בתוך null". כשרואים אותה, הצעד הראשון הוא תמיד לבדוק את הבורר: האם יש שגיאת כתיב? האם שכחתם נקודה (<code>.</code>) לפני שם מחלקה, או סולמית (<code>#</code>) לפני id? תקנו את הבורר ל-<code>'.main-title'</code> והריצו שוב.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדף יש <code>&lt;p id="msg"&gt;שלום&lt;/p&gt;</code>. איזו שורה תמצא אותו?</p>
+        <ul>
+          <li><code>document.querySelector('msg')</code></li>
+          <li><code>document.querySelector('.msg')</code></li>
+          <li data-correct><code>document.querySelector('#msg')</code></li>
+          <li><code>document.querySelectorAll('p.msg')</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏id מסמנים ב-<code>#</code>, בדיוק כמו ב-CSS. ‏<code>'msg'</code> בלי סימן מחפש תגית בשם <code>&lt;msg&gt;</code>, ו-<code>'.msg'</code> מחפש מחלקה. שתיהן יחזירו <code>null</code>.</p>
+      </div>
+
+      <h2 id="content">שינוי תוכן: textContent <span class="time">5 דק׳</span></h2>
+      <p>אחרי שתפסנו אלמנט, אפשר לקרוא ולשנות את הטקסט שלו דרך המאפיין <code>textContent</code>. קריאה מחזירה את הטקסט, והשמה מחליפה אותו:</p>
+      <div class="playground" id="pg-text" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <h1>ברוכים הבאים</h1>
+          <p>יש בסל <span id="count">0</span> מוצרים</p>
+          <p id="total">סה״כ: ₪0</p>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const heading = document.querySelector('h1');
+          console.log('לפני:', heading.textContent);
+
+          const userName = 'דנה';
+          heading.textContent = `ברוכה הבאה, ${userName}!`;
+          console.log('אחרי:', heading.textContent);
+
+          // textContent תמיד מחרוזת. אפשר לשים בו גם מספר, והוא יומר לטקסט
+          const items = 3;
+          const price = 24.9;
+          document.querySelector('#count').textContent = items;
+          document.querySelector('#total').textContent = `סה״כ: ₪${(items * price).toFixed(2)}`;
+        </script>
+      </div>
+      <p>נסו לשנות את <code>items</code> ל-5 ולהריץ. שימו לב שכל החישוב נעשה ב-JavaScript, וה-DOM רק <strong>מציג</strong> את התוצאה. זה רעיון שנחזור אליו הרבה.</p>
+
+      <h3>למה לא innerHTML?</h3>
+      <p>תראו באינטרנט הרבה דוגמאות עם מאפיין בשם <code>innerHTML</code>. הוא דומה ל-<code>textContent</code>, אבל הדפדפן מפרש את מה ששמים בו <strong>כ-HTML</strong>, ולא כטקסט רגיל. זה נשמע נוח, אבל זה מסוכן כשהתוכן מגיע מהמשתמש.</p>
+      <p>דמיינו אתר תגובות שמציג כל תגובה עם <code>innerHTML</code>. משתמש זדוני כותב "תגובה" שהיא בעצם תגית HTML עם קוד JavaScript בתוכה. מעכשיו, כל מי שנכנס לדף מריץ את הקוד שלו. הקוד יכול לגנוב את פרטי ההתחברות של הגולשים, או לשלוח הודעות בשמם. התקפה כזו נקראת <strong>XSS</strong> (Cross-Site Scripting), והיא מהנפוצות ברשת.</p>
+      <p>עם <code>textContent</code> זה לא יכול לקרות: גם אם מישהו כותב תגיות, הן יוצגו כטקסט רגיל, עם הסוגריים המשולשים, ולא ירוצו. נסו בעצמכם:</p>
+      <div class="playground" id="pg-xss" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <p>התגובה של המשתמש:</p>
+          <p id="comment" style="background:#f1f5f9; padding:8px"></p>
+        </script>
+        <script type="text/plain" data-lang="js">
+          // נניח שזה מה שמשתמש הקליד בטופס התגובות
+          const userComment = '<b>מודגש?</b> <img src="x" onerror="alert(1)">';
+
+          // textContent מציג את זה כטקסט, בבטחה
+          document.querySelector('#comment').textContent = userComment;
+        </script>
+      </div>
+      <div class="box warn">
+        <p><strong>הכלל בקורס:</strong> לטקסט משתמשים תמיד ב-<code>textContent</code>. כשצריך מבנה HTML חדש (למשל פריט ברשימה), יוצרים אותו עם <code>createElement</code>, כמו שנלמד בעוד רגע. כך אין סיכון. גם React עובדת כך: כל טקסט שמכניסים ל-JSX מוצג כטקסט ולא כ-HTML, בדיוק בגלל XSS.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>XSS:</strong> לא צריך להעמיק, אבל כדאי שהסטודנטים יצאו עם הכלל "textContent לטקסט". כדאי להזכיר שמנועי חיפוש מלאים בדוגמאות ישנות עם innerHTML, ושגם כלי AI מציעים אותו לעתים קרובות. כשרואים <code>innerHTML = משהו שהמשתמש הקליד</code> בקוד, זה סימן אזהרה.</p>
+      </aside>
+
+      <h2 id="attributes">שינוי תכונות ועיצוב <span class="time">5 דק׳</span></h2>
+      <h3>תכונות (attributes)</h3>
+      <p>לכל תכונה ב-HTML, כמו <code>src</code> של תמונה, ‏<code>href</code> של קישור או <code>disabled</code> של כפתור, יש מאפיין באותו שם באובייקט ב-DOM. משנים אותו כמו כל מאפיין של אובייקט:</p>
+      <div class="playground" id="pg-attrs" data-height="440">
+        <script type="text/plain" data-lang="html">
+          <img id="pic" src="https://picsum.photos/id/237/200/120" alt="כלב">
+          <p><a id="link" href="https://example.com">קישור</a></p>
+          <button id="buy">קנייה</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const pic = document.querySelector('#pic');
+          console.log('התמונה הנוכחית:', pic.src);
+          pic.src = 'https://picsum.photos/id/1025/200/120';
+          pic.alt = 'כלב אחר';
+
+          const link = document.querySelector('#link');
+          link.href = 'https://developer.mozilla.org';
+          link.textContent = 'לאתר MDN';
+
+          // disabled הוא true או false
+          const buy = document.querySelector('#buy');
+          buy.disabled = true;
+          buy.textContent = 'אזל מהמלאי';
+        </script>
+      </div>
+      <p>נסו לשנות את <code>buy.disabled</code> ל-<code>false</code>. שימו לב איך הכפתור חוזר להיות לחיץ.</p>
+
+      <h3>עיצוב: style מול classList</h3>
+      <p>יש שתי דרכים לשנות עיצוב מ-JavaScript:</p>
+      <ul>
+        <li><strong><code>element.style</code></strong>: משנה מאפיין CSS אחד ישירות על האלמנט. שמות המאפיינים כתובים ב-camelCase: ‏<code>background-color</code> הופך ל-<code>style.backgroundColor</code>.</li>
+        <li><strong><code>element.classList</code></strong>: מוסיף או מוריד מחלקת CSS. את העיצוב עצמו כותבים מראש בקובץ ה-CSS.</li>
+      </ul>
+      <div class="playground" id="pg-classlist" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <p id="a">פסקה שמשנים עם style</p>
+          <p id="b">פסקה שמשנים עם classList</p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .highlight {
+            background: #fef3c7;
+            border-right: 4px solid #f59e0b;
+            padding: 8px;
+            font-weight: bold;
+          }
+        </script>
+        <script type="text/plain" data-lang="js">
+          // דרך 1: style, מאפיין אחד בכל פעם
+          const a = document.querySelector('#a');
+          a.style.color = 'crimson';
+          a.style.fontSize = '20px';
+
+          // דרך 2: classList, עדיפה ברוב המקרים
+          const b = document.querySelector('#b');
+          b.classList.add('highlight');      // מוסיפה מחלקה
+          console.log('יש highlight?', b.classList.contains('highlight'));
+
+          // b.classList.remove('highlight'); // מורידה מחלקה
+          // b.classList.toggle('highlight'); // מוסיפה אם אין, מורידה אם יש
+        </script>
+      </div>
+      <p>נסו להוריד את ההערה (<code>//</code>) מהשורה של <code>toggle</code>, ולהריץ. ה-toggle הוריד את המחלקה כי היא כבר הייתה. עכשיו הורידו גם את ההערה מ-<code>remove</code> ובדקו מה קורה.</p>
+      <div class="box tip">
+        <p><strong>למה classList עדיף?</strong> העיצוב נשאר בקובץ ה-CSS, ו-JavaScript רק מחליטה <em>איזה מצב</em> פעיל: "מודגש", "פתוח", "שגיאה", "מצב כהה". קל יותר לשנות את העיצוב בלי לגעת בקוד, ואפשר להחליף בבת אחת הרבה מאפיינים עם מחלקה אחת. ‏<code>style</code> מתאים בעיקר לערכים שמחושבים בקוד, כמו רוחב של פס התקדמות באחוזים.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 רוצים שכפתור "מצב כהה" יחליף בין מצב כהה לבהיר בכל לחיצה. מה הכי מתאים?</p>
+        <ul>
+          <li><code>document.body.style.background = 'black'</code></li>
+          <li><code>document.body.classList.add('dark')</code></li>
+          <li data-correct><code>document.body.classList.toggle('dark')</code></li>
+          <li><code>document.body.textContent = 'dark'</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>toggle</code> מוסיפה את המחלקה אם היא לא קיימת ומורידה אותה אם היא קיימת, כך שכל לחיצה מחליפה מצב. ‏<code>add</code> עובדת רק בכיוון אחד. ואת <code>textContent</code> של body אסור לשנות ככה: זה מוחק את כל הדף!</p>
+      </div>
+
+      <h2 id="create">יצירת אלמנטים ומחיקה <span class="time">5 דק׳</span></h2>
+      <p>כדי להוסיף לדף משהו שלא היה בו, עושים שלושה צעדים:</p>
+      <div class="flow">
+        <span class="node">1. יוצרים<small>document.createElement('li')</small></span><span class="arrow">←</span><span class="node">2. ממלאים<small>li.textContent = 'חלב'</small></span><span class="arrow">←</span><span class="node">3. מוסיפים לדף<small>list.append(li)</small></span>
+      </div>
+      <p>עד הצעד השלישי, האלמנט קיים רק בזיכרון ולא רואים אותו. רק <code>append</code> "תולה" אותו על העץ, ואז הוא מופיע במסך.</p>
+      <div class="playground" id="pg-create" data-height="400">
+        <script type="text/plain" data-lang="html">
+          <h2>רשימת קניות</h2>
+          <ul id="list">
+            <li>חלב</li>
+          </ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const list = document.querySelector('#list');
+
+          // 1. יוצרים
+          const li = document.createElement('li');
+          // 2. ממלאים
+          li.textContent = 'לחם';
+          li.classList.add('new');
+          // 3. מוסיפים לסוף הרשימה
+          list.append(li);
+
+          // אפשר גם להוסיף להתחלה
+          const first = document.createElement('li');
+          first.textContent = 'ביצים (ראשון!)';
+          list.prepend(first);
+
+          console.log('עכשיו יש ברשימה', list.children.length, 'פריטים');
+        </script>
+      </div>
+      <p>נסו להוסיף פריט שלישי, "גבינה", באותה שיטה.</p>
+
+      <h3>מחיקה והחלפה</h3>
+      <table>
+        <tr><th>הקוד</th><th>מה הוא עושה</th></tr>
+        <tr><td><code>element.remove()</code></td><td>מוחק את האלמנט מהדף</td></tr>
+        <tr><td><code>parent.replaceChildren()</code></td><td>מוחק את <strong>כל</strong> הילדים של האלמנט (מרוקן אותו)</td></tr>
+        <tr><td><code>parent.replaceChildren(a, b)</code></td><td>מרוקן ושם במקום את <code>a</code> ו-<code>b</code></td></tr>
+        <tr><td><code>parent.append(a, b, c)</code></td><td>מוסיף כמה אלמנטים (או מחרוזות) לסוף, בבת אחת</td></tr>
+      </table>
+      <div class="playground" id="pg-remove" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <ul id="list">
+            <li>חלב</li>
+            <li class="done">לחם</li>
+            <li>גבינה</li>
+            <li class="done">ביצים</li>
+          </ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          // מוחקים את כל מה שכבר קנינו
+          document.querySelectorAll('.done').forEach((li) => li.remove());
+
+          const list = document.querySelector('#list');
+          console.log('נשארו', list.children.length);
+
+          // רוצים לרוקן הכול? הורידו את ההערה:
+          // list.replaceChildren();
+        </script>
+      </div>
+
+      <h2 id="render-list">הצגת רשימה ממערך: פונקציית render <span class="time">5 דק׳</span></h2>
+      <p>באפליקציות אמיתיות המידע מגיע כמערך: מוצרים מהחנות, הודעות בצ׳אט, משימות. בחלקים הקודמים למדתם לעבוד עם מערכים ואובייקטים. עכשיו נציג מערך כזה בדף. הרעיון: כותבים פונקציה בשם <code>render</code> (מלשון "ציור") שעוברת על המערך, יוצרת אלמנט לכל פריט, ושמה את כולם בדף.</p>
+      <div class="playground" id="pg-render" data-height="440">
+        <script type="text/plain" data-lang="html">
+          <h2>התפריט שלנו</h2>
+          <ul id="menu"></ul>
+        </script>
+        <script type="text/plain" data-lang="css">
+          #menu { list-style: none; padding: 0; }
+          #menu li { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #e2e8f0; }
+          .price { color: #4f46e5; font-weight: bold; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const dishes = [
+            { name: 'שקשוקה', price: 52 },
+            { name: 'סלט ירקות', price: 38 },
+            { name: 'פסטה ברוטב עגבניות', price: 56 },
+          ];
+
+          function render() {
+            const menu = document.querySelector('#menu');
+            menu.replaceChildren(); // מרוקנים את מה שהיה
+
+            dishes.forEach((dish) => {
+              const li = document.createElement('li');
+              const name = document.createElement('span');
+              name.textContent = dish.name;
+              const price = document.createElement('span');
+              price.className = 'price';
+              price.textContent = `₪${dish.price}`;
+              li.append(name, price);
+              menu.append(li);
+            });
+          }
+
+          render();
+        </script>
+      </div>
+      <p>נסו להוסיף מנה למערך (למשל <code>{ name: 'מרק עדשים', price: 34 }</code>) ולהריץ. לא נגעתם ב-HTML בכלל, וה-DOM התעדכן לבד. זה כוחה של פונקציית render: <strong>המידע נמצא במקום אחד (המערך), והדף נבנה ממנו</strong>.</p>
+
+      <h3>אותו דבר עם map</h3>
+      <p>בחלק ב׳ למדתם ש-<code>map</code> הופכת כל פריט במערך לפריט חדש. אפשר להשתמש בה כדי להפוך כל אובייקט לאלמנט, ואז לשים את כל האלמנטים בבת אחת עם <code>replaceChildren(...)</code> ו-spread:</p>
+      <div class="playground" id="pg-render-map" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <ul id="menu"></ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const dishes = [
+            { name: 'שקשוקה', price: 52 },
+            { name: 'סלט ירקות', price: 38 },
+            { name: 'פסטה ברוטב עגבניות', price: 56 },
+          ];
+
+          // פונקציה קטנה שהופכת מנה אחת לאלמנט li
+          const dishToLi = (dish) => {
+            const li = document.createElement('li');
+            li.textContent = `${dish.name}: ₪${dish.price}`;
+            return li;
+          };
+
+          function render() {
+            const cheap = dishes.filter((dish) => dish.price < 55);
+            document.querySelector('#menu').replaceChildren(...cheap.map(dishToLi));
+          }
+
+          render();
+        </script>
+      </div>
+      <p>שימו לב לשרשור: קודם <code>filter</code> (רק מנות זולות מ-55), ואז <code>map</code> (כל מנה לאלמנט). ב-React תכתבו כמעט בדיוק את זה: ‏<code>dishes.map(dish =&gt; &lt;li&gt;...&lt;/li&gt;)</code>.</p>
+
+      <h3>🎯 אתגר 1: רשימת מוצרים <span class="level easy">קל</span></h3>
+      <p>השלימו את הפונקציה <code>render</code> כך שתציג כל מוצר מהמערך <code>products</code> כ-<code>li</code> בתוך <code>&lt;ul id="products"&gt;</code>. הטקסט של כל פריט צריך להיות בפורמט <code>שם - ₪מחיר</code>, למשל <code>מחברת - ₪12</code>. השתמשו ב-<code>createElement</code> וב-<code>textContent</code>.</p>
+      <div class="playground challenge" id="ch-products" data-check="ch-products" data-height="400">
+        <script type="text/plain" data-lang="html">
+          <h2>המוצרים שלנו</h2>
+          <ul id="products"></ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const products = [
+            { name: 'מחברת', price: 12 },
+            { name: 'עט', price: 5 },
+            { name: 'קלמר', price: 30 },
+          ];
+
+          function render() {
+            const list = document.querySelector('#products');
+            // כתבו כאן: לכל מוצר צרו li, מלאו טקסט, והוסיפו לרשימה
+
+          }
+
+          render();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const products = [
+            { name: 'מחברת', price: 12 },
+            { name: 'עט', price: 5 },
+            { name: 'קלמר', price: 30 },
+          ];
+
+          function render() {
+            const list = document.querySelector('#products');
+            list.replaceChildren();
+            products.forEach((product) => {
+              const li = document.createElement('li');
+              li.textContent = `${product.name} - ₪${product.price}`;
+              list.append(li);
+            });
+          }
+
+          render();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-products': (out, win) => {
+            const items = [...win.document.querySelectorAll('#products li')].map((li) => li.textContent.trim());
+            // מוסיפים מוצר ומריצים render שוב: הפתרון צריך לעבוד מהמערך, לא מטקסט קבוע
+            let rerender = false;
+            try {
+              win.eval("products.push({ name: 'מחק', price: 3 }); render();");
+              rerender = win.document.querySelectorAll('#products li').length === 4;
+            } catch {}
+            return [
+              [items.length === 3, `ברשימה צריכים להיות 3 פריטי li, ומצאתי ${items.length}.`],
+              [items[0] === 'מחברת - ₪12', "הפריט הראשון צריך להיות בדיוק 'מחברת - ₪12' (עם רווח, מקף ורווח)."],
+              [items[2] === 'קלמר - ₪30', "הפריט האחרון צריך להיות 'קלמר - ₪30'."],
+              [rerender, 'כשמוסיפים מוצר למערך ומריצים render שוב, צריכים להיות 4 פריטים. אל תשכחו לרוקן את הרשימה בתחילת render (replaceChildren), ולבנות אותה מהמערך.'],
+              [!/innerHTML/.test(out.code), 'השתמשו ב-createElement וב-textContent, בלי innerHTML.'],
+            ];
+          },
+        });
+      </script>
+
+      <aside class="box lecturer-note">
+        <p><strong>render() הוא הרעיון המרכזי של החלק.</strong> כדאי לצייר על הלוח: מערך בצד אחד, הדף בצד השני, וחץ שעליו כתוב render. כל מה שנעשה מעכשיו (אירועים, טפסים, todo) הוא: לשנות את המערך, ולקרוא שוב ל-render. בשיעור 4 החץ הזה יקבל שם: React.</p>
+      </aside>
+
+      <h2 id="events">אירועים: להגיב למשתמש <span class="time">7 דק׳</span></h2>
+      <p>עד עכשיו הקוד רץ פעם אחת, כשהדף נטען. אבל דף אינטראקטיבי צריך לחכות למשתמש: לעשות משהו <em>כש</em>הוא לוחץ, <em>כש</em>הוא מקליד, <em>כש</em>הוא שולח טופס. כל דבר כזה נקרא <strong>אירוע</strong> (event).</p>
+      <p>כדי להגיב לאירוע, "רושמים" אצל האלמנט פונקציה שתרוץ כשהאירוע קורה. עושים את זה עם <code>addEventListener</code>, שמקבלת שני דברים:</p>
+      <pre><code class="language-js">button.addEventListener('click', handleClick);
+//                       ↑ איזה אירוע   ↑ איזו פונקציה להריץ כשהוא קורה</code></pre>
+      <p>זה בדיוק ה-callback שלמדתם בשיעור 2: מעבירים פונקציה לפונקציה אחרת, והיא תקרא לה מאוחר יותר. כאן "מאוחר יותר" הוא כשהמשתמש לוחץ.</p>
+      <div class="playground" id="pg-click" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <button id="hello">תגידו שלום</button>
+          <p id="msg"></p>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const button = document.querySelector('#hello');
+          const msg = document.querySelector('#msg');
+
+          function handleClick() {
+            msg.textContent = 'שלום! 👋';
+            console.log('לחצו על הכפתור');
+          }
+
+          button.addEventListener('click', handleClick);
+          console.log('הקוד סיים לרוץ. עכשיו לחצו על הכפתור בתוצאה');
+        </script>
+      </div>
+      <p>הריצו, ואז <strong>לחצו על הכפתור בחלון התוצאה</strong>. שימו לב לסדר בקונסול: קודם "הקוד סיים לרוץ", ורק אחר כך, בכל לחיצה, "לחצו על הכפתור". הפונקציה לא רצה כשכתבנו את <code>addEventListener</code>. היא רק נרשמה, ומחכה.</p>
+
+      <h3>הבאג הקלאסי: סוגריים מיותרים</h3>
+      <p>זו טעות שכמעט כל מתחיל עושה, ולכן כדאי להכיר אותה מראש:</p>
+      <table>
+        <tr><th>הקוד</th><th>מה קורה</th></tr>
+        <tr><td>✅ <code>button.addEventListener('click', handleClick)</code></td><td>מעבירים את <strong>הפונקציה עצמה</strong>. היא תרוץ בכל לחיצה.</td></tr>
+        <tr><td>❌ <code>button.addEventListener('click', handleClick())</code></td><td>הסוגריים <strong>מריצים</strong> את הפונקציה מיד, פעם אחת, ומעבירים את מה שהיא החזירה (<code>undefined</code>). הלחיצות לא יעשו כלום.</td></tr>
+      </table>
+      <div class="playground" id="pg-bug-parens" data-height="340">
+        <script type="text/plain" data-lang="html">
+          <button>לחצו עליי</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          function sayHi() {
+            console.log('היי!');
+          }
+
+          // הבאג: sayHi() רצה מיד, פעם אחת בלבד
+          document.querySelector('button').addEventListener('click', sayHi());
+        </script>
+      </div>
+      <p>הריצו ולחצו על הכפתור כמה פעמים. "היי!" הודפס פעם אחת, מיד בהרצה, ואחר כך כלום. מחקו את הסוגריים אחרי <code>sayHi</code>, הריצו שוב, ולחצו.</p>
+
+      <h3>פונקציית חץ ישירות בתוך addEventListener</h3>
+      <p>כשהקוד קצר, נהוג לכתוב את הפונקציה ישירות בתוך הקריאה, כפונקציית חץ. זה הכי נפוץ בקוד אמיתי:</p>
+      <div class="playground" id="pg-click-arrow" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <p>לחצתם <strong id="count">0</strong> פעמים</p>
+          <button id="plus">+1</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          let count = 0;
+          const countEl = document.querySelector('#count');
+
+          document.querySelector('#plus').addEventListener('click', () => {
+            count = count + 1;
+            countEl.textContent = count;
+          });
+        </script>
+      </div>
+      <p>שימו לב: <code>count</code> הוא משתנה JavaScript רגיל. ה-DOM לא "יודע" עליו כלום. בכל לחיצה <strong>אנחנו</strong> צריכים לעדכן את המשתנה, ואז לעדכן גם את הטקסט בדף. אם נשכח את השורה השנייה, המשתנה ישתנה אבל המסך לא. זכרו את זה, זה יהיה חשוב בסוף החלק.</p>
+
+      <h3>האובייקט event ו-event.target</h3>
+      <p>כשהדפדפן קורא לפונקציה שלנו, הוא מעביר לה פרמטר: אובייקט עם פרטים על האירוע. נהוג לקרוא לו <code>event</code> או בקיצור <code>e</code>. המאפיין השימושי ביותר בו הוא <code>event.target</code>: האלמנט שעליו האירוע קרה.</p>
+      <div class="playground" id="pg-target" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <p>בחרו טעם:</p>
+          <button>וניל</button>
+          <button>שוקולד</button>
+          <button>תות</button>
+          <p id="choice"></p>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const choice = document.querySelector('#choice');
+
+          // פונקציה אחת לכל הכפתורים. event.target אומר על מה לחצו
+          function pick(event) {
+            choice.textContent = `בחרתם: ${event.target.textContent}`;
+            console.log('סוג האירוע:', event.type);
+          }
+
+          document.querySelectorAll('button').forEach((btn) => {
+            btn.addEventListener('click', pick);
+          });
+        </script>
+      </div>
+
+      <h3>אירועים נפוצים</h3>
+      <table>
+        <tr><th>אירוע</th><th>מתי הוא קורה</th><th>על מה מאזינים</th></tr>
+        <tr><td><code>click</code></td><td>לחיצה</td><td>כפתורים, קישורים, כל אלמנט</td></tr>
+        <tr><td><code>input</code></td><td>בכל שינוי בשדה, בכל תו שמקלידים</td><td><code>input</code>, ‏<code>textarea</code>, ‏<code>select</code></td></tr>
+        <tr><td><code>change</code></td><td>כשהשדה השתנה וה"פוקוס" יצא ממנו (או בבחירה ב-select / checkbox)</td><td>שדות טופס</td></tr>
+        <tr><td><code>submit</code></td><td>שליחת טופס (לחיצה על כפתור שליחה, או Enter בשדה)</td><td><code>form</code></td></tr>
+        <tr><td><code>keydown</code></td><td>לחיצה על מקש במקלדת</td><td>שדות, או <code>document</code> כולו</td></tr>
+      </table>
+
+      <h3>🎯 אתגר 2: כותרת משתנה <span class="level easy">קל</span></h3>
+      <p>כשלוחצים על הכפתור <code>#change</code>, הטקסט של הכותרת <code>#title</code> צריך להשתנות ל-<code>שלום עולם</code>.</p>
+      <div class="playground challenge" id="ch-heading" data-check="ch-heading" data-height="340">
+        <script type="text/plain" data-lang="html">
+          <h1 id="title">כותרת ישנה</h1>
+          <button id="change">שנו את הכותרת</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const title = document.querySelector('#title');
+          const button = document.querySelector('#change');
+
+          // כתבו כאן: הוסיפו מאזין לאירוע click
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const title = document.querySelector('#title');
+          const button = document.querySelector('#change');
+
+          button.addEventListener('click', () => {
+            title.textContent = 'שלום עולם';
+          });
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-heading': (out, win) => {
+            const doc = win.document;
+            const title = doc.querySelector('#title');
+            const before = title?.textContent;
+            doc.querySelector('#change')?.click();
+            return [
+              [before === 'כותרת ישנה', 'לפני הלחיצה הכותרת צריכה להישאר "כותרת ישנה". שנו אותה רק בתוך המאזין, לא מיד.'],
+              [title?.textContent === 'שלום עולם', 'אחרי לחיצה על הכפתור, הכותרת צריכה להיות בדיוק "שלום עולם". בדקו שהוספתם addEventListener עם click.'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 3: מצב כהה <span class="level easy">קל</span></h3>
+      <p>לחיצה על הכפתור <code>#theme</code> צריכה להוסיף ל-<code>body</code> את המחלקה <code>dark</code>, ולחיצה נוספת צריכה להוריד אותה. ה-CSS כבר כתוב. בונוס: שנו גם את הטקסט של הכפתור ל-"☀️ מצב בהיר" כשהמצב כהה, ובחזרה ל-"🌙 מצב כהה".</p>
+      <div class="playground challenge" id="ch-dark" data-check="ch-dark" data-height="340">
+        <script type="text/plain" data-lang="html">
+          <h1>הבלוג שלי</h1>
+          <p>קצת טקסט כדי לראות את ההבדל.</p>
+          <button id="theme">🌙 מצב כהה</button>
+        </script>
+        <script type="text/plain" data-lang="css">
+          body { transition: background 0.3s; }
+          body.dark { background: #0f172a; color: #e2e8f0; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const themeButton = document.querySelector('#theme');
+
+          // כתבו כאן
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const themeButton = document.querySelector('#theme');
+
+          themeButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            themeButton.textContent = isDark ? '☀️ מצב בהיר' : '🌙 מצב כהה';
+          });
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-dark': (out, win) => {
+            const doc = win.document;
+            const btn = doc.querySelector('#theme');
+            const start = doc.body.classList.contains('dark');
+            btn?.click();
+            const afterOne = doc.body.classList.contains('dark');
+            btn?.click();
+            const afterTwo = doc.body.classList.contains('dark');
+            return [
+              [!start, 'בהתחלה ל-body לא צריכה להיות המחלקה dark.'],
+              [afterOne, 'אחרי לחיצה אחת ל-body צריכה להיות המחלקה dark. השתמשו ב-document.body.classList.'],
+              [!afterTwo, 'אחרי לחיצה שנייה המחלקה dark צריכה לרדת. רמז: classList.toggle.'],
+            ];
+          },
+        });
+      </script>
+
+      <aside class="box lecturer-note">
+        <p><strong>7 דק׳.</strong> כדאי להדגים את הבאג של <code>handleClick()</code> בכוונה מול הכיתה ולשאול "למה זה לא עובד?" לפני שמסבירים. ההבנה ש"פונקציה בלי סוגריים היא ערך, ועם סוגריים היא הרצה" תחזור ב-React ב-<code>onClick={handleClick}</code>, ושם זה בדיוק אותו באג.</p>
+      </aside>
+
+      <h2 id="input">הקלדה: האירוע input <span class="time">3 דק׳</span></h2>
+      <p>כדי לקרוא מה המשתמש כתב בשדה, משתמשים במאפיין <code>value</code> של השדה. האירוע <code>input</code> קורה בכל פעם שהערך משתנה, כלומר בכל תו שמקלידים או מוחקים. כך אפשר להגיב "בזמן אמת":</p>
+      <div class="playground" id="pg-input" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <label for="name">איך קוראים לכם?</label>
+          <input id="name" placeholder="הקלידו שם">
+          <p id="greeting">שלום, אורח!</p>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const nameInput = document.querySelector('#name');
+          const greeting = document.querySelector('#greeting');
+
+          nameInput.addEventListener('input', () => {
+            const name = nameInput.value.trim();
+            greeting.textContent = name ? `שלום, ${name}!` : 'שלום, אורח!';
+            console.log('value עכשיו:', nameInput.value);
+          });
+        </script>
+      </div>
+      <p>הריצו והקלידו שם בשדה שבתוצאה. כל תו מופיע מיד גם בברכה וגם בקונסול.</p>
+
+      <div class="box warn">
+        <p><strong><code>value</code> הוא תמיד מחרוזת</strong>, גם בשדה <code>type="number"</code>. אם כותבים בשדה 5 ובשדה אחר 3, אז <code>a.value + b.value</code> ייתן <code>'53'</code> ולא 8. זו בדיוק הבעיה של <code>"5" + 3</code> מחלק א׳ של שיעור 2. הפתרון: להמיר עם <code>Number(a.value)</code> לפני החישוב.</p>
+      </div>
+      <div class="playground" id="pg-number-input" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <input id="a" type="number" value="5"> +
+          <input id="b" type="number" value="3">
+          <p>בלי המרה: <strong id="wrong"></strong></p>
+          <p>עם Number: <strong id="right"></strong></p>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const a = document.querySelector('#a');
+          const b = document.querySelector('#b');
+
+          function update() {
+            document.querySelector('#wrong').textContent = a.value + b.value;
+            document.querySelector('#right').textContent = Number(a.value) + Number(b.value);
+          }
+
+          a.addEventListener('input', update);
+          b.addEventListener('input', update);
+          update(); // פעם ראשונה, כדי שיוצג משהו לפני שמקלידים
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 4: מונה תווים <span class="level medium">בינוני</span></h3>
+      <p>כמו בטוויטר: מתחת לתיבת הטקסט מוצג כמה תווים נשארו מתוך 50. בכל הקלדה עדכנו את <code>#left</code> למספר התווים שנשארו (<code>50 פחות האורך</code>). כשנשארים <strong>פחות מ-0</strong> תווים, הוסיפו ל-<code>#left</code> את המחלקה <code>over</code>, ובטלו את הכפתור <code>#send</code> (<code>disabled = true</code>). כשחוזרים למגבלה, הורידו את המחלקה והחזירו את הכפתור.</p>
+      <div class="playground challenge" id="ch-counter-chars" data-check="ch-counter-chars" data-height="400">
+        <script type="text/plain" data-lang="html">
+          <textarea id="tweet" rows="3" cols="30" placeholder="מה קורה?"></textarea>
+          <p>נשארו <span id="left">50</span> תווים</p>
+          <button id="send">שליחה</button>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .over { color: crimson; font-weight: bold; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const MAX = 50;
+          const tweet = document.querySelector('#tweet');
+          const left = document.querySelector('#left');
+          const send = document.querySelector('#send');
+
+          // כתבו כאן: מאזין לאירוע input על tweet
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const MAX = 50;
+          const tweet = document.querySelector('#tweet');
+          const left = document.querySelector('#left');
+          const send = document.querySelector('#send');
+
+          tweet.addEventListener('input', () => {
+            const remaining = MAX - tweet.value.length;
+            left.textContent = remaining;
+            const isOver = remaining < 0;
+            left.classList.toggle('over', isOver);
+            send.disabled = isOver;
+          });
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-counter-chars': (out, win) => {
+            const doc = win.document;
+            const tweet = doc.querySelector('#tweet');
+            const left = doc.querySelector('#left');
+            const send = doc.querySelector('#send');
+            const type = (text) => { tweet.value = text; tweet.dispatchEvent(new win.Event('input', { bubbles: true })); };
+            type('שלום');
+            const short = left.textContent.trim();
+            type('x'.repeat(55));
+            const long = left.textContent.trim();
+            const overOn = left.classList.contains('over');
+            const disabledOn = send.disabled;
+            type('x'.repeat(10));
+            const back = left.textContent.trim();
+            return [
+              [short === '46', `אחרי הקלדת "שלום" (4 תווים) צריך להיות כתוב 46, וכתוב "${short}". בדקו שאתם מאזינים לאירוע input ומחשבים MAX - tweet.value.length.`],
+              [long === '-5', `אחרי 55 תווים צריך להיות כתוב -5, וכתוב "${long}".`],
+              [overOn, 'כשעוברים את המגבלה, #left צריך לקבל את המחלקה over.'],
+              [disabledOn, 'כשעוברים את המגבלה, הכפתור #send צריך להיות disabled.'],
+              [back === '40' && !left.classList.contains('over') && !send.disabled, 'כשחוזרים לפחות מ-50 תווים, צריך להוריד את over ולהחזיר את הכפתור (disabled = false).'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="forms">טפסים: submit ו-preventDefault <span class="time">5 דק׳</span></h2>
+      <p>בשיעור 1 בניתם טפסים ב-HTML. כשלוחצים על כפתור השליחה, ההתנהגות הרגילה של הדפדפן היא <strong>לשלוח את הטופס לשרת ולטעון דף חדש</strong>. ככה עבדו אתרים לפני 20 שנה. היום אנחנו רוצים לטפל בטופס ב-JavaScript, בלי לטעון מחדש את הדף. בשביל זה:</p>
+      <ol>
+        <li>מאזינים לאירוע <code>submit</code> <strong>על ה-<code>form</code></strong> (לא על הכפתור). כך הוא עובד גם בלחיצה וגם כשלוחצים Enter בשדה.</li>
+        <li>בתחילת הפונקציה קוראים ל-<code>event.preventDefault()</code>, שאומר לדפדפן: "אל תעשה את מה שאתה עושה בדרך כלל (טעינה מחדש). אני אטפל בזה."</li>
+        <li>קוראים את הערכים מהשדות, בודקים אותם, ועושים משהו.</li>
+      </ol>
+      <div class="playground" id="pg-form" data-height="440">
+        <script type="text/plain" data-lang="html">
+          <form id="signup">
+            <label for="email">אימייל</label>
+            <input id="email" type="text">
+            <label for="age">גיל</label>
+            <input id="age" type="number">
+            <button>הרשמה</button>
+          </form>
+          <p id="result"></p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          form { display: flex; flex-direction: column; gap: 6px; max-width: 220px; }
+          .error { color: crimson; }
+          .success { color: green; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          const form = document.querySelector('#signup');
+          const result = document.querySelector('#result');
+
+          form.addEventListener('submit', (event) => {
+            event.preventDefault(); // בלי זה הדף נטען מחדש וכל מה שעשינו נעלם
+
+            const email = document.querySelector('#email').value.trim();
+            const age = Number(document.querySelector('#age').value);
+
+            // בדיקות תקינות (ולידציה), כל אחת עם הודעה ברורה
+            if (!email.includes('@')) {
+              result.textContent = 'כתובת האימייל צריכה לכלול @';
+              result.className = 'error';
+              return;
+            }
+            if (age < 16) {
+              result.textContent = 'ההרשמה מגיל 16';
+              result.className = 'error';
+              return;
+            }
+
+            result.textContent = `נרשמתם בהצלחה עם ${email} 🎉`;
+            result.className = 'success';
+            form.reset(); // מנקה את השדות
+          });
+        </script>
+      </div>
+      <p>נסו: שלחו את הטופס ריק, אחר כך עם אימייל בלי <code>@</code>, אחר כך עם גיל 12, ובסוף עם פרטים תקינים. שימו לב איך <code>return</code> עוצר את הפונקציה ברגע שמצאנו בעיה. זה ה-"early return" מהשיעור הקודם.</p>
+      <div class="box tip">
+        <p><strong>ולידציה ב-HTML מול JavaScript:</strong> לבדיקות פשוטות אפשר להשתמש בתכונות HTML כמו <code>required</code>, ‏<code>type="email"</code> ו-<code>min="16"</code>, והדפדפן יציג הודעה בעצמו. ב-JavaScript כותבים בדיקות שה-HTML לא יודע לעשות, כמו "שתי הסיסמאות זהות", ושולטים בדיוק בהודעה ובמיקום שלה.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 כתבתם מאזין ל-submit, אבל בכל שליחה הדף "מהבהב", ההודעה שלכם מופיעה לשנייה ונעלמת. מה חסר?</p>
+        <ul>
+          <li><code>form.reset()</code></li>
+          <li data-correct><code>event.preventDefault()</code> בתחילת המאזין</li>
+          <li><code>return</code> בסוף המאזין</li>
+          <li>להאזין ל-click במקום ל-submit</li>
+        </ul>
+        <p class="quiz-explain">נכון! בלי <code>preventDefault</code> הדפדפן ממשיך בהתנהגות הרגילה שלו: שולח את הטופס וטוען את הדף מחדש. הטעינה מוחקת את כל מה ש-JavaScript שינתה, ולכן ההודעה נעלמת.</p>
+      </div>
+
+      <h2 id="state-render">התבנית החשובה: נתונים ← render <span class="time">7 דק׳</span></h2>
+      <p>עד עכשיו כל מאזין שינה את הדף ישירות: "תכתוב כאן טקסט", "תוסיף פה מחלקה". בדף קטן זה עובד. אבל כשיש הרבה כפתורים שמשנים את אותו מידע, קל מאוד להגיע למצב שהדף מראה דבר אחד והמשתנים אומרים דבר אחר.</p>
+      <p>הפתרון הוא תבנית עבודה פשוטה, ששווה לזכור כי <strong>זו בדיוק הדרך שבה React חושבת</strong>:</p>
+      <div class="flow">
+        <span class="node">אירוע<small>לחיצה, הקלדה, שליחה</small></span>
+        <span class="arrow">←</span>
+        <span class="node">משנים את הנתונים<small>state: משתנה, מערך, אובייקט</small></span>
+        <span class="arrow">←</span>
+        <span class="node">קוראים ל-render()<small>מציירת את הדף מחדש לפי הנתונים</small></span>
+      </div>
+      <ol>
+        <li><strong>state</strong> (מצב): המשתנים שמחזיקים את המידע של הדף. למשל <code>let count = 0</code> או מערך משימות.</li>
+        <li><strong>render</strong>: פונקציה אחת שיודעת לקחת את ה-state ולהציג אותו. היא לא מחליטה כלום, רק מציגה.</li>
+        <li><strong>מאזינים</strong>: כל מאזין רק משנה את ה-state, ואז קורא ל-<code>render()</code>. הם לא נוגעים בדף בעצמם.</li>
+      </ol>
+      <p>הנה מונה עם שני כפתורים שבנוי בדרך הזאת. שימו לב שרק <code>render</code> כותבת לדף:</p>
+      <div class="playground" id="pg-state" data-height="400">
+        <script type="text/plain" data-lang="html">
+          <p>לייקים: <strong id="likes"></strong></p>
+          <p id="label"></p>
+          <button id="like">👍</button>
+          <button id="unlike">👎</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          // 1. state
+          let likes = 0;
+
+          // 2. render: מציגה את ה-state, וזה הכול
+          function render() {
+            document.querySelector('#likes').textContent = likes;
+            document.querySelector('#label').textContent = likes >= 5 ? '🔥 פופולרי!' : '';
+            console.log('render, likes =', likes);
+          }
+
+          // 3. מאזינים: משנים state וקוראים ל-render
+          document.querySelector('#like').addEventListener('click', () => {
+            likes++;
+            render();
+          });
+          document.querySelector('#unlike').addEventListener('click', () => {
+            likes--;
+            render();
+          });
+
+          render(); // ציור ראשון
+        </script>
+      </div>
+      <p>היתרון: ההודעה "פופולרי" תמיד נכונה, לא משנה איזה כפתור לחצו, כי היא מחושבת מחדש מה-state בכל פעם. אם מחר נוסיף כפתור שלישי, הוא רק צריך לשנות את <code>likes</code> ולקרוא ל-<code>render</code>.</p>
+
+      <h3>🎯 אתגר 5: מונה עם איפוס <span class="level easy">קל</span></h3>
+      <p>השלימו את המונה: <code>+</code> מעלה ב-1, <code>−</code> מוריד ב-1, ו"איפוס" מחזיר ל-0. עבדו לפי התבנית: כל מאזין משנה את <code>count</code> וקורא ל-<code>render()</code>. בונוס: אל תתנו למונה לרדת מתחת ל-0.</p>
+      <div class="playground challenge" id="ch-counter" data-check="ch-counter" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <h2 id="count">0</h2>
+          <button id="minus">−</button>
+          <button id="plus">+</button>
+          <button id="reset">איפוס</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          let count = 0;
+
+          function render() {
+            document.querySelector('#count').textContent = count;
+          }
+
+          // כתבו כאן שלושה מאזינים
+
+          render();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          let count = 0;
+
+          function render() {
+            document.querySelector('#count').textContent = count;
+          }
+
+          document.querySelector('#plus').addEventListener('click', () => {
+            count++;
+            render();
+          });
+          document.querySelector('#minus').addEventListener('click', () => {
+            if (count > 0) count--;
+            render();
+          });
+          document.querySelector('#reset').addEventListener('click', () => {
+            count = 0;
+            render();
+          });
+
+          render();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-counter': (out, win) => {
+            const doc = win.document;
+            const shown = () => doc.querySelector('#count').textContent.trim();
+            const click = (sel) => doc.querySelector(sel).click();
+            click('#plus'); click('#plus'); click('#plus');
+            const afterPlus = shown();
+            click('#minus');
+            const afterMinus = shown();
+            let state = null;
+            try { state = win.eval('count'); } catch (e) {}
+            click('#reset');
+            const afterReset = shown();
+            return [
+              [afterPlus === '3', `אחרי 3 לחיצות על + צריך להיות מוצג 3, ומוצג "${afterPlus}".`],
+              [afterMinus === '2', `אחרי לחיצה על − צריך להיות מוצג 2, ומוצג "${afterMinus}".`],
+              [state === 2, 'המשתנה count צריך להשתנות (ולא רק הטקסט בדף). שנו את count ואז קראו ל-render().'],
+              [afterReset === '0', `אחרי איפוס צריך להיות מוצג 0, ומוצג "${afterReset}".`],
+            ];
+          },
+        });
+      </script>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 לפי תבנית state ← render, מה צריך לעשות מאזין ללחיצה על כפתור "מחק"?</p>
+        <ul>
+          <li>למצוא את ה-<code>li</code> בדף ולהפעיל עליו <code>remove()</code></li>
+          <li data-correct>להוריד את הפריט מהמערך, ואז לקרוא ל-<code>render()</code></li>
+          <li>לקרוא ל-<code>render()</code> בלבד</li>
+          <li>לטעון מחדש את הדף</li>
+        </ul>
+        <p class="quiz-explain">נכון! המאזין משנה רק את הנתונים, ו-<code>render</code> דואגת שהדף יתאים להם. אם רק נמחק את ה-<code>li</code>, הפריט עדיין יהיה במערך ויחזור ברינדור הבא. ואם רק נקרא ל-<code>render</code> בלי לשנות את המערך, שום דבר לא ישתנה.</p>
+      </div>
+
+      <h2 id="todo">דוגמה פתורה: רשימת משימות <span class="time">8 דק׳</span></h2>
+      <p>עכשיו נחבר את כל מה שלמדנו לאפליקציה קטנה אחת: רשימת משימות שאפשר להוסיף אליה, לסמן משימה כבוצעה ולמחוק. זו "אפליקציית ה-Hello World" של עולם הפרונטאנד, ובשיעור 5 נבנה אותה שוב ב-React. נבנה אותה בשלושה צעדים.</p>
+
+      <h3>צעד 1: ה-state וה-render</h3>
+      <p>כל משימה היא אובייקט עם <code>id</code> (מספר ייחודי, כדי שנוכל לזהות אותה), ‏<code>text</code> ו-<code>done</code>. הפונקציה <code>render</code> מוחקת את הרשימה ובונה אותה מחדש מהמערך:</p>
+      <pre><code class="language-js">let todos = [
+  { id: 1, text: 'לקנות חלב', done: false },
+  { id: 2, text: 'לסיים את שיעור 3', done: true },
+];
+
+function render() {
+  const list = document.querySelector('#list');
+  list.replaceChildren(); // מנקים את מה שהיה
+
+  todos.forEach((todo) =&gt; {
+    const li = document.createElement('li');
+    li.textContent = todo.text;
+    if (todo.done) li.classList.add('done');
+    list.append(li);
+  });
+}</code></pre>
+
+      <h3>צעד 2: הוספה עם טופס</h3>
+      <p>מאזין ל-<code>submit</code> שיוצר אובייקט חדש, מוסיף אותו למערך וקורא ל-<code>render</code>. בתור <code>id</code> משתמשים ב-<code>Date.now()</code>, שמחזיר את מספר המילישניות מאז 1970, כך שהוא כמעט תמיד שונה:</p>
+      <pre><code class="language-js">form.addEventListener('submit', (event) =&gt; {
+  event.preventDefault();
+  const text = input.value.trim();
+  if (!text) return; // לא מוסיפים משימה ריקה
+
+  todos.push({ id: Date.now(), text, done: false });
+  input.value = '';
+  render();
+});</code></pre>
+
+      <h3>צעד 3: סימון ומחיקה</h3>
+      <p>לכל משימה יוצרים בתוך <code>render</code> גם כפתור מחיקה ותיבת סימון, ומחברים אליהם מאזינים. כל מאזין "זוכר" את ה-<code>todo</code> שלו, כי הוא נוצר בתוך ה-<code>forEach</code>. המחיקה משתמשת ב-<code>filter</code> מחלק ב׳: משאירים את כל המשימות חוץ מזו שה-id שלה שווה.</p>
+      <p>הנה הכול יחד. הריצו, הוסיפו משימות, סמנו ומחקו:</p>
+      <div class="playground" id="pg-todo" data-height="440">
+        <script type="text/plain" data-lang="html">
+          <form id="todo-form">
+            <input id="todo-input" placeholder="משימה חדשה">
+            <button>הוספה</button>
+          </form>
+          <ul id="list"></ul>
+          <p id="summary"></p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          ul { padding: 0; list-style: none; }
+          li { display: flex; gap: 8px; align-items: center; padding: 4px 0; }
+          li.done span { text-decoration: line-through; color: gray; }
+          li button { margin-inline-start: auto; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          let todos = [
+            { id: 1, text: 'לקנות חלב', done: false },
+            { id: 2, text: 'לסיים את שיעור 3', done: true },
+          ];
+
+          const form = document.querySelector('#todo-form');
+          const input = document.querySelector('#todo-input');
+
+          function render() {
+            const list = document.querySelector('#list');
+            list.replaceChildren();
+
+            todos.forEach((todo) => {
+              const li = document.createElement('li');
+              if (todo.done) li.classList.add('done');
+
+              const checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
+              checkbox.checked = todo.done;
+              checkbox.addEventListener('change', () => {
+                todo.done = !todo.done; // משנים state
+                render();               // ומציירים מחדש
+              });
+
+              const text = document.createElement('span');
+              text.textContent = todo.text;
+
+              const del = document.createElement('button');
+              del.textContent = '🗑️';
+              del.addEventListener('click', () => {
+                todos = todos.filter((t) => t.id !== todo.id);
+                render();
+              });
+
+              li.append(checkbox, text, del);
+              list.append(li);
+            });
+
+            const left = todos.filter((t) => !t.done).length;
+            document.querySelector('#summary').textContent = `נשארו ${left} משימות מתוך ${todos.length}`;
+          }
+
+          form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            todos.push({ id: Date.now(), text, done: false });
+            input.value = '';
+            render();
+          });
+
+          render();
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>שימו לב לשורת הסיכום.</strong> אף מאזין לא מעדכן אותה. היא תמיד נכונה, כי <code>render</code> מחשבת אותה מחדש מהמערך בכל פעם. זה הכוח של התבנית: מוסיפים תצוגה חדשה במקום אחד, וכל הפעולות "מקבלות" אותה בחינם.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>הדוגמה הזאת היא לב השיעור (כ-15 דק׳ יחד עם האתגר הבא).</strong> מומלץ לבנות אותה בלייב מאפס לפי שלושת הצעדים, ולהריץ אחרי כל צעד. לפני צעד 3 כדאי לשאול את הכיתה: "איך נדע איזו משימה למחוק?" ולהגיע יחד ל-id.</p>
+        <p>אחרי שהכול עובד, לשאול: "כמה פעמים כתבנו <code>render()</code>? מה היה קורה אם היינו שוכחים אחת?" זו הכנה ישירה ל"למה React" בהמשך העמוד: ב-React אין צורך לקרוא ל-render בעצמנו.</p>
+      </aside>
+
+      <h3>🎯 אתגר 6: רשימת קניות עם טופס <span class="level hard">מאתגר</span></h3>
+      <p>ה-state והפונקציה <code>render</code> כבר כתובים. כתבו מאזין ל-<code>submit</code> על הטופס שעושה את כל אלה:</p>
+      <ol>
+        <li>מונע את טעינת הדף מחדש.</li>
+        <li>קורא את הטקסט מ-<code>#item</code> ומוריד רווחים בצדדים (<code>trim</code>).</li>
+        <li>אם הטקסט ריק: כותב ב-<code>#error</code> הודעה (למשל "נא לכתוב שם של פריט") ולא מוסיף כלום.</li>
+        <li>אחרת: מוסיף את הטקסט למערך <code>items</code>, מנקה את השדה ואת הודעת השגיאה, וקורא ל-<code>render()</code>.</li>
+      </ol>
+      <div class="playground challenge" id="ch-todo-form" data-check="ch-todo-form" data-height="440">
+        <script type="text/plain" data-lang="html">
+          <form id="shop-form">
+            <input id="item" placeholder="מה לקנות?">
+            <button>הוספה</button>
+          </form>
+          <p id="error"></p>
+          <ul id="shopping"></ul>
+        </script>
+        <script type="text/plain" data-lang="css">
+          #error { color: crimson; }
+        </script>
+        <script type="text/plain" data-lang="js">
+          let items = ['לחם', 'ביצים'];
+
+          const form = document.querySelector('#shop-form');
+          const input = document.querySelector('#item');
+          const error = document.querySelector('#error');
+
+          function render() {
+            const list = document.querySelector('#shopping');
+            list.replaceChildren(...items.map((item) => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              return li;
+            }));
+          }
+
+          // כתבו כאן את המאזין ל-submit
+
+          render();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          let items = ['לחם', 'ביצים'];
+
+          const form = document.querySelector('#shop-form');
+          const input = document.querySelector('#item');
+          const error = document.querySelector('#error');
+
+          function render() {
+            const list = document.querySelector('#shopping');
+            list.replaceChildren(...items.map((item) => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              return li;
+            }));
+          }
+
+          form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const text = input.value.trim();
+            if (!text) {
+              error.textContent = 'נא לכתוב שם של פריט';
+              return;
+            }
+            items.push(text);
+            input.value = '';
+            error.textContent = '';
+            render();
+          });
+
+          render();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-todo-form': (out, win) => {
+            const doc = win.document;
+            const form = doc.querySelector('#shop-form');
+            const input = doc.querySelector('#item');
+            const error = doc.querySelector('#error');
+            const lis = () => [...doc.querySelectorAll('#shopping li')].map((li) => li.textContent.trim());
+            const submit = (text) => {
+              input.value = text;
+              const ev = new win.Event('submit', { bubbles: true, cancelable: true });
+              form.dispatchEvent(ev);
+              return ev.defaultPrevented;
+            };
+            const prevented = submit('  עגבניות  ');
+            const afterAdd = lis();
+            const cleared = input.value === '';
+            let stateLen = null;
+            try { stateLen = win.eval('items.length'); } catch (e) {}
+            submit('   ');
+            const afterEmpty = lis();
+            const errorText = error.textContent.trim();
+            submit('גבינה');
+            const errorAfterFix = error.textContent.trim();
+            return [
+              [prevented, 'המאזין צריך לקרוא ל-event.preventDefault(), אחרת הדף ייטען מחדש.'],
+              [afterAdd.length === 3 && afterAdd[2] === 'עגבניות', `אחרי הוספת "  עגבניות  " צריכים להיות 3 פריטים, והאחרון "עגבניות" (בלי רווחים). כרגע: ${afterAdd.join(', ')}`],
+              [stateLen === 3, 'הפריט צריך להתווסף למערך items (ואז render מציגה אותו).'],
+              [cleared, 'אחרי הוספה צריך לנקות את השדה: input.value = \'\''],
+              [afterEmpty.length === 3, 'שליחה של שדה ריק (או רק רווחים) לא צריכה להוסיף פריט.'],
+              [errorText.length > 0, 'בשליחה ריקה צריך לכתוב הודעה ב-#error.'],
+              [errorAfterFix === '', 'אחרי הוספה תקינה צריך לנקות את הודעת השגיאה.'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="script-tag">איך מחברים JavaScript לדף אמיתי <span class="time">3 דק׳</span></h2>
+      <p>בעורך באתר הקוד שלכם רץ אחרי שה-HTML כבר מוכן. בפרויקט אמיתי ב-VS Code צריך לדאוג לזה בעצמכם. מבנה התיקייה הרגיל:</p>
+      <pre><code class="nohighlight">my-todo/
+├── index.html
+├── style.css
+└── script.js</code></pre>
+      <p>וב-<code>index.html</code> מחברים את הקובץ בתוך ה-<code>head</code>, עם המילה <code>defer</code>:</p>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="he" dir="rtl"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;המשימות שלי&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+  &lt;script src="script.js" defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;ul id="list"&gt;&lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <p><strong>למה <code>defer</code>?</strong> הדפדפן קורא את ה-HTML מלמעלה למטה. בלי <code>defer</code>, הסקריפט ירוץ ברגע שהדפדפן מגיע אליו, כשה-<code>body</code> עוד לא קיים. אז <code>document.querySelector('#list')</code> יחזיר <code>null</code>, ותקבלו את השגיאה המוכרת <code>Cannot read properties of null</code>. ‏<code>defer</code> אומר: "תוריד את הקובץ עכשיו, אבל תריץ אותו רק אחרי שכל ה-HTML נקרא".</p>
+      <div class="box tip">
+        <p>בקוד ישן תראו לפעמים שתי דרכים אחרות לאותה בעיה: לשים את ה-<code>&lt;script&gt;</code> בסוף ה-<code>body</code>, או לעטוף את כל הקוד ב-<code>document.addEventListener('DOMContentLoaded', () =&gt; { ... })</code>. שתיהן עובדות, אבל <code>defer</code> הוא הפשוט והמודרני ביותר.</p>
+      </div>
+
+      <h2 id="why-react">אז למה צריך React? <span class="time">5 דק׳</span></h2>
+      <p>בניתם עכשיו אפליקציה אמיתית רק עם JavaScript ("Vanilla JS", כלומר JavaScript "רגיל" בלי ספריות). זה עובד, אבל תסתכלו כמה עבודה ידנית עשינו:</p>
+      <ul>
+        <li>חיפשנו כל אלמנט בעצמנו עם <code>querySelector</code>, וקיווינו שלא טעינו בשם.</li>
+        <li>יצרנו כל תגית בנפרד: <code>createElement</code>, ‏<code>textContent</code>, ‏<code>append</code>. שלוש שורות לכל <code>li</code>.</li>
+        <li>חיברנו מאזינים אחד-אחד, גם לכפתורים שנוצרים מחדש בכל רינדור.</li>
+        <li>היינו צריכים <strong>לזכור</strong> לקרוא ל-<code>render()</code> אחרי כל שינוי. שכחתם פעם אחת? הדף מראה מידע ישן.</li>
+        <li>ה-<code>render</code> שלנו מוחקת ובונה את <em>כל</em> הרשימה מחדש, גם כשהשתנתה משימה אחת. ברשימה של 5,000 פריטים זה כבר איטי.</li>
+      </ul>
+      <p>‏<strong>React</strong> נולדה בדיוק בשביל הבעיות האלה. הנה אותה רשימת משימות כפי שתיכתב ב-React (לא צריך להבין עכשיו כל שורה, רק להתרשם):</p>
+      <pre><code class="language-js">function TodoApp() {
+  const [todos, setTodos] = useState([
+    { id: 1, text: 'לקנות חלב', done: false },
+  ]);
+
+  return (
+    &lt;ul&gt;
+      {todos.map((todo) =&gt; (
+        &lt;li key={todo.id} className={todo.done ? 'done' : ''}&gt;
+          {todo.text}
+          &lt;button onClick={() =&gt; setTodos(todos.filter((t) =&gt; t.id !== todo.id))}&gt;
+            🗑️
+          &lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+      <p>מה אתם כבר מזהים כאן? ‏<code>map</code> ו-<code>filter</code> מחלק ב׳, ‏arrow functions, ‏מערך של אובייקטים עם <code>id</code>, ומאזין ללחיצה (<code>onClick</code>). ומה נעלם? אין <code>querySelector</code>, אין <code>createElement</code>, ואין קריאה ל-<code>render</code>. כשקוראים ל-<code>setTodos</code>, ‏React מציירת מחדש בעצמה, ומעדכנת רק את מה שבאמת השתנה.</p>
+
+      <h3>אימפרטיבי מול דקלרטיבי</h3>
+      <table>
+        <tr><th></th><th>Vanilla JS (אימפרטיבי)</th><th>React (דקלרטיבי)</th></tr>
+        <tr><td>מה כותבים</td><td><strong>איך</strong> לשנות את הדף, צעד אחר צעד: "צור li, שים בו טקסט, הוסף לרשימה"</td><td><strong>מה</strong> הדף צריך להראות לפי ה-state: "לכל משימה יש li"</td></tr>
+        <tr><td>מי מעדכן את הדף</td><td>אתם, בכל מאזין</td><td>React, אוטומטית אחרי שינוי state</td></tr>
+        <tr><td>דימוי</td><td>להסביר לנהג מונית כל פנייה</td><td>להגיד לנהג את הכתובת</td></tr>
+      </table>
+      <div class="box goals">
+        <p><strong>החדשות הטובות:</strong> התבנית state ← render שלמדתם כאן היא בדיוק הדרך שבה React חושבת. מי שהבין את רשימת המשימות בעמוד הזה, יבין את React הרבה יותר מהר. וגם ב-React עדיין תשתמשו ב-<code>event.preventDefault()</code>, ב-<code>event.target.value</code> ובאירועים כמו <code>click</code> ו-<code>submit</code>.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה הבעיה העיקרית ש-React פותרת, לעומת מה שעשינו בעמוד הזה?</p>
+        <ul>
+          <li>ב-Vanilla JS אי אפשר לבנות רשימת משימות</li>
+          <li>React מריצה JavaScript מהר יותר</li>
+          <li data-correct>ב-React מתארים מה הדף צריך להראות לפי ה-state, והיא מעדכנת את ה-DOM בעצמה</li>
+          <li>ב-React לא צריך לכתוב JavaScript</li>
+        </ul>
+        <p class="quiz-explain">נכון! הכול אפשרי גם ב-Vanilla JS, כמו שראיתם. React חוסכת את העבודה הידנית: את ה-querySelector, את ה-createElement ואת הצורך לזכור לקרוא ל-render.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>כ-5 דק׳, וחשוב לא לדלג.</strong> זה הגשר לשיעור 4. כדאי לשים את קוד ה-Vanilla ואת קוד ה-React זה לצד זה על המסך, ולבקש מהכיתה לסמן מה משותף (map, filter, id, אירוע לחיצה) ומה נעלם. המטרה היא שהסטודנטים ירגישו את "הכאב" של העבודה הידנית, כדי ש-React תיראה כפתרון ולא כעוד דבר ללמוד.</p>
+      </aside>
+
+      <h2 id="mistakes">טעויות נפוצות <span class="time">2 דק׳</span></h2>
+      <table>
+        <tr><th>מה רואים</th><th>הסיבה</th><th>התיקון</th></tr>
+        <tr><td><code>Cannot read properties of null</code></td><td>‏<code>querySelector</code> לא מצא את האלמנט: טעות בשם, שכחתם <code>#</code> או <code>.</code>, או שהסקריפט רץ לפני ה-HTML</td><td>בדקו את הסלקטור מול ה-HTML, והוסיפו <code>defer</code> לתגית ה-script</td></tr>
+        <tr><td>הפונקציה רצה מיד כשהדף נטען, ולא בלחיצה</td><td>כתבתם <code>addEventListener('click', fn())</code> עם סוגריים</td><td>מעבירים את הפונקציה בלי לקרוא לה: <code>fn</code></td></tr>
+        <tr><td>הדף מהבהב והשינויים נעלמים בשליחת טופס</td><td>חסר <code>event.preventDefault()</code></td><td>להוסיף אותו בשורה הראשונה של מאזין ה-submit</td></tr>
+        <tr><td><code>5 + 3</code> נותן <code>53</code></td><td>‏<code>input.value</code> הוא תמיד מחרוזת</td><td>‏<code>Number(input.value)</code></td></tr>
+        <tr><td>הנתונים השתנו אבל הדף לא</td><td>שכחתם לקרוא ל-<code>render()</code></td><td>בכל מאזין: לשנות state ואז <code>render()</code></td></tr>
+        <tr><td>הפריטים ברשימה מופיעים פעמיים</td><td>‏<code>render</code> מוסיפה בלי לנקות קודם</td><td>להתחיל את <code>render</code> ב-<code>list.replaceChildren()</code></td></tr>
+        <tr><td><code>querySelectorAll(...).map is not a function</code></td><td>‏<code>NodeList</code> הוא לא מערך רגיל</td><td>להשתמש ב-<code>forEach</code>, או להמיר: <code>[...nodeList].map(...)</code></td></tr>
+      </table>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 הקוד <code>document.querySelector('#list').append(li)</code> נכתב בקובץ <code>script.js</code> שמחובר ב-head <strong>בלי</strong> <code>defer</code>. מה יקרה?</p>
+        <ul>
+          <li>הכול יעבוד כרגיל</li>
+          <li>ה-li יתווסף לסוף הדף</li>
+          <li data-correct>שגיאה, כי ברגע שהסקריפט רץ ה-ul עוד לא קיים ו-querySelector מחזיר null</li>
+          <li>הדפדפן יחכה אוטומטית עד שה-HTML ייטען</li>
+        </ul>
+        <p class="quiz-explain">נכון! בלי <code>defer</code> הסקריפט רץ ברגע שהדפדפן מגיע אליו ב-head, לפני שהוא קרא את ה-body. ‏<code>querySelector</code> מחזיר <code>null</code>, ו-<code>null.append</code> זורק שגיאה.</p>
+      </div>
+
+      <h2 id="cheatsheet">דף עזר</h2>
+      <table>
+        <tr><th>רוצים...</th><th>כותבים</th></tr>
+        <tr><td>למצוא אלמנט אחד / את כולם</td><td><code>document.querySelector('.x')</code> / <code>document.querySelectorAll('li')</code></td></tr>
+        <tr><td>לשנות טקסט</td><td><code>el.textContent = 'שלום'</code></td></tr>
+        <tr><td>לשנות תכונה</td><td><code>img.src = 'a.png'</code>, ‏<code>btn.disabled = true</code></td></tr>
+        <tr><td>להוסיף / להוריד / להחליף מחלקה</td><td><code>el.classList.add('x')</code> / <code>.remove('x')</code> / <code>.toggle('x')</code></td></tr>
+        <tr><td>ליצור ולהוסיף אלמנט</td><td><code>const li = document.createElement('li'); list.append(li)</code></td></tr>
+        <tr><td>למחוק אלמנט / לרוקן רשימה</td><td><code>el.remove()</code> / <code>list.replaceChildren()</code></td></tr>
+        <tr><td>להגיב ללחיצה</td><td><code>btn.addEventListener('click', () =&gt; { ... })</code></td></tr>
+        <tr><td>לדעת על מה לחצו</td><td><code>event.target</code></td></tr>
+        <tr><td>לקרוא שדה בכל הקלדה</td><td><code>input.addEventListener('input', () =&gt; input.value)</code></td></tr>
+        <tr><td>לטפל בטופס</td><td><code>form.addEventListener('submit', (e) =&gt; { e.preventDefault(); ... })</code></td></tr>
+        <tr><td>לחבר קובץ JS</td><td><code>&lt;script src="script.js" defer&gt;&lt;/script&gt;</code></td></tr>
+      </table>
+
+      <h2 id="summary">סיכום</h2>
+      <ul>
+        <li>ה-<strong>DOM</strong> הוא העץ שהדפדפן בונה מה-HTML. JavaScript יכולה לקרוא אותו ולשנות אותו, והדף מתעדכן מיד.</li>
+        <li>‏<code>querySelector</code> מוצא אלמנטים, ‏<code>textContent</code> ו-<code>classList</code> משנים אותם, ו-<code>createElement</code> + <code>append</code> יוצרים חדשים. ‏<code>innerHTML</code> לא משתמשים, כדי להימנע מ-XSS.</li>
+        <li>‏<code>addEventListener</code> מחבר פונקציה לאירוע: <code>click</code>, ‏<code>input</code>, ‏<code>submit</code>. בטפסים תמיד <code>event.preventDefault()</code>, ו-<code>value</code> הוא תמיד מחרוזת.</li>
+        <li>התבנית <strong>state ← render</strong>: מאזינים משנים רק את הנתונים, ופונקציה אחת מציירת את הדף לפיהם.</li>
+        <li>React לוקחת את אותה תבנית ועושה בשבילכם את העבודה הידנית. זה מה שנתחיל בשיעור 4.</li>
+      </ul>
+
+      <h3>לקריאה נוספת</h3>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction" target="_blank" rel="noopener">MDN: Introduction to the DOM</a></li>
+        <li><a href="https://javascript.info/document" target="_blank" rel="noopener">javascript.info: Document</a> (פרקים 2.1 עד 2.8)</li>
+        <li><a href="https://javascript.info/events" target="_blank" rel="noopener">javascript.info: Introduction to Events</a></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events" target="_blank" rel="noopener">MDN: Introduction to events</a></li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p><strong>אם נשאר זמן:</strong> לבקש מהסטודנטים להוסיף לרשימת המשימות כפתור "מחק את כל הבוצעות" (רמז: <code>filter</code> + <code>render</code>). מי שמסיים מהר יכול להוסיף שדה חיפוש שמסנן את הרשימה בכל הקלדה. את שניהם אפשר גם לתת כשיעורי בית לקראת הפרויקט.</p>
+      </aside>
+
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -257,7 +257,7 @@ a.lesson-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgb(0 
 
 /* ---------- עורך JavaScript: מספרי שורות וחלון פלט ---------- */
 .pg-preview[hidden] { display: none; }
-.pg-code { display: flex; background: #0d1117; }
+.pg-code { display: flex; flex: 1; background: #0d1117; }
 .pg-code .pg-editor { flex: 1; min-width: 0; }
 .pg-lines { flex-shrink: 0; overflow: hidden; padding: 0.75rem 0.5rem; min-width: 2.2rem; text-align: right; white-space: pre; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.85rem; line-height: 1.55; color: #6e7681; background: #0d1117; border-right: 1px solid #21262d; user-select: none; }
 .pg-btn.run { background: #16a34a; color: white; border-color: #16a34a; font-weight: 600; }
@@ -269,3 +269,6 @@ a.lesson-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgb(0 
 
 /* בלי ליגטורות בגופן הקוד: מתחילים צריכים לראות === ו->= כמו שהם מוקלדים */
 code, pre, kbd, .pg-editor, .pg-lines, .pg-console { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+
+/* כל טוקן של הדגשת התחביר (מחרוזת, הערה) מבודד, כדי שמחרוזת בעברית והערה בעברית באותה שורה לא יתערבבו */
+pre code span { unicode-bidi: isolate; }

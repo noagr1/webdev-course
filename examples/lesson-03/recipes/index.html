@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חיפוש מתכונים</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>🍳 חיפוש מתכונים</h1>
+    <span id="fav-count">⭐ 0 מועדפים</span>
+  </header>
+
+  <form id="search-form" class="controls">
+    <input id="search-input" type="search" placeholder="חפשו מתכון באנגלית, למשל pasta" aria-label="חיפוש מתכון">
+    <button type="submit">חיפוש</button>
+    <select id="difficulty" aria-label="רמת קושי">
+      <option value="all">כל הרמות</option>
+      <option value="Easy">קל</option>
+      <option value="Medium">בינוני</option>
+    </select>
+  </form>
+
+  <p id="status" role="status"></p>
+  <main id="results"></main>
+</body>
+</html>

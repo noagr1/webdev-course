@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 3: JavaScript מודרני ב׳</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body data-page="lesson" data-lesson="3" data-part="index" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 3</span>
+      <h1>JavaScript מודרני ב׳</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ שעתיים בכיתה</span>
+        <span class="chip">📚 6–8 שעות לימוד עצמי</span>
+        <span class="chip">🧑‍🎓 נדרש: שיעור 2</span>
+      </div>
+
+      <p>בשיעור הקודם למדנו את אבני הבניין של כל שפת תכנות. עכשיו נלמד לעבוד עם <strong>נתונים אמיתיים</strong>: רשימות של מוצרים, משתמשים ומתכונים. נשמור אותם במערכים ובאובייקטים, נעבד אותם עם <code>map</code> ו-<code>filter</code>, נציג אותם בדף, ונביא אותם מהאינטרנט.</p>
+      <p>זה השיעור האחרון לפני React. בסופו נבנה אפליקציה שלמה ב-JavaScript "רגיל" (מפתחים קוראים לזה <strong>Vanilla JavaScript</strong>, כלומר בלי ספריות). בשיעור 4 נבנה את <em>אותה אפליקציה בדיוק</em> ב-React, ונראה כמה עבודה React חוסכת.</p>
+
+      <div class="box goals">
+        <h3>מטרות השיעור</h3>
+        <p>בסוף השיעור תדעו:</p>
+        <ul>
+          <li>לשמור נתונים במערכים ובאובייקטים, ולעבוד עם מערך של אובייקטים</li>
+          <li>להשתמש ב-destructuring וב-spread (<code>...</code>), שמופיעים בכל קוד React</li>
+          <li>לעבד רשימות עם <code>map</code>, ‏<code>filter</code>, ‏<code>find</code> ו-<code>reduce</code>, בלי לשנות את המערך המקורי</li>
+          <li>להבין מה זה ה-DOM, ולשנות את הדף מתוך JavaScript</li>
+          <li>להגיב לפעולות של המשתמש: לחיצות, הקלדה ושליחת טפסים</li>
+          <li>להביא נתונים משרת עם <code>fetch</code>, ‏<code>async</code> ו-<code>await</code>, ולהציג מצב טעינה ושגיאה</li>
+          <li>להסביר אילו בעיות React פותרת, ולמה</li>
+        </ul>
+      </div>
+
+      <h2 id="parts">חלקי השיעור</h2>
+      <p>כל חלק נשען על הקודם, ולכן מומלץ לעבור עליהם לפי הסדר:</p>
+      <div class="features">
+        <a class="lesson-card" href="data.html">
+          <span class="lesson-num">חלק א׳</span>
+          <h3>מערכים ואובייקטים</h3>
+          <p>מערכים, אובייקטים, מערך של אובייקטים, ‏destructuring, ‏spread ו-JSON</p>
+        </a>
+        <a class="lesson-card" href="methods.html">
+          <span class="lesson-num">חלק ב׳</span>
+          <h3>‏map, ‏filter ו-reduce</h3>
+          <p>עיבוד רשימות בשורה אחת, שרשור, ולמה לא משנים את המערך המקורי</p>
+        </a>
+        <a class="lesson-card" href="dom.html">
+          <span class="lesson-num">חלק ג׳</span>
+          <h3>ה-DOM ואירועים</h3>
+          <p>שינוי הדף מ-JavaScript, לחיצות וטפסים, הצגת רשימה ממערך, ולמה צריך את React</p>
+        </a>
+        <a class="lesson-card" href="async.html">
+          <span class="lesson-num">חלק ד׳</span>
+          <h3>‏async ו-fetch</h3>
+          <p>קוד אסינכרוני, ‏Promise, ‏async/await, הבאת נתונים משרת, טעינה ושגיאות</p>
+        </a>
+        <a class="lesson-card" href="project.html">
+          <span class="lesson-num">פרויקט</span>
+          <h3>חיפוש מתכונים</h3>
+          <p>אפליקציה שלמה שמביאה מתכונים מהאינטרנט, עם חיפוש, סינון ומועדפים</p>
+        </a>
+      </div>
+
+      <h2 id="vanilla">מה זה "Vanilla JavaScript", ולמה לומדים את זה לפני React?</h2>
+      <p>‏<strong>Vanilla JavaScript</strong> הוא JavaScript "בטעם הבסיסי": רק מה שהדפדפן נותן, בלי ספריות כמו React. כשכותבים Vanilla JavaScript לדף אינטרנט, עובדים כל הזמן עם ה-<strong>DOM</strong>: הייצוג של הדף בזיכרון, שדרכו JavaScript קוראת ומשנה את מה שמוצג על המסך.</p>
+      <p>הנה הטעימה הראשונה. לחצו על הכפתור בתוצאה. ‏JavaScript מוצאת את המספר בדף ומשנה אותו:</p>
+      <div class="playground" id="pg-teaser" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <p>לחצתם <strong id="count">0</strong> פעמים</p>
+          <button id="btn">לחצו עליי</button>
+        </script>
+        <script type="text/plain" data-lang="js">
+          let count = 0;
+          const countEl = document.querySelector('#count');
+          const button = document.querySelector('#btn');
+
+          button.addEventListener('click', () => {
+            count = count + 1;          // 1. משנים את הנתונים
+            countEl.textContent = count; // 2. מעדכנים את הדף בעצמנו
+            console.log('count =', count);
+          });
+        </script>
+      </div>
+      <p>שימו לב לשני השלבים בקוד: קודם משנים את המשתנה, ואחר כך <em>בעצמנו</em> מעדכנים את הדף. כאן זה קל, כי יש מספר אחד. אבל באפליקציה אמיתית יש עשרות דברים שמשתנים: רשימות, מונים, הודעות. כל אחד מהם צריך לעדכן ידנית, ואם שוכחים אחד, הדף מציג מידע לא נכון.</p>
+      <div class="flow">
+        <div class="node">📦 הנתונים<small>מערכים, אובייקטים</small></div>
+        <span class="arrow">←</span>
+        <div class="node">✍️ אנחנו מעדכנים את הדף<small>ב-Vanilla: ידנית, בכל שינוי</small></div>
+        <span class="arrow">←</span>
+        <div class="node">🖥️ מה שרואים<small>ה-DOM</small></div>
+      </div>
+      <p>זו בדיוק הבעיה ש-<strong>React</strong> פותרת: ב-React מתארים איך הדף צריך להיראות לפי הנתונים, ו-React מעדכנת את ה-DOM בעצמה בכל שינוי. כדי להעריך את זה, צריך קודם להרגיש את העבודה הידנית. לכן בחלק ג׳ ובפרויקט נעבוד עם ה-DOM ישירות.</p>
+
+      <div class="box tip">
+        <p><strong>מה ממשיך איתנו ל-React:</strong> כמעט כל מה שבשיעור הזה. ‏<code>map</code> הוא הדרך שבה React מציגה רשימות. ‏spread ו-<code>filter</code> הם הדרך שבה מעדכנים נתונים ב-React. ‏destructuring מופיע בכל קומפוננטה, ו-<code>fetch</code> עם מצבי טעינה ושגיאה חוזר בשיעור 6. מה שלא ממשיך הוא העבודה הידנית עם ה-DOM, ובשביל זה בדיוק יש React.</p>
+      </div>
+
+      <h2 id="setup">הכנה לשיעור</h2>
+      <ul>
+        <li>אין צורך להתקין שום דבר חדש.</li>
+        <li>בחלק ד׳ ובפרויקט מביאים נתונים מהאינטרנט (מהאתרים <a href="https://dummyjson.com" target="_blank" rel="noopener">DummyJSON</a> ו-<a href="https://jsonplaceholder.typicode.com" target="_blank" rel="noopener">JSONPlaceholder</a>). הם חינמיים ולא דורשים הרשמה, אבל צריך חיבור לאינטרנט.</li>
+        <li>אם לא הגשתם את הפרויקט משיעור 2, כדאי להשלים אותו קודם. הפונקציות והלולאות משם הן הבסיס לכאן.</li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p><strong>תוכנית לשעתיים בכיתה.</strong> השיעור עמוס, ואי אפשר להספיק את כל העמודים בכיתה. העמודים כתובים ללמידה עצמית, ולכן בכיתה כדאי להתמקד במה שהכי קשה להבין לבד:</p>
+        <table>
+          <tr><th>זמן</th><th>מה עושים</th><th>עמוד</th></tr>
+          <tr><td>5 דק׳</td><td>פתיחה: הדגמת הכפתור למעלה, ו"מה יקרה אם יהיו 20 דברים שמשתנים?"</td><td>סקירה</td></tr>
+          <tr><td>25 דק׳</td><td>מערכים, אובייקטים, מערך של אובייקטים, ‏destructuring ו-spread. לדלג על רוב השיטות של מערכים, הן בעמוד</td><td>חלק א׳</td></tr>
+          <tr><td>25 דק׳</td><td>‏map ו-filter עם השוואה ללולאת for, ושלושת העדכונים שלא משנים את המקור (הוספה, מחיקה, עדכון). ‏reduce בקצרה</td><td>חלק ב׳</td></tr>
+          <tr><td>35 דק׳</td><td>‏DOM: ‏querySelector, ‏textContent, ‏addEventListener, ואז בנייה חיה של רשימת משימות עם דפוס state + render. לסיים ב"למה React?"</td><td>חלק ג׳</td></tr>
+          <tr><td>25 דק׳</td><td>‏async/await ו-fetch: להראות את כל שלבי הבקשה בלשונית Network, ומצבי טעינה ושגיאה</td><td>חלק ד׳</td></tr>
+          <tr><td>5 דק׳</td><td>הצגת הפרויקט, והבטחה: "בשיעור הבא נבנה את זה מחדש ב-React"</td><td>פרויקט</td></tr>
+        </table>
+        <p>‏<strong>הנקודה החשובה בשיעור</strong> היא דפוס ה-state + render בחלק ג׳: הנתונים במשתנה, כל שינוי עובר דרך הנתונים, ואחריו קוראים ל-render. סטודנטים שמבינים את הדפוס הזה יבינו את React מהר מאוד, כי React היא בעצם הדפוס הזה, אוטומטי.</p>
+        <p>אם הזמן לוחץ, אפשר להשאיר את חלק ד׳ ללמידה עצמית ולהקדיש לו 10 דקות בתחילת שיעור 4. ‏fetch חוזר בשיעור 6 בכל מקרה.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

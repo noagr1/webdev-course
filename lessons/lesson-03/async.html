@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 3 · חלק ד׳: async ו-fetch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="3" data-part="async" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 3 · חלק ד׳</span>
+      <h1>‏async ו-fetch: נתונים מהרשת</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 30 דק׳ בכיתה</span>
+        <span class="chip">📚 3–4 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: חלקים א׳–ג׳ (מערכים, map/filter, DOM)</span>
+      </div>
+
+      <p>עד עכשיו כל הנתונים בתוכניות שלנו היו כתובים בתוך הקוד: מערך של מוצרים, רשימה של סטודנטים. אבל באתרים אמיתיים הנתונים נמצאים <strong>בשרת</strong>: הפוסטים בפייסבוק, מזג האוויר, המוצרים בחנות. הדפדפן צריך <strong>לבקש</strong> אותם דרך האינטרנט, ולחכות לתשובה.</p>
+      <p>החלק הזה מלמד שני דברים שהולכים ביחד: איך כותבים קוד ש<strong>מחכה</strong> בלי לתקוע את הדף (קוד אסינכרוני, <code>async</code>/<code>await</code>), ואיך <strong>מבקשים נתונים משרת</strong> עם <code>fetch</code>. בסוף החלק תמשכו מוצרים אמיתיים מהאינטרנט ותציגו אותם בדף, כולל הודעת "טוען..." והודעת שגיאה.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>להסביר מה ההבדל בין קוד סינכרוני לקוד אסינכרוני, ולמה הדפדפן צריך את שניהם</li>
+          <li>לחזות באיזה סדר יודפסו שורות כשיש <code>setTimeout</code> בקוד</li>
+          <li>להבין מה זה <code>Promise</code> ובאילו שלושה מצבים הוא יכול להיות</li>
+          <li>לכתוב פונקציות <code>async</code> ולהשתמש ב-<code>await</code></li>
+          <li>לטפל בשגיאות עם <code>try</code>/<code>catch</code></li>
+          <li>למשוך נתונים מ-API עם <code>fetch</code>, ולבדוק אם הבקשה הצליחה עם <code>res.ok</code></li>
+          <li>להציג נתונים מהשרת בדף, עם מצב טעינה ומצב שגיאה</li>
+          <li>לראות את הבקשות בלשונית Network בכלי המפתחים</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בדוגמאות של החלק הזה יש קוד שמחכה: לטיימר או לתשובה מהשרת. לכן הפלט מופיע <strong>קצת אחרי</strong> הלחיצה על ▶ הרצה, ולא מיד. זה בדיוק מה שנלמד כאן. הדוגמאות שמושכות נתונים צריכות חיבור לאינטרנט.</p>
+      </div>
+
+      <h2 id="sync-async">סינכרוני ואסינכרוני <span class="time">5 דק׳</span></h2>
+      <p>כל הקוד שכתבנו עד עכשיו היה <strong>סינכרוני</strong> (synchronous): שורה רצה, מסתיימת, ורק אז מתחילה השורה הבאה. כמו תור בסופר: הקופאית מטפלת בלקוח אחד עד הסוף, ורק אז בלקוח הבא.</p>
+
+      <h3>אנלוגיה: מלצר במסעדה</h3>
+      <p>דמיינו מסעדה עם מלצר אחד. לקוח מזמין פיצה, והכנת הפיצה לוקחת 15 דקות.</p>
+      <table>
+        <tr><th></th><th>מלצר סינכרוני 🐢</th><th>מלצר אסינכרוני 🚀</th></tr>
+        <tr><td>מה הוא עושה</td><td>לוקח הזמנה, הולך למטבח, <strong>עומד ומחכה</strong> 15 דקות ליד התנור, מגיש, ורק אז ניגש ללקוח הבא</td><td>לוקח הזמנה, מוסר אותה למטבח, <strong>וממשיך</strong> לקחת הזמנות משולחנות אחרים. כשהפיצה מוכנה, המטבח קורא לו והוא מגיש</td></tr>
+        <tr><td>מה קורה לשאר הלקוחות</td><td>כולם מחכים. אף אחד לא מקבל אפילו מים</td><td>כולם מקבלים שירות. אף אחד לא נתקע בגלל הפיצה</td></tr>
+      </table>
+      <p>בדפדפן, ה"מלצר" הוא JavaScript. יש לו רק "ידיים" אחת: הוא עושה דבר אחד בכל רגע (אומרים ש-JavaScript היא <strong>single-threaded</strong>). אם הוא יעמוד ויחכה לתשובה מהשרת, הדף כולו ייתקע: אי אפשר יהיה ללחוץ על כפתורים, לגלול או להקליד.</p>
+      <p>לכן פעולות שלוקחות זמן, כמו בקשה לשרת או טיימר, הן <strong>אסינכרוניות</strong> (asynchronous): JavaScript "מוסר אותן למטבח" (לדפדפן), ממשיך לרוץ, וכשהתוצאה מוכנה הוא מקבל הודעה וממשיך מהמקום שבו התוצאה נדרשה.</p>
+
+      <div class="flow">
+        <span class="node">📝 JavaScript מבקש נתונים<small>fetch(...)</small></span><span class="arrow">←</span><span class="node">🌐 הדפדפן שולח את הבקשה<small>JavaScript ממשיך לרוץ</small></span><span class="arrow">←</span><span class="node">📬 התשובה מגיעה<small>אחרי 200 מילישניות, או 3 שניות</small></span><span class="arrow">←</span><span class="node">⚙️ הקוד שחיכה לתשובה רץ<small>מציג את הנתונים</small></span>
+      </div>
+
+      <h3>מה לוקח זמן במחשב?</h3>
+      <p>רוב הקוד רץ מהר מאוד: חישוב, השוואה, לולאה על 1,000 פריטים. אלה לוקחים מיליוניות שנייה. אבל יש פעולות שבהן המחשב מחכה <strong>למשהו מבחוץ</strong>:</p>
+      <ul>
+        <li><strong>בקשה לשרת</strong> (fetch): התשובה צריכה לעבור באינטרנט, לפעמים מצד שני של העולם</li>
+        <li><strong>טיימר</strong> (setTimeout): "תריץ את זה עוד שנייה"</li>
+        <li><strong>פעולה של המשתמש</strong>: לחיצה על כפתור. את זה כבר ראיתם בחלק ג׳, עם <code>addEventListener</code>. גם זה קוד שרץ "מתישהו אחר כך"!</li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p>‏(5 דק׳) האנלוגיה של המלצר עובדת טוב אם משחקים אותה: לבקש מסטודנט אחד להיות "מלצר סינכרוני" ולעמוד ליד הלוח 10 שניות בזמן שאחרים "מזמינים". הכיתה מרגישה מיד את התקיעה. לציין שהאירועים מחלק ג׳ (addEventListener) הם כבר אסינכרוניים, כך שהרעיון לא חדש לגמרי.</p>
+      </aside>
+
+      <h2 id="settimeout">‏setTimeout: הקוד האסינכרוני הראשון <span class="time">5 דק׳</span></h2>
+      <p>הדרך הפשוטה ביותר לראות קוד אסינכרוני היא <code>setTimeout</code>. היא מקבלת שני דברים: <strong>פונקציה</strong> (מה לעשות) ו<strong>מספר מילישניות</strong> (מתי). 1000 מילישניות הן שנייה אחת.</p>
+      <pre><code class="language-js">setTimeout(() =&gt; {
+  console.log('עברה שנייה!');
+}, 1000);</code></pre>
+      <p>שימו לב: הפונקציה שמעבירים היא <strong>callback</strong>, בדיוק כמו בחלק ב׳ עם <code>map</code> ובחלק ג׳ עם <code>addEventListener</code>. אנחנו לא קוראים לה בעצמנו. אנחנו מוסרים אותה, ומישהו אחר (הדפדפן) יקרא לה כשיגיע הזמן.</p>
+      <p>הריצו, ושימו לב שהשורה השנייה מופיעה <strong>אחרי</strong> הפסקה:</p>
+      <div class="playground" id="pg-timeout" data-height="200" data-wait="1200">
+        <script type="text/plain" data-lang="js">
+          console.log('מזמינים פיצה 🍕');
+
+          setTimeout(() => {
+            console.log('הפיצה מוכנה! (אחרי שנייה)');
+          }, 1000);
+        </script>
+      </div>
+
+      <h3>חידה: באיזה סדר יודפס?</h3>
+      <p>זו השאלה החשובה ביותר בחלק. לפני שאתם מריצים, כתבו על דף באיזה סדר יופיעו שלוש השורות:</p>
+      <pre><code class="language-js">console.log('1: לפני');
+
+setTimeout(() =&gt; {
+  console.log('2: בתוך setTimeout');
+}, 0);
+
+console.log('3: אחרי');</code></pre>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 שימו לב: הזמן הוא <strong>0</strong> מילישניות. באיזה סדר יודפסו השורות?</p>
+        <ul>
+          <li>1, 2, 3</li>
+          <li data-correct>1, 3, 2</li>
+          <li>2, 1, 3</li>
+          <li>רק 1 ו-3, כי 0 מילישניות זה כלום</li>
+        </ul>
+        <p class="quiz-explain">נכון! גם עם 0 מילישניות, הפונקציה של setTimeout <strong>לא</strong> רצה מיד. היא נכנסת ל"תור" ורצה רק אחרי שכל הקוד הסינכרוני הנוכחי הסתיים. לכן קודם רצים 1 ו-3 (הקוד הרגיל), ורק אז 2. כמו המלצר: גם אם הפיצה מוכנה ברגע שהזמינו אותה, הוא קודם מסיים את מה שהוא עושה עכשיו.</p>
+      </div>
+
+      <p>עכשיו הריצו ובדקו את התשובה:</p>
+      <div class="playground" id="pg-order" data-height="220" data-wait="200">
+        <script type="text/plain" data-lang="js">
+          console.log('1: לפני');
+
+          setTimeout(() => {
+            console.log('2: בתוך setTimeout');
+          }, 0);
+
+          console.log('3: אחרי');
+        </script>
+      </div>
+
+      <h3>ציר זמן</h3>
+      <p>ככה זה נראה על ציר זמן. JavaScript מריץ את כל השורות מלמעלה למטה. כש<code>setTimeout</code> נקראת, היא רק <em>רושמת</em> את הפונקציה אצל הדפדפן. רק כש-JavaScript מסיים את הכול ו"פנוי", הדפדפן נותן לו להריץ את הפונקציה שחיכתה:</p>
+      <table>
+        <tr><th>רגע</th><th>מה JavaScript עושה</th><th>מה מודפס</th></tr>
+        <tr><td>0</td><td>מריץ את שורה 1</td><td><code>1: לפני</code></td></tr>
+        <tr><td>0</td><td>קורא ל-setTimeout: מוסר את הפונקציה לדפדפן ו<strong>ממשיך</strong></td><td>(כלום)</td></tr>
+        <tr><td>0</td><td>מריץ את השורה האחרונה</td><td><code>3: אחרי</code></td></tr>
+        <tr><td>0</td><td>סיים את כל הקוד, פנוי</td><td></td></tr>
+        <tr><td>אחרי 0 מ״ש</td><td>הדפדפן: "הזמן עבר, הנה הפונקציה". JavaScript מריץ אותה</td><td><code>2: בתוך setTimeout</code></td></tr>
+      </table>
+
+      <p>נסו לשנות: הוסיפו עוד <code>setTimeout</code> עם 500 מילישניות שמדפיס "4", ועוד אחד עם 100 שמדפיס "5". באיזה סדר הם יופיעו? (רמז: לפי הזמן, לא לפי הסדר בקוד.)</p>
+      <div class="playground" id="pg-order2" data-height="260" data-wait="800">
+        <script type="text/plain" data-lang="js">
+          setTimeout(() => console.log('אחרי חצי שנייה'), 500);
+          setTimeout(() => console.log('אחרי עשירית שנייה'), 100);
+          console.log('מיד');
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 1: ספירה לאחור לשיגור <span class="level easy">קל</span></h3>
+      <p>כתבו קוד שמדפיס <strong>מיד</strong> את <code>3</code>, אחרי שנייה את <code>2</code>, אחרי שתי שניות את <code>1</code>, ואחרי שלוש שניות את <code>🚀 שיגור!</code>. השתמשו ב-<code>setTimeout</code> (כמה פעמים שצריך). כרגע הקוד מדפיס הכול בבת אחת.</p>
+      <div class="playground challenge" id="ch-countdown" data-check="ch-countdown" data-height="240" data-wait="3300">
+        <script type="text/plain" data-lang="js">
+          // כרגע הכול מודפס מיד. השתמשו ב-setTimeout כדי לפזר את ההדפסות בזמן
+          console.log(3);
+          console.log(2);
+          console.log(1);
+          console.log('🚀 שיגור!');
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          console.log(3);
+          setTimeout(() => console.log(2), 1000);
+          setTimeout(() => console.log(1), 2000);
+          setTimeout(() => console.log('🚀 שיגור!'), 3000);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-countdown': (out) => {
+            const timers = (out.code.match(/setTimeout\s*\(/g) || []).length;
+            const expected = ['3', '2', '1', '🚀 שיגור!'];
+            return [
+              [timers >= 3, 'צריך להשתמש ב-setTimeout לפחות 3 פעמים: אחת לכל הדפסה שמגיעה מאוחר יותר.'],
+              [out.code.includes('1000') && out.code.includes('2000') && out.code.includes('3000'), 'הזמנים צריכים להיות 1000, 2000 ו-3000 מילישניות (כל אחד נמדד מההתחלה, לא מהטיימר הקודם).'],
+              [JSON.stringify(out.logs) === JSON.stringify(expected), `הפלט צריך להיות בדיוק 3, 2, 1, 🚀 שיגור! לפי הסדר. כרגע: ${out.logs.join(', ') || '(ריק)'}`],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="no-wait">למה אי אפשר פשוט "לחכות"? <span class="time">2 דק׳</span></h2>
+      <p>אפשר לשאול: למה כל הסיבוך? למה שלא תהיה פקודה <code>wait(3000)</code> שפשוט עוצרת שלוש שניות, וממשיכה?</p>
+      <p>כי בזמן שהקוד "עוצר", JavaScript תפוס, והוא האחראי על <strong>כל הדף</strong>. הוא לא יכול להגיב ללחיצות, לעדכן את המסך או לגלול. הדף נראה "קפוא", והדפדפן אפילו עלול להציג הודעה "הדף אינו מגיב". נסו לדמיין אתר שנתקע כל פעם שהוא מחכה לשרת: אחרי כל לחיצה, שנייה או שתיים של קיפאון מוחלט.</p>
+      <p>לכן ב-JavaScript אין "המתנה שתוקעת". במקום זה אומרים: <strong>"כשזה יהיה מוכן, תריץ את הקוד הזה"</strong>. בהתחלה עשו את זה עם callbacks (כמו ב-setTimeout). היום יש דרך נוחה הרבה יותר: <code>Promise</code> ו-<code>await</code>.</p>
+      <div class="box warn">
+        <p><strong>זוכרים את הלולאה האינסופית מחלק ב׳ של שיעור 2?</strong> זה בדיוק מה שקורה כש-JavaScript תפוס: הדף כולו נתקע. לולאה שרצה 5 שניות שקולה ל"המתנה" של 5 שניות, ולכן לעולם לא מחכים עם לולאה.</p>
+      </div>
+
+      <h2 id="promise">‏Promise: קבלה על הזמנה <span class="time">5 דק׳</span></h2>
+      <p>כשמזמינים קפה בדוכן, לא מקבלים קפה מיד. מקבלים <strong>קבלה עם מספר</strong>. הקבלה היא "הבטחה": "יהיה לך קפה, רק לא עכשיו". עם הקבלה ביד אפשר לשבת, לבדוק את הטלפון, ולחכות שיקראו למספר שלכם.</p>
+      <p>‏<strong>Promise</strong> (בעברית: הבטחה) הוא בדיוק הקבלה הזו. זה אובייקט שמייצג <strong>תוצאה שעוד לא הגיעה</strong>. כש-<code>fetch</code> שולחת בקשה לשרת, היא לא מחזירה את הנתונים (הם עוד לא הגיעו!). היא מחזירה מיד Promise: "הנתונים יגיעו".</p>
+
+      <h3>שלושת המצבים של Promise</h3>
+      <table>
+        <tr><th>מצב</th><th>שם באנגלית</th><th>בדוכן הקפה</th></tr>
+        <tr><td>⏳ ממתין</td><td><code>pending</code></td><td>הקפה בהכנה. יש לכם קבלה, אבל עדיין אין קפה</td></tr>
+        <tr><td>✅ הצליח</td><td><code>fulfilled</code></td><td>קראו למספר שלכם, הנה הקפה. ה-Promise מכיל עכשיו <strong>ערך</strong></td></tr>
+        <tr><td>❌ נכשל</td><td><code>rejected</code></td><td>"מצטערים, נגמר החלב". ה-Promise מכיל עכשיו <strong>שגיאה</strong></td></tr>
+      </table>
+      <p>‏Promise מתחיל תמיד ב-<code>pending</code>, ועובר <strong>פעם אחת בלבד</strong> לאחד משני המצבים האחרים. אחרי שהוא הצליח או נכשל, הוא לא משתנה יותר.</p>
+
+      <div class="flow">
+        <span class="node">⏳ pending<small>הקבלה ביד</small></span><span class="arrow">←</span><span class="node">✅ fulfilled<small>יש ערך</small></span>
+        <span class="node">⏳ pending<small>הקבלה ביד</small></span><span class="arrow">←</span><span class="node">❌ rejected<small>יש שגיאה</small></span>
+      </div>
+
+      <h3>איך נראה Promise בקוד?</h3>
+      <p>ברוב המקרים <strong>לא תיצרו</strong> Promise בעצמכם. פונקציות כמו <code>fetch</code> יוצרות אותו בשבילכם. אבל כדי להבין מה קורה, הנה Promise שאנחנו בונים בעצמנו. הוא "מבשל קפה" שנייה אחת, ואז מצליח:</p>
+      <div class="playground" id="pg-promise" data-height="300" data-wait="1200">
+        <script type="text/plain" data-lang="js">
+          const coffeePromise = new Promise((resolve, reject) => {
+            // resolve = "הצלחתי, הנה התוצאה"
+            // reject  = "נכשלתי, הנה השגיאה"
+            setTimeout(() => {
+              resolve('☕ קפה הפוך');
+            }, 1000);
+          });
+
+          console.log('קיבלתי משהו. האם זה Promise?', coffeePromise instanceof Promise);
+          console.log('האם זה הקפה?', coffeePromise === '☕ קפה הפוך');
+        </script>
+      </div>
+      <p>שימו לב למה שהודפס: מה שקיבלנו הוא לא <code>'☕ קפה הפוך'</code>, אלא Promise (הקבלה). בקונסול של הדפדפן (F12) תראו אותו כך: <code>Promise {&lt;pending&gt;}</code>, כלומר "הבטחה במצב ממתין". הפלט של העורך באתר מציג אותו בקיצור: <code>Promise {…}</code>. אי אפשר לשתות את הקבלה. צריך <strong>לחכות</strong> לה. בשביל זה יש שתי דרכים: <code>.then</code> הישנה, ו-<code>await</code> החדשה.</p>
+
+      <h2 id="then">‏.then ו-.catch: הדרך הישנה <span class="time">3 דק׳</span></h2>
+      <p>לכל Promise יש פעולה <code>.then(callback)</code>: "כשתצליח, תריץ את הפונקציה הזו עם התוצאה". ויש <code>.catch(callback)</code>: "אם תיכשל, תריץ את זו עם השגיאה".</p>
+      <div class="playground" id="pg-then" data-height="320" data-wait="1200">
+        <script type="text/plain" data-lang="js">
+          function orderCoffee(kind) {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                if (kind === 'תה') {
+                  reject(new Error('אנחנו מגישים רק קפה'));
+                } else {
+                  resolve('☕ ' + kind);
+                }
+              }, 1000);
+            });
+          }
+
+          orderCoffee('אספרסו')
+            .then((coffee) => console.log('הגיע:', coffee))
+            .catch((error) => console.log('בעיה:', error.message));
+
+          console.log('הזמנתי, מחכה...');
+        </script>
+      </div>
+      <p>נסו לשנות: החליפו את <code>'אספרסו'</code> ב-<code>'תה'</code> והריצו. עכשיו ה-Promise נכשל, ורצה הפונקציה שב-<code>.catch</code>.</p>
+      <p>ל-<code>.then</code> אפשר לשרשר עוד <code>.then</code>, וזה יכול להפוך ל"רכבת" ארוכה וקשה לקריאה. <strong>לכן היום כותבים כמעט תמיד עם <code>async</code>/<code>await</code></strong>, שנלמד מיד. בכל זאת כדאי להכיר את <code>.then</code>: תפגשו אותו הרבה בקוד ישן, בתיעוד ובדוגמאות באינטרנט.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 פונקציה מחזירה Promise. כמה פעמים הוא יכול לעבור ממצב pending למצב אחר?</p>
+        <ul>
+          <li>כמה פעמים שרוצים</li>
+          <li data-correct>פעם אחת בלבד: הוא מצליח או נכשל, ונשאר כך</li>
+          <li>פעמיים: פעם מצליח ופעם נכשל</li>
+          <li>אף פעם, Promise תמיד pending</li>
+        </ul>
+        <p class="quiz-explain">נכון! Promise "מתיישב" פעם אחת. כמו קבלה בדוכן: או שקיבלתם קפה, או שאמרו לכם שאין. ההזמנה לא תחזור להיות "בהכנה".</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏(8 דק׳ ל-Promise ו-.then) אין צורך שהסטודנטים ידעו לכתוב <code>new Promise</code> בעצמם. המטרה היא שיבינו שזו "קבלה" ושיזהו את שלושת המצבים. כדאי להראות בקונסול של הדפדפן <code>fetch('https://dummyjson.com/products/1')</code> בלי await: הדפדפן מציג <code>Promise {&lt;pending&gt;}</code>, וזה הרגע שבו הרעיון "נוחת".</p>
+      </aside>
+
+      <h2 id="async-await">‏async ו-await: הדרך המודרנית <span class="time">7 דק׳</span></h2>
+      <p>‏<code>await</code> היא מילה שאומרת: <strong>"חכה כאן עד שה-Promise יתיישב, ותן לי את הערך שבתוכו"</strong>. במקום קבלה, מקבלים את הקפה עצמו. והכי חשוב: הקוד נראה כמו קוד רגיל, שורה אחרי שורה.</p>
+      <p>יש כלל אחד: <strong>מותר להשתמש ב-<code>await</code> רק בתוך פונקציה שמסומנת ב-<code>async</code></strong>. המילה <code>async</code> לפני הפונקציה אומרת ל-JavaScript: "בפונקציה הזו יש המתנות".</p>
+      <p>השוו את שתי הגרסאות. שתיהן עושות בדיוק אותו דבר:</p>
+      <table>
+        <tr><th>עם .then (ישן)</th><th>עם async/await (מודרני)</th></tr>
+        <tr>
+          <td><pre><code class="language-js">orderCoffee('אספרסו')
+  .then((coffee) =&gt; {
+    console.log(coffee);
+  });</code></pre></td>
+          <td><pre><code class="language-js">async function main() {
+  const coffee = await orderCoffee('אספרסו');
+  console.log(coffee);
+}
+main();</code></pre></td>
+        </tr>
+      </table>
+      <p>הריצו ושימו לב שהשורות מודפסות לפי הסדר, עם הפסקה ביניהן:</p>
+      <div class="playground" id="pg-await" data-height="360" data-wait="2200">
+        <script type="text/plain" data-lang="js">
+          function orderCoffee(kind) {
+            return new Promise((resolve) => {
+              setTimeout(() => resolve('☕ ' + kind), 1000);
+            });
+          }
+
+          async function main() {
+            console.log('מזמינה אספרסו...');
+            const first = await orderCoffee('אספרסו');   // מחכה שנייה
+            console.log('קיבלתי:', first);
+
+            console.log('מזמינה הפוך...');
+            const second = await orderCoffee('הפוך');    // מחכה עוד שנייה
+            console.log('קיבלתי:', second);
+          }
+
+          main();
+        </script>
+      </div>
+
+      <h3>אז await כן "תוקע"?</h3>
+      <p>לא! זו הנקודה העדינה. ‏<code>await</code> עוצרת רק את <strong>הפונקציה שבה היא נמצאת</strong>. כל שאר הקוד, והדף כולו, ממשיכים לרוץ. ‏JavaScript "יוצא" מהפונקציה, עושה דברים אחרים, וחוזר אליה כשה-Promise מוכן. כמו המלצר: הוא "מחכה" לפיצה של שולחן 3, אבל בינתיים מגיש לכל השאר.</p>
+      <div class="playground" id="pg-await-order" data-height="280" data-wait="1200">
+        <script type="text/plain" data-lang="js">
+          function wait(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+          }
+
+          async function cook() {
+            console.log('א: מתחילים לבשל');
+            await wait(1000);
+            console.log('ג: התבשיל מוכן');
+          }
+
+          cook();
+          console.log('ב: בינתיים, הקוד שאחרי cook() ממשיך מיד');
+        </script>
+      </div>
+
+      <h3>למה צריך את main()?</h3>
+      <p>בעורך באתר, וברוב קבצי JavaScript רגילים, אי אפשר לכתוב <code>await</code> ישר בקוד, מחוץ לפונקציה. לכן עוטפים את הקוד בפונקציה <code>async</code> (נהוג לקרוא לה <code>main</code> או <code>loadData</code>), ו<strong>קוראים לה</strong> בשורה האחרונה. אל תשכחו את הקריאה! בלעדיה הפונקציה רק מוגדרת, ושום דבר לא קורה.</p>
+      <div class="box tip">
+        <p><strong>לעתיד:</strong> בקבצים מסוג <em>module</em> (‏<code>&lt;script type="module"&gt;</code>) מותר לכתוב <code>await</code> גם מחוץ לפונקציה. זה נקרא <strong>top-level await</strong>. נפגוש מודולים בשיעור 4, כשנעבוד עם Vite.</p>
+      </div>
+
+      <h3>פונקציית async תמיד מחזירה Promise</h3>
+      <p>גם אם כותבים <code>return 5</code> בתוך פונקציית <code>async</code>, מי שקורא לה מקבל Promise ולא 5. כדי לקבל את ה-5, צריך <code>await</code> גם בצד שקורא:</p>
+      <div class="playground" id="pg-async-returns" data-height="260" data-wait="300">
+        <script type="text/plain" data-lang="js">
+          async function getNumber() {
+            return 5;
+          }
+
+          const p = getNumber();
+          console.log('בלי await, האם קיבלנו Promise?', p instanceof Promise);
+
+          async function main() {
+            const n = await getNumber();
+            console.log('עם await קיבלנו:', n);
+          }
+          main();
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 2: הפונקציה wait <span class="level medium">בינוני</span></h3>
+      <p>כתבו פונקציה <code>wait(ms)</code> ש<strong>מחזירה Promise</strong> שמצליח אחרי <code>ms</code> מילישניות (רמז: <code>new Promise</code> ובתוכו <code>setTimeout</code> שקורא ל-<code>resolve</code>). הפונקציה <code>main</code> כבר כתובה ומשתמשת בה: היא אמורה להדפיס "א", לחכות חצי שנייה, להדפיס "ב", לחכות עוד חצי שנייה ולהדפיס "ג".</p>
+      <div class="playground challenge" id="ch-wait" data-check="ch-wait" data-height="300" data-wait="1400">
+        <script type="text/plain" data-lang="js">
+          function wait(ms) {
+            // השלימו: החזירו Promise שמצליח אחרי ms מילישניות
+          }
+
+          async function main() {
+            console.log('א');
+            await wait(500);
+            console.log('ב');
+            await wait(500);
+            console.log('ג');
+          }
+
+          main();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function wait(ms) {
+            return new Promise((resolve) => {
+              setTimeout(resolve, ms);
+            });
+          }
+
+          async function main() {
+            console.log('א');
+            await wait(500);
+            console.log('ב');
+            await wait(500);
+            console.log('ג');
+          }
+
+          main();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-wait': (out, win) => {
+            const fn = win.eval('typeof wait === "function" ? wait : null');
+            const result = fn ? fn(10) : null;
+            return [
+              [fn, 'לא מצאתי פונקציה בשם wait.'],
+              [result instanceof win.Promise, 'wait(ms) צריכה להחזיר Promise. השתמשו ב-return new Promise((resolve) => ...)'],
+              [/setTimeout/.test(out.code), 'בתוך ה-Promise צריך setTimeout שקורא ל-resolve אחרי ms מילישניות.'],
+              [JSON.stringify(out.logs) === JSON.stringify(['א', 'ב', 'ג']), `הפלט צריך להיות א, ב, ג. כרגע: ${out.logs.join(', ') || '(ריק)'}`],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="try-catch">שגיאות: try, catch ו-finally <span class="time">4 דק׳</span></h2>
+      <p>עם <code>.then</code> השתמשנו ב-<code>.catch</code> כדי לטפל בכישלון. עם <code>await</code> משתמשים ב-<code>try</code>/<code>catch</code>. זה מבנה שמתאים לכל קוד, לא רק לקוד אסינכרוני:</p>
+      <pre><code class="language-js">try {
+  // קוד שעלול להיכשל
+} catch (error) {
+  // רץ רק אם משהו בתוך try נכשל. error הוא אובייקט השגיאה
+} finally {
+  // (לא חובה) רץ תמיד בסוף, בהצלחה וגם בכישלון
+}</code></pre>
+      <p>כש-Promise שעושים לו <code>await</code> נכשל (rejected), זה כמו שגיאה שנזרקה באותה שורה: הקוד קופץ ישר ל-<code>catch</code>, והשורות שאחרי ה-await בתוך <code>try</code> לא רצות.</p>
+      <div class="playground" id="pg-try" data-height="420" data-wait="1200">
+        <script type="text/plain" data-lang="js">
+          function orderCoffee(kind) {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                if (kind === 'תה') reject(new Error('אנחנו מגישים רק קפה'));
+                else resolve('☕ ' + kind);
+              }, 1000);
+            });
+          }
+
+          async function main() {
+            try {
+              console.log('מזמינים...');
+              const drink = await orderCoffee('תה');
+              console.log('הגיע:', drink);       // לא ירוץ אם ההזמנה נכשלה
+            } catch (error) {
+              console.log('😕 לא הצלחנו:', error.message);
+            } finally {
+              console.log('סגרנו את ההזמנה');   // רץ בכל מקרה
+            }
+          }
+
+          main();
+        </script>
+      </div>
+      <p>נסו לשנות את <code>'תה'</code> ל-<code>'אספרסו'</code>: עכשיו <code>catch</code> לא רץ, אבל <code>finally</code> כן.</p>
+      <p>מתי <code>finally</code> שימושי? בדיוק בשביל הודעת "טוען...": מציגים אותה לפני הבקשה, ומסתירים אותה ב-<code>finally</code>, כי צריך להסתיר אותה גם אם הבקשה הצליחה וגם אם נכשלה. נראה את זה בהמשך.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 איפה מותר לכתוב <code>await</code> בעורך באתר?</p>
+        <ul>
+          <li>בכל מקום בקוד</li>
+          <li>רק בתוך לולאה</li>
+          <li data-correct>רק בתוך פונקציה שמסומנת ב-async</li>
+          <li>רק בתוך try</li>
+        </ul>
+        <p class="quiz-explain">נכון! await עובד רק בתוך פונקציית async. לכן עוטפים את הקוד ב-<code>async function main() { ... }</code> וקוראים ל-<code>main()</code>. (מחוץ לפונקציה מותר רק במודולים, שנכיר בשיעור 4.)</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏(7 דק׳ ל-async/await) הדוגמה pg-await-order היא המפתח: לשאול את הכיתה לפני ההרצה באיזה סדר יופיעו א, ב, ג. רבים יענו א-ג-ב, כי await "עוצר". ההבנה ש-await עוצרת רק את הפונקציה שלה חשובה מאוד ל-useEffect בשיעור 6. את אתגר 2 אפשר לדלג בכיתה ולהשאיר לבית.</p>
+      </aside>
+
+      <h2 id="fetch">‏fetch: מבקשים נתונים משרת <span class="time">8 דק׳</span></h2>
+      <p>עכשיו, כשאנחנו מבינים Promise ו-await, אפשר להגיע לעיקר: <strong>לקבל נתונים אמיתיים מהאינטרנט</strong>. כל אתר מודרני עושה את זה כל הזמן: רשימת המוצרים בחנות, הודעות בצ׳אט, מזג האוויר. הנתונים לא כתובים בקובץ ה-HTML. הדף מבקש אותם משרת, ומציג אותם כשהם מגיעים.</p>
+      <p>הפונקציה שעושה את זה נקראת <code>fetch</code> (באנגלית: "להביא"). היא מובנית בדפדפן, ולא צריך להתקין שום דבר.</p>
+
+      <h3>מה זה API?</h3>
+      <p>‏<strong>API</strong> (בהקשר שלנו) הוא כתובת באינטרנט שמחזירה <strong>נתונים</strong> במקום דף HTML. במקום דף מעוצב לבני אדם, מקבלים טקסט בפורמט <strong>JSON</strong>, שנראה בדיוק כמו אובייקטים ומערכים של JavaScript (פגשנו אותו בחלק א׳). נסו לפתוח את הכתובת הזו בלשונית חדשה בדפדפן:</p>
+      <p dir="ltr"><a href="https://jsonplaceholder.typicode.com/users/1" target="_blank" rel="noopener">https://jsonplaceholder.typicode.com/users/1</a></p>
+      <p>תראו טקסט שמתחיל ב-<code>{ "id": 1, "name": "Leanne Graham", ...</code>. זה משתמש מדומה מתוך <strong>JSONPlaceholder</strong>, שרת חינמי שנבנה בדיוק בשביל תרגול. בעמוד הזה נשתמש בו ובאתר דומה בשם <strong>DummyJSON</strong>.</p>
+
+      <h3>שלושה צעדים</h3>
+      <p>קבלת נתונים עם fetch היא תמיד אותם שלושה צעדים. כדאי לזכור אותם בעל פה:</p>
+      <div class="flow">
+        <span class="node">1️⃣ שולחים בקשה<small>await fetch(url)</small></span><span class="arrow">←</span><span class="node">2️⃣ קוראים את הגוף כ-JSON<small>await res.json()</small></span><span class="arrow">←</span><span class="node">3️⃣ משתמשים בנתונים<small>data.name</small></span>
+      </div>
+      <div class="playground" id="pg-fetch" data-height="300" data-wait="2000">
+        <script type="text/plain" data-lang="js">
+          async function main() {
+            // צעד 1: שולחים בקשה ומחכים לתשובה
+            const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+            console.log('סטטוס:', res.status);
+
+            // צעד 2: קוראים את גוף התשובה והופכים אותו לאובייקט
+            const user = await res.json();
+
+            // צעד 3: משתמשים בנתונים כמו בכל אובייקט רגיל
+            console.log('שם:', user.name);
+            console.log('אימייל:', user.email);
+            console.log('עיר:', user.address.city);
+          }
+
+          main();
+        </script>
+      </div>
+      <p>כמה דברים חשובים בקוד הזה:</p>
+      <ul>
+        <li>‏<strong>יש שני await.</strong> הראשון מחכה ש<em>תתחיל</em> להגיע תשובה מהשרת (הסטטוס והכותרות). השני מחכה שכל <em>גוף</em> התשובה יגיע ויפוענח. אם הרשת איטית, שניהם לוקחים זמן.</li>
+        <li>‏<code>res</code> (קיצור של response, תשובה) הוא <strong>לא</strong> הנתונים. זה אובייקט עם מידע על התשובה: <code>res.status</code> (קוד מספרי, כמו 200), <code>res.ok</code> (האם הצליח), ומתודות לקריאת הגוף.</li>
+        <li>‏<code>res.json()</code> מחזירה Promise, ולכן צריך עליה <code>await</code>. התוצאה היא אובייקט JavaScript רגיל: אפשר לכתוב <code>user.name</code> ו-<code>user.address.city</code>, בדיוק כמו בחלק א׳.</li>
+      </ul>
+      <div class="box tip">
+        <p><strong>אין תוצאה?</strong> הדוגמאות האלה צריכות חיבור לאינטרנט. אם אתם רואים שגיאה <code>Failed to fetch</code>, בדקו את החיבור ונסו שוב עם ▶ הרצה.</p>
+      </div>
+
+      <h3>🎯 אתגר 3: הביאו פוסט <span class="level easy">קל</span></h3>
+      <p>בכתובת <code dir="ltr">https://jsonplaceholder.typicode.com/posts/1</code> יש פוסט עם השדות <code>id</code>, ‏<code>title</code> ו-<code>body</code>. השלימו את הקוד: הביאו את הפוסט, והדפיסו את <strong>הכותרת שלו בלבד</strong> (השדה <code>title</code>).</p>
+      <div class="playground challenge" id="ch-post" data-check="ch-post" data-height="260" data-wait="2000">
+        <script type="text/plain" data-lang="js">
+          async function main() {
+            const url = 'https://jsonplaceholder.typicode.com/posts/1';
+            // 1. fetch עם await
+            // 2. res.json() עם await
+            // 3. console.log של הכותרת
+          }
+
+          main();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          async function main() {
+            const url = 'https://jsonplaceholder.typicode.com/posts/1';
+            const res = await fetch(url);
+            const post = await res.json();
+            console.log(post.title);
+          }
+
+          main();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-post': (out) => [
+            [/fetch\s*\(/.test(out.code), 'צריך לקרוא ל-fetch עם הכתובת.'],
+            [/await\s+\w+\.json\s*\(/.test(out.code), 'צריך לקרוא את הגוף עם await res.json() (שימו לב ל-await!).'],
+            [out.logs.some((l) => l.startsWith('sunt aut facere')), 'הדפיסו את post.title. הכותרת מתחילה ב-"sunt aut facere".'],
+            [!out.logs.some((l) => l.startsWith('{')), 'הדפיסו רק את הכותרת, לא את כל האובייקט.'],
+          ],
+        });
+      </script>
+
+      <h2 id="status">‏res.ok וקודי סטטוס <span class="time">5 דק׳</span></h2>
+      <p>כל תשובה משרת מגיעה עם <strong>קוד סטטוס</strong>: מספר בן שלוש ספרות שאומר איך הבקשה הסתיימה. לא צריך לזכור את כולם, רק את המשפחות:</p>
+      <table>
+        <tr><th>קוד</th><th>משמעות</th><th>דוגמה</th></tr>
+        <tr><td><code>200</code> (וכל ה-2xx)</td><td>✅ הצלחה</td><td>הנה המשתמש שביקשתם</td></tr>
+        <tr><td><code>404</code></td><td>❌ לא נמצא</td><td>אין משתמש מספר 999</td></tr>
+        <tr><td><code>401</code> / <code>403</code></td><td>🔒 אין הרשאה</td><td>צריך להתחבר קודם</td></tr>
+        <tr><td><code>500</code> (וכל ה-5xx)</td><td>💥 תקלה בשרת</td><td>הבעיה אצלם, לא אצלכם</td></tr>
+      </table>
+      <p>‏<code>res.ok</code> הוא קיצור נוח: הוא <code>true</code> אם הסטטוס בין 200 ל-299, ו-<code>false</code> אחרת.</p>
+
+      <h3>המלכודת: fetch לא נכשל על 404</h3>
+      <p>זו טעות שכמעט כל מתחיל עושה. הייתם מצפים שאם המשתמש לא קיים, <code>fetch</code> תיכשל ונגיע ל-<code>catch</code>. <strong>אבל לא.</strong> מבחינת fetch, השרת ענה, ולכן הבקשה "הצליחה". התשובה פשוט אומרת "לא מצאתי". ‏<code>fetch</code> נכשלת (rejected) רק כשאין תשובה בכלל: אין אינטרנט, כתובת שגויה לגמרי, או חסימת CORS (נסביר בהמשך).</p>
+      <div class="playground" id="pg-404" data-height="320" data-wait="2000">
+        <script type="text/plain" data-lang="js">
+          async function main() {
+            try {
+              const res = await fetch('https://jsonplaceholder.typicode.com/users/999');
+              console.log('הגענו לכאן! status =', res.status, ', ok =', res.ok);
+              const user = await res.json();
+              console.log('השם:', user.name);   // undefined, כי אין משתמש כזה
+            } catch (error) {
+              console.log('catch רץ:', error.message);  // לא ירוץ!
+            }
+          }
+
+          main();
+        </script>
+      </div>
+      <p>לכן <strong>תמיד</strong> בודקים את <code>res.ok</code> בעצמנו. אם התשובה לא תקינה, <strong>זורקים שגיאה</strong> עם <code>throw</code>, וכך היא מגיעה ל-<code>catch</code> כמו כל כישלון אחר:</p>
+      <pre><code class="language-js">const res = await fetch(url);
+if (!res.ok) {
+  throw new Error(`שגיאה מהשרת: ${res.status}`);
+}
+const data = await res.json();   // מגיעים לכאן רק אם הכול תקין</code></pre>
+      <p>‏<code>throw</code> (באנגלית: "לזרוק") עוצרת את הפונקציה מיד, וקופצת ל-<code>catch</code> הקרוב. <code>new Error('...')</code> יוצר אובייקט שגיאה עם הודעה, וב-catch קוראים אותה עם <code>error.message</code>.</p>
+
+      <h3>🎯 אתגר 4: משתמש שלא קיים <span class="level medium">בינוני</span></h3>
+      <p>הפונקציה <code>showUser(id)</code> מביאה משתמש ומדפיסה את השם שלו. היא עובדת למשתמש 1, אבל למשתמש 999 היא מדפיסה <code>undefined</code>. תקנו אותה: אם <code>res.ok</code> הוא false, הדפיסו <code>שגיאה: 404</code> (עם הסטטוס האמיתי מתוך <code>res.status</code>) במקום השם.</p>
+      <p>הפלט הנכון: <code>Leanne Graham</code> ואחריו <code>שגיאה: 404</code>.</p>
+      <div class="playground challenge" id="ch-404" data-check="ch-404" data-height="340" data-wait="2500">
+        <script type="text/plain" data-lang="js">
+          async function showUser(id) {
+            const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+            // הוסיפו כאן בדיקה של res.ok
+
+            const user = await res.json();
+            console.log(user.name);
+          }
+
+          async function main() {
+            await showUser(1);
+            await showUser(999);
+          }
+
+          main();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          async function showUser(id) {
+            try {
+              const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+              if (!res.ok) {
+                throw new Error(`שגיאה: ${res.status}`);
+              }
+              const user = await res.json();
+              console.log(user.name);
+            } catch (error) {
+              console.log(error.message);
+            }
+          }
+
+          async function main() {
+            await showUser(1);
+            await showUser(999);
+          }
+
+          main();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-404': (out) => [
+            [/\.ok\b/.test(out.code), 'צריך לבדוק את res.ok.'],
+            [/\.status\b/.test(out.code), 'השתמשו ב-res.status כדי להדפיס את הקוד האמיתי (ולא לכתוב 404 ידנית).'],
+            [!out.logs.includes('undefined'), 'עדיין מודפס undefined: למשתמש 999 לא צריך להגיע לשורה שמדפיסה את השם.'],
+            [JSON.stringify(out.logs) === JSON.stringify(['Leanne Graham', 'שגיאה: 404']), `הפלט צריך להיות Leanne Graham ואז שגיאה: 404. כרגע: ${out.logs.join(' | ') || '(ריק)'}`],
+          ],
+        });
+      </script>
+      <p>שימו לב שבפתרון יש שתי דרכים נכונות: לזרוק שגיאה ולתפוס אותה ב-catch (כמו בפתרון שלנו), או פשוט <code>if (!res.ok) { console.log(...); return; }</code>. הדרך עם throw עדיפה כשיש כמה דברים שיכולים להיכשל (גם אין אינטרנט וגם 404), כי כולם מגיעים לאותו catch.</p>
+
+      <h2 id="render-list">מהשרת אל הדף: רשימה ב-DOM <span class="time">7 דק׳</span></h2>
+      <p>עד עכשיו הדפסנו לקונסול. אבל המטרה היא להציג את הנתונים <strong>בדף</strong>. כאן מתחברים שלושה חלקים של השיעור: <strong>fetch</strong> מביא מערך, <strong>מתודות של מערכים</strong> (חלק ב׳) עוברות עליו, ו<strong>ה-DOM</strong> (חלק ג׳) יוצר אלמנט לכל פריט.</p>
+      <p>בכתובת הבאה של DummyJSON יש מוצרים של חנות מדומה. <code>limit=5</code> מבקש רק 5 מוצרים, ו-<code>select=title,price</code> מבקש רק את השדות שאנחנו צריכים:</p>
+      <p dir="ltr"><code>https://dummyjson.com/products?limit=5&amp;select=title,price</code></p>
+      <p>התשובה היא <strong>אובייקט</strong>, והמערך נמצא בתוכו בשדה <code>products</code>: ‏<code dir="ltr">{ products: [ {...}, {...} ], total: 194, ... }</code>. זה נפוץ מאוד ב-APIs, ולכן תמיד כדאי להדפיס קודם את <code>data</code> ולראות את המבנה שלו.</p>
+      <div class="playground" id="pg-list" data-height="380" data-wait="2000">
+        <script type="text/plain" data-lang="html">
+          <h3>המוצרים שלנו</h3>
+          <ul id="products"></ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          async function main() {
+            const res = await fetch('https://dummyjson.com/products?limit=5&select=title,price');
+            const data = await res.json();
+            console.log('קיבלנו', data.products.length, 'מוצרים');
+
+            const list = document.querySelector('#products');
+            data.products.forEach((product) => {
+              const li = document.createElement('li');
+              li.textContent = `${product.title}: $${product.price}`;
+              list.append(li);
+            });
+          }
+
+          main();
+        </script>
+      </div>
+      <p>זה בדיוק הדפוס מחלק ג׳: <code>createElement</code>, ‏<code>textContent</code>, ‏<code>append</code>. ההבדל היחיד הוא שהמערך מגיע מהשרת ולא כתוב בקוד. נסו לשנות את <code>limit=5</code> ל-<code>limit=10</code>, והרשימה תגדל לבד.</p>
+      <div class="box warn">
+        <p><strong>למה textContent ולא innerHTML?</strong> הנתונים מגיעים משרת זר. אם מישהו הכניס לשם שם מוצר כמו <code>&lt;img src=x onerror="..."&gt;</code>, ‏<code>innerHTML</code> יריץ אותו בדף שלכם. ‏<code>textContent</code> תמיד מציג אותו כטקסט רגיל. לכן: נתונים מבחוץ נכנסים לדף רק עם <code>textContent</code>.</p>
+      </div>
+      <p>‏React עושה בדיוק את זה בשבילנו: בשיעור 5 נכתוב <code>products.map(p =&gt; &lt;li&gt;{p.title}&lt;/li&gt;)</code>, ו-React ייצור את האלמנטים (וגם יגן עלינו מהבעיה של innerHTML, אוטומטית).</p>
+
+      <h3>🎯 אתגר 5: כמה משימות הושלמו? <span class="level medium">בינוני</span></h3>
+      <p>בכתובת <code dir="ltr">https://jsonplaceholder.typicode.com/todos?userId=1</code> יש <strong>מערך</strong> של המשימות של משתמש 1. לכל משימה יש <code>title</code> ו-<code>completed</code> (true או false). הביאו את המערך, ספרו כמה משימות <strong>הושלמו</strong>, והדפיסו רק את המספר.</p>
+      <p>רמז: <code>filter</code> מחלק ב׳, ואחריו <code>.length</code>. ‏(הפעם התשובה היא מערך ישר, בלי שדה עוטף.)</p>
+      <div class="playground challenge" id="ch-todos" data-check="ch-todos" data-height="260" data-wait="2000">
+        <script type="text/plain" data-lang="js">
+          async function main() {
+            const url = 'https://jsonplaceholder.typicode.com/todos?userId=1';
+            // הביאו את המערך, ספרו כמה completed, והדפיסו את המספר
+
+          }
+
+          main();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          async function main() {
+            const url = 'https://jsonplaceholder.typicode.com/todos?userId=1';
+            const res = await fetch(url);
+            const todos = await res.json();
+            const done = todos.filter((todo) => todo.completed);
+            console.log(done.length);
+          }
+
+          main();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-todos': (out) => [
+            [/fetch\s*\(/.test(out.code) && /\.json\s*\(/.test(out.code), 'צריך fetch ואחריו res.json().'],
+            [!/\b11\b/.test(out.code), 'אל תכתבו את התשובה בקוד 😉 תנו לקוד לספור.'],
+            [out.logs[out.logs.length - 1] === '11', `השורה האחרונה בפלט צריכה להיות מספר המשימות שהושלמו. כרגע: ${out.logs[out.logs.length - 1] ?? '(ריק)'}`],
+          ],
+        });
+      </script>
+
+      <h2 id="loading">מצבי טעינה ושגיאה <span class="time">6 דק׳</span></h2>
+      <p>באתר אמיתי, בקשה יכולה לקחת שנייה, שלוש, או להיכשל. אם הדף ריק בזמן הזה, המשתמש לא יודע אם משהו קורה. לכן כל רכיב שמביא נתונים מטפל ב<strong>שלושה מצבים</strong>:</p>
+      <table>
+        <tr><th>מצב</th><th>מה רואים</th><th>איפה בקוד</th></tr>
+        <tr><td>⏳ טוען</td><td>"טוען..." או אנימציה מסתובבת</td><td>לפני ה-<code>await fetch</code></td></tr>
+        <tr><td>✅ הצלחה</td><td>הנתונים עצמם</td><td>אחרי ה-<code>await res.json()</code>, בתוך <code>try</code></td></tr>
+        <tr><td>❌ שגיאה</td><td>הודעה ברורה, ולא דף ריק</td><td>בתוך <code>catch</code></td></tr>
+      </table>
+      <p>ואת הסתרת "טוען..." שמים ב-<code>finally</code>, כי צריך להסתיר אותה בשני המקרים. הנה התבנית המלאה. כדי לראות את מצב השגיאה, שנו בכתובת את <code>products</code> ל-<code>productz</code> והריצו:</p>
+      <div class="playground" id="pg-loading" data-height="460" data-wait="2000">
+        <script type="text/plain" data-lang="html">
+          <p id="status"></p>
+          <ul id="products"></ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const status = document.querySelector('#status');
+          const list = document.querySelector('#products');
+
+          async function loadProducts() {
+            status.textContent = '⏳ טוען מוצרים...';
+            try {
+              const res = await fetch('https://dummyjson.com/products?limit=5&select=title');
+              if (!res.ok) throw new Error(`השרת החזיר ${res.status}`);
+              const data = await res.json();
+
+              data.products.forEach((product) => {
+                const li = document.createElement('li');
+                li.textContent = product.title;
+                list.append(li);
+              });
+              console.log('✅ נטענו', data.products.length, 'מוצרים');
+            } catch (error) {
+              console.log('❌', error.message);
+              list.replaceChildren();               // מנקים רשימה ישנה, אם הייתה
+              const li = document.createElement('li');
+              li.textContent = `❌ לא הצלחנו לטעון: ${error.message}`;
+              list.append(li);
+            } finally {
+              status.textContent = '';             // מסתירים את "טוען..." בכל מקרה
+            }
+          }
+
+          loadProducts();
+        </script>
+      </div>
+      <p>‏"טוען..." מופיע רק לרגע, כי DummyJSON מהיר. כדי לראות אותו לאורך זמן, אפשר להאט את הרשת בכלי המפתחים (נראה בהמשך, בלשונית Network).</p>
+      <div class="box tip">
+        <p><strong>קדימה לשיעור 6:</strong> ב-React נכתוב את אותה תבנית בדיוק, עם שלושה משתנים: <code>loading</code>, ‏<code>error</code> ו-<code>data</code>, בתוך <code>useEffect</code>. מי שמבין את הדוגמה הזו, יבין את <code>useEffect</code> בקלות.</p>
+      </div>
+
+      <h3>🎯 אתגר 6: ספר מתכונים <span class="level medium">בינוני</span></h3>
+      <p>בכתובת <code dir="ltr">https://dummyjson.com/recipes?limit=5&amp;select=name</code> יש 5 מתכונים, בתוך השדה <code>recipes</code>. לכל מתכון יש <code>name</code>. השלימו את <code>loadRecipes</code>:</p>
+      <ol>
+        <li>לפני הבקשה: כתבו ב-<code>#status</code> את הטקסט <code>טוען...</code></li>
+        <li>הביאו את המתכונים, והוסיפו לרשימה <code>#recipes</code> פריט <code>li</code> לכל מתכון, עם השם שלו</li>
+        <li>בסוף (בהצלחה או בכישלון): רוקנו את <code>#status</code></li>
+      </ol>
+      <div class="playground challenge" id="ch-recipes" data-check="ch-recipes" data-height="420" data-wait="2000">
+        <script type="text/plain" data-lang="html">
+          <h3>🍝 מתכונים</h3>
+          <p id="status"></p>
+          <ul id="recipes"></ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const status = document.querySelector('#status');
+          const list = document.querySelector('#recipes');
+
+          async function loadRecipes() {
+            // 1. טוען...
+            // 2. fetch + json + li לכל מתכון
+            // 3. finally: לרוקן את status
+          }
+
+          loadRecipes();
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const status = document.querySelector('#status');
+          const list = document.querySelector('#recipes');
+
+          async function loadRecipes() {
+            status.textContent = 'טוען...';
+            try {
+              const res = await fetch('https://dummyjson.com/recipes?limit=5&select=name');
+              if (!res.ok) throw new Error(`השרת החזיר ${res.status}`);
+              const data = await res.json();
+              data.recipes.forEach((recipe) => {
+                const li = document.createElement('li');
+                li.textContent = recipe.name;
+                list.append(li);
+              });
+            } catch (error) {
+              const li = document.createElement('li');
+              li.textContent = `❌ ${error.message}`;
+              list.append(li);
+            } finally {
+              status.textContent = '';
+            }
+          }
+
+          loadRecipes();
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-recipes': (out, win) => {
+            const items = [...win.document.querySelectorAll('#recipes li')].map((li) => li.textContent.trim());
+            return [
+              [out.code.includes('טוען...'), 'לפני הבקשה כתבו "טוען..." ב-status.'],
+              [/fetch\s*\(/.test(out.code), 'צריך fetch לכתובת של המתכונים.'],
+              [!/innerHTML/.test(out.code), 'השתמשו ב-createElement ו-textContent, לא ב-innerHTML.'],
+              [items.length === 5, `ברשימה צריכים להיות 5 פריטים. כרגע: ${items.length}`],
+              [items[0] === 'Classic Margherita Pizza', 'כל li צריך להכיל את השם של המתכון (recipe.name) ותו לא.'],
+              [win.document.querySelector('#status').textContent === '', 'בסוף צריך לרוקן את #status (רמז: finally).'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="search">חיפוש: פרמטרים בכתובת <span class="time">6 דק׳</span></h2>
+      <p>שמתם לב לחלק <code dir="ltr">?limit=5&amp;select=title</code> בכתובות? זה נקרא <strong>query string</strong> (מחרוזת שאילתה). דרכו מעבירים לשרת פרטים על מה שרוצים:</p>
+      <table>
+        <tr><th>חלק</th><th>מה זה</th></tr>
+        <tr><td dir="ltr"><code>https://dummyjson.com/products/search</code></td><td>הכתובת עצמה (איזה "שירות")</td></tr>
+        <tr><td dir="ltr"><code>?</code></td><td>מכאן מתחילים הפרמטרים</td></tr>
+        <tr><td dir="ltr"><code>q=phone</code></td><td>פרמטר: שם, ‏<code>=</code>, ערך. כאן: "חפש phone"</td></tr>
+        <tr><td dir="ltr"><code>&amp;</code></td><td>מפריד בין פרמטרים</td></tr>
+        <tr><td dir="ltr"><code>limit=5</code></td><td>פרמטר נוסף: "רק 5 תוצאות"</td></tr>
+      </table>
+      <p>כל API מחליט בעצמו אילו פרמטרים הוא מכיר. את זה קוראים בתיעוד שלו. למשל, <a href="https://dummyjson.com/docs/products" target="_blank" rel="noopener">התיעוד של DummyJSON</a> אומר שבכתובת <code>/products/search</code> הפרמטר <code>q</code> הוא מילת החיפוש.</p>
+
+      <h3>בונים כתובת מקלט של המשתמש</h3>
+      <p>כשהמילה מגיעה מהמשתמש, אסור פשוט להדביק אותה לכתובת: רווח, <code>&amp;</code> או <code>?</code> בתוך המילה ישברו אותה. הפתרון: <code>encodeURIComponent</code>, שהופכת תווים מיוחדים לצורה בטוחה לכתובת (רווח הופך ל-<code>%20</code>):</p>
+      <pre><code class="language-js">const word = 'iphone case';
+const url = `https://dummyjson.com/products/search?q=${encodeURIComponent(word)}&amp;limit=5`;
+// https://dummyjson.com/products/search?q=iphone%20case&amp;limit=5</code></pre>
+
+      <h3>טופס חיפוש מלא</h3>
+      <p>הנה הכול ביחד: טופס (מחלק ג׳, עם <code>preventDefault</code>), ‏fetch עם פרמטר, מצב טעינה, ורשימה. כתבו מילה באנגלית (laptop, ‏watch, ‏apple) ולחצו "חיפוש":</p>
+      <div class="playground" id="pg-search" data-height="520" data-wait="2500">
+        <script type="text/plain" data-lang="html">
+          <form id="search-form">
+            <input id="q" placeholder="מה לחפש? (באנגלית)" value="phone">
+            <button>חיפוש</button>
+          </form>
+          <p id="status"></p>
+          <ul id="results"></ul>
+        </script>
+        <script type="text/plain" data-lang="js">
+          const form = document.querySelector('#search-form');
+          const input = document.querySelector('#q');
+          const status = document.querySelector('#status');
+          const results = document.querySelector('#results');
+
+          async function search(word) {
+            status.textContent = `⏳ מחפשים "${word}"...`;
+            results.replaceChildren();   // מנקים תוצאות קודמות
+            try {
+              const url = `https://dummyjson.com/products/search?q=${encodeURIComponent(word)}&limit=5&select=title,price`;
+              const res = await fetch(url);
+              if (!res.ok) throw new Error(`השרת החזיר ${res.status}`);
+              const data = await res.json();
+
+              status.textContent = `נמצאו ${data.total} מוצרים (מציגים עד 5)`;
+              data.products.forEach((p) => {
+                const li = document.createElement('li');
+                li.textContent = `${p.title}: $${p.price}`;
+                results.append(li);
+              });
+              console.log('חיפוש', word, '→', data.total, 'תוצאות');
+            } catch (error) {
+              status.textContent = `❌ ${error.message}`;
+            }
+          }
+
+          form.addEventListener('submit', (event) => {
+            event.preventDefault();         // בלי זה, הדף נטען מחדש!
+            const word = input.value.trim();
+            if (word) search(word);
+          });
+
+          search(input.value);              // חיפוש ראשון כשהדף נטען
+        </script>
+      </div>
+      <p>נסו לחפש מילה שאין לה תוצאות (למשל <code>zzzz</code>). מה מוצג? איך הייתם משפרים את זה? (רמז: <code>if (data.products.length === 0)</code>.)</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 ביקשנו משתמש שלא קיים, והשרת החזיר 404. מה קורה בקוד <code>const res = await fetch(url)</code>?</p>
+        <ul>
+          <li>‏fetch זורקת שגיאה ומגיעים ל-catch</li>
+          <li data-correct>‏fetch מצליחה, ו-res.ok הוא false</li>
+          <li>הדף מציג הודעת שגיאה לבד</li>
+          <li>‏res הוא undefined</li>
+        </ul>
+        <p class="quiz-explain">נכון! מבחינת fetch השרת ענה, אז ה-Promise מצליח. רק כשאין תשובה בכלל (אין רשת) הוא נכשל. לכן תמיד בודקים <code>if (!res.ok) throw new Error(...)</code>.</p>
+      </div>
+
+      <h2 id="post">שליחת נתונים: POST <span class="time">4 דק׳</span></h2>
+      <p>עד עכשיו רק <strong>ביקשנו</strong> נתונים. זו בקשה מסוג <code>GET</code>, ברירת המחדל של fetch. כשרוצים <strong>לשלוח</strong> משהו לשרת (הרשמה, תגובה, הזמנה), משתמשים בבקשה מסוג <code>POST</code>. לשם כך מעבירים ל-fetch פרמטר שני: אובייקט הגדרות.</p>
+      <div class="playground" id="pg-post" data-height="400" data-wait="2000">
+        <script type="text/plain" data-lang="js">
+          async function createPost() {
+            const newPost = {
+              title: 'הפוסט הראשון שלי',
+              body: 'שלחתי את זה עם fetch!',
+              userId: 1,
+            };
+
+            const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
+              method: 'POST',                                  // סוג הבקשה
+              headers: { 'Content-Type': 'application/json' }, // "אני שולח JSON"
+              body: JSON.stringify(newPost),                   // הנתונים, כמחרוזת
+            });
+
+            console.log('סטטוס:', res.status);   // 201 = נוצר
+            const saved = await res.json();
+            console.log('השרת שמר את הפוסט עם id:', saved.id);
+            console.log('הכותרת:', saved.title);
+          }
+
+          createPost();
+        </script>
+      </div>
+      <ul>
+        <li>‏<code>method</code>: סוג הבקשה. יש גם <code>PUT</code> (עדכון) ו-<code>DELETE</code> (מחיקה).</li>
+        <li>‏<code>headers</code>: מידע נוסף על הבקשה. כאן אומרים לשרת שהגוף הוא JSON.</li>
+        <li>‏<code>body</code>: הנתונים עצמם. אי אפשר לשלוח אובייקט ישירות, ולכן הופכים אותו למחרוזת עם <code>JSON.stringify</code> (ההפך של <code>res.json()</code>).</li>
+      </ul>
+      <p>‏JSONPlaceholder הוא שרת לתרגול, ולכן הוא רק <em>מעמיד פנים</em> ששמר: הוא מחזיר את הפוסט עם <code>id: 101</code>, אבל לא באמת שומר אותו. בשרת אמיתי הפוסט היה נשמר במסד נתונים.</p>
+
+      <h2 id="promise-all">כמה בקשות במקביל: Promise.all <span class="time">3 דק׳</span></h2>
+      <p>נניח שצריך שלושה משתמשים. אפשר לכתוב שלושה <code>await</code> אחד אחרי השני, אבל אז כל בקשה מחכה שהקודמת תסתיים. אם כל אחת לוקחת חצי שנייה, זה שנייה וחצי. הבקשות לא תלויות זו בזו, אז למה לא לשלוח את כולן <strong>בבת אחת</strong>?</p>
+      <p>‏<code>Promise.all</code> מקבלת מערך של Promises, ומחזירה Promise אחד שמצליח כשכולם הצליחו. התוצאה היא מערך של התוצאות, <strong>באותו סדר</strong>:</p>
+      <div class="playground" id="pg-all" data-height="380" data-wait="2000">
+        <script type="text/plain" data-lang="js">
+          async function getUser(id) {
+            const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+            return res.json();
+          }
+
+          async function main() {
+            const start = Date.now();
+
+            // שלוש הבקשות יוצאות יחד. מחכים פעם אחת לכולן
+            const users = await Promise.all([getUser(1), getUser(2), getUser(3)]);
+
+            users.forEach((user) => console.log(user.name));
+            console.log('זמן:', Date.now() - start, 'מילישניות');
+          }
+
+          main();
+        </script>
+      </div>
+      <p>שימו לב: ‏<code>getUser(1)</code> בלי await מחזירה Promise, ובדיוק זה מה ש-Promise.all צריכה. אם <strong>אחת</strong> הבקשות נכשלת, כל ה-Promise.all נכשל, ומגיעים ל-catch.</p>
+
+      <h2 id="network">לראות את הבקשות: לשונית Network <span class="time">4 דק׳</span></h2>
+      <p>כשמשהו לא עובד עם fetch, הכלי הכי חשוב הוא לשונית <strong>Network</strong> בכלי המפתחים. היא מראה <strong>כל</strong> בקשה שהדף שולח, ומה בדיוק השרת ענה.</p>
+      <ol>
+        <li>פתחו את כלי המפתחים: <kbd>F12</kbd>, או <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> (ב-Mac: <kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>I</kbd>).</li>
+        <li>עברו ללשונית <strong>Network</strong>.</li>
+        <li>לחצו על הסינון <strong>Fetch/XHR</strong>, כדי לראות רק בקשות של נתונים (בלי תמונות ופונטים).</li>
+        <li>גללו לטופס החיפוש למעלה, וחפשו מילה. תופיע שורה חדשה: <code>search?q=...</code>.</li>
+        <li>לחצו על השורה. בלשונית <strong>Headers</strong> רואים את הכתובת המלאה ואת הסטטוס. בלשונית <strong>Response</strong> (או <strong>Preview</strong>, שמציגה אותו יפה) רואים את ה-JSON שהשרת החזיר.</li>
+      </ol>
+      <table>
+        <tr><th>מה רואים ב-Network</th><th>מה זה אומר</th></tr>
+        <tr><td>הבקשה לא מופיעה בכלל</td><td>הקוד לא הגיע ל-fetch. אולי שכחתם לקרוא לפונקציה (<code>main()</code>)?</td></tr>
+        <tr><td>סטטוס 404 באדום</td><td>הכתובת לא נכונה. בדקו אותה תו אחר תו</td></tr>
+        <tr><td>‏<code>(failed)</code> או <code>CORS error</code></td><td>אין תשובה בכלל: בעיית רשת, או שהשרת לא מרשה לאתר שלכם לגשת (ראו CORS למטה)</td></tr>
+        <tr><td>סטטוס 200, אבל הדף לא מתעדכן</td><td>הנתונים הגיעו! הבעיה בקוד שמציג אותם. ב-Preview בדקו את המבנה: אולי המערך בתוך שדה כמו <code>products</code>?</td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>להאט את הרשת:</strong> בראש לשונית Network יש תפריט שכתוב בו <strong>No throttling</strong>. בחרו <strong>Slow 4G</strong> או <strong>3G</strong>, והריצו שוב את הדוגמה של מצבי הטעינה. עכשיו תראו את "טוען..." לאורך זמן, כמו שמשתמש עם חיבור איטי רואה. אל תשכחו להחזיר ל-No throttling!</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏(4 דק׳) להדגים את Network על המסך: לפתוח, לסנן Fetch/XHR, לחפש בטופס ולהראות Preview. אחר כך להאט ל-3G ולהריץ את pg-loading, כדי שהכיתה תראה את "טוען..." בעיניים. ההדגמה הזו חוסכת המון שאלות "למה זה לא עובד" בפרויקט.</p>
+      </aside>
+
+      <h2 id="mistakes">טעויות נפוצות <span class="time">5 דק׳</span></h2>
+      <p>את הטעויות האלה כולם עושים בהתחלה. כדאי להכיר אותן מראש, כדי לזהות אותן מהר.</p>
+
+      <h3>1. שכחתם await לפני fetch</h3>
+      <p>בלי await, המשתנה מקבל את ה-<strong>Promise</strong> (הקבלה), ולא את התשובה. לקבלה אין <code>status</code>, ולכן מקבלים <code>undefined</code>. בקונסול של הדפדפן זה נראה כך: <code>Promise {&lt;pending&gt;}</code>. (בעורך באתר: <code>Promise {…}</code>.)</p>
+      <div class="playground" id="pg-mistake-await" data-height="300" data-wait="1500">
+        <script type="text/plain" data-lang="js">
+          async function main() {
+            const res = fetch('https://jsonplaceholder.typicode.com/users/1');   // ❌ חסר await
+            console.log('res הוא Promise?', res instanceof Promise);
+            console.log('status:', res.status);                                 // undefined
+
+            const res2 = await fetch('https://jsonplaceholder.typicode.com/users/1'); // ✅
+            console.log('עם await, status:', res2.status);
+          }
+
+          main();
+        </script>
+      </div>
+
+      <h3>2. שכחתם await לפני res.json()</h3>
+      <p>אותה בעיה בצעד השני: <code>const data = res.json()</code> בלי await נותן Promise, ו-<code>data.name</code> יוצא <code>undefined</code>. כלל אצבע: <strong>שני await</strong>, אחד ל-fetch ואחד ל-json.</p>
+
+      <h3>3. משתמשים בנתונים מחוץ לפונקציה, לפני שהגיעו</h3>
+      <p>זו הטעות הכי מבלבלת. הקוד הבא נראה הגיוני, אבל מדפיס <code>undefined</code>:</p>
+      <pre><code class="language-js">let user;
+
+async function load() {
+  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+  user = await res.json();
+}
+
+load();
+console.log(user.name);   // ❌ Cannot read properties of undefined</code></pre>
+      <p>למה? זוכרים את דוגמת הבישול? <code>load()</code> מתחילה, מגיעה ל-await, <strong>ומחזירה שליטה מיד</strong>. השורה <code>console.log</code> רצה כשהבקשה עוד בדרך, ו-<code>user</code> עדיין ריק. <strong>הפתרון:</strong> כל מה שצריך את הנתונים נכתב <em>בתוך</em> הפונקציה, אחרי ה-await (או בפונקציה שנקראת משם).</p>
+      <pre><code class="language-js">async function load() {
+  const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+  const user = await res.json();
+  console.log(user.name);   // ✅ כאן הנתונים כבר הגיעו
+  showUser(user);           // ✅ או מעבירים אותם לפונקציה שמציגה
+}</code></pre>
+
+      <h3>4. לא בדקתם את res.ok</h3>
+      <p>ראינו את זה: על 404 fetch לא נכשלת. בלי <code>if (!res.ok)</code> תקבלו <code>undefined</code> מסתורי במקום הודעת שגיאה ברורה.</p>
+
+      <h3>5. שגיאת CORS</h3>
+      <p>יום אחד תנסו לעשות fetch לאתר כלשהו ותקבלו בקונסול שגיאה אדומה ארוכה עם המילה <strong>CORS</strong>, ו-<code>Failed to fetch</code>. מה קרה?</p>
+      <p>‏<strong>CORS</strong> הוא כלל אבטחה של הדפדפן: דף מאתר אחד לא יכול לקרוא נתונים מאתר אחר, <strong>אלא אם האתר האחר מרשה זאת במפורש</strong>. ההרשאה מגיעה בכותרת מיוחדת בתשובה (<code>Access-Control-Allow-Origin</code>). למה זה קיים? דמיינו שנכנסתם לאתר זדוני, והוא עושה fetch לאתר הבנק שלכם. הדפדפן שלכם מחובר לבנק, אז הבקשה הייתה מצליחה, והאתר הזדוני היה קורא את היתרה שלכם. ‏CORS מונע את זה.</p>
+      <ul>
+        <li>‏APIs ציבוריים לתרגול (כמו JSONPlaceholder ו-DummyJSON) <strong>מרשים</strong> לכל אתר, ולכן הם עובדים לנו.</li>
+        <li>אם קיבלתם שגיאת CORS, הבעיה <strong>לא בקוד שלכם</strong>, ואי אפשר לתקן אותה מהצד של הדפדפן. צריך API אחר, או שרת משלכם שיבקש בשבילכם (על זה בהמשך הקורס).</li>
+      </ul>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה ידפיס הקוד?<br><code>const res = fetch(url); console.log(res.ok);</code></p>
+        <ul>
+          <li>‏<code>true</code></li>
+          <li>‏<code>false</code></li>
+          <li data-correct>‏<code>undefined</code></li>
+          <li>שגיאת CORS</li>
+        </ul>
+        <p class="quiz-explain">נכון! בלי await, ‏<code>res</code> הוא Promise ולא תשובה. ל-Promise אין מאפיין <code>ok</code>, ולכן מקבלים undefined. התיקון: <code>const res = await fetch(url)</code>, בתוך פונקציית async.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 קיבלתם שגיאת CORS כשניסיתם לעשות fetch לאתר כלשהו. מה הסיבה הסבירה?</p>
+        <ul>
+          <li>שכחתם await</li>
+          <li>שגיאת כתיב בשם המשתנה</li>
+          <li data-correct>השרת לא מרשה לאתרים אחרים לקרוא ממנו נתונים</li>
+          <li>האינטרנט איטי מדי</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏CORS הוא החלטה של השרת. אם הוא לא שולח את הכותרת שמרשה גישה, הדפדפן חוסם את התשובה. אי אפשר לתקן את זה בקוד של הדף.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏(5 דק׳) טעות 3 היא החשובה ביותר. כדאי לכתוב אותה על הלוח, לשאול "מה יודפס?", ולחזור לדוגמת הבישול (א-ב-ג). ב-React הבעיה הזו נפתרת בעזרת state: שומרים את הנתונים ב-state, ו-React מצייר מחדש כשהם מגיעים. אפשר לרמוז על כך כבר עכשיו. את CORS מספיק להסביר ברמת "כלל אבטחה של הדפדפן, והשרת מחליט", בלי להיכנס לפרטים.</p>
+      </aside>
+
+      <h2 id="cheatsheet">דף סיכום</h2>
+<pre><code class="language-js">// טיימר: מריץ פונקציה פעם אחת, אחרי ms מילישניות
+setTimeout(() =&gt; console.log('אחרי שנייה'), 1000);
+
+// Promise שמצליח אחרי ms מילישניות
+const wait = (ms) =&gt; new Promise((resolve) =&gt; setTimeout(resolve, ms));
+
+// התבנית המלאה של fetch: טעינה, הצלחה, שגיאה
+async function main() {
+  status.textContent = 'טוען...';
+  try {
+    const res = await fetch(url);                         // 1. בקשה
+    if (!res.ok) throw new Error(`שגיאה: ${res.status}`); //    404 לא זורק לבד!
+    const data = await res.json();                        // 2. גוף כ-JSON
+    data.items.forEach((item) =&gt; { /* createElement */ }); // 3. שימוש בנתונים
+  } catch (error) {
+    status.textContent = error.message;                   // ❌ אין רשת / 404 / CORS
+  } finally {
+    // רץ תמיד: מסתירים "טוען..."
+  }
+}
+main();   // לא לשכוח לקרוא לפונקציה!
+
+// פרמטרים בכתובת
+const url2 = `https://dummyjson.com/products/search?q=${encodeURIComponent(word)}&amp;limit=5`;
+
+// POST: שליחת נתונים
+await fetch(url, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'שלום' }),
+});
+
+// כמה בקשות במקביל
+const [a, b] = await Promise.all([fetch(url1), fetch(url2)]);</code></pre>
+
+      <h2 id="summary">סיכום</h2>
+      <ul>
+        <li>קוד <strong>אסינכרוני</strong> הוא קוד שמחכה למשהו מבחוץ (שרת, טיימר) בלי לתקוע את הדף. JavaScript לא "מחכה": הוא ממשיך, וחוזר לקוד שחיכה כשהתוצאה מגיעה.</li>
+        <li>‏<code>setTimeout</code> רק <em>רושמת</em> פונקציה לעתיד. הקוד שאחריה רץ מיד, גם עם 0 מילישניות.</li>
+        <li>‏<strong>Promise</strong> הוא "קבלה" על תוצאה שעוד לא הגיעה. הוא <code>pending</code>, ואז פעם אחת בלבד <code>fulfilled</code> (עם ערך) או <code>rejected</code> (עם שגיאה).</li>
+        <li>‏<code>await</code> מחכה ל-Promise ונותן את הערך שבתוכו. מותר רק בתוך פונקציית <code>async</code>, והוא עוצר רק אותה. פונקציית async תמיד מחזירה Promise.</li>
+        <li>‏<code>try</code>/<code>catch</code>/<code>finally</code> מטפלים בכישלון: catch רץ כשמשהו נכשל, finally רץ תמיד.</li>
+        <li>‏fetch בשלושה צעדים: <code>await fetch(url)</code>, ‏<code>await res.json()</code>, משתמשים ב-data. ‏<strong>fetch לא נכשלת על 404</strong>, לכן בודקים <code>res.ok</code>.</li>
+        <li>נתונים מהשרת מציגים ב-DOM עם <code>createElement</code> ו-<code>textContent</code> (לא innerHTML), ותמיד מטפלים בשלושה מצבים: טוען, הצלחה, שגיאה.</li>
+        <li>לשונית <strong>Network</strong> בכלי המפתחים מראה כל בקשה: הכתובת, הסטטוס והתשובה. זה המקום הראשון לבדוק כש-fetch "לא עובד".</li>
+      </ul>
+
+      <div class="box goals">
+        <h3>מה הלאה?</h3>
+        <p>סיימתם את כל החומר של שיעור 3! עכשיו הזמן לחבר הכול ב<a href="project.html">פרויקט המסכם</a>: אפליקציה שמביאה נתונים מהרשת, מסננת אותם עם מתודות של מערכים ומציגה אותם ב-DOM. בשיעור 4 נתחיל React, ותראו כמה מהקוד שכתבנו כאן React כותב בשבילנו.</p>
+      </div>
+
+      <h3>מקורות להעמקה</h3>
+      <ul>
+        <li><a href="https://javascript.info/async" target="_blank" rel="noopener">javascript.info: Promises, async/await</a>: פרק מצוין, צעד אחר צעד, עם תרגילים</li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch" target="_blank" rel="noopener">MDN: Using the Fetch API</a></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Async_JS" target="_blank" rel="noopener">MDN: Asynchronous JavaScript</a>: מבוא למתחילים</li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" target="_blank" rel="noopener">MDN: HTTP response status codes</a> ו-<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank" rel="noopener">CORS</a></li>
+        <li><a href="https://jsonplaceholder.typicode.com/" target="_blank" rel="noopener">JSONPlaceholder</a> ו-<a href="https://dummyjson.com/docs" target="_blank" rel="noopener">DummyJSON</a>: שרתי התרגול שהשתמשנו בהם, עם רשימת כל הכתובות</li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p>‏<strong>בכיתה יש לחלק הזה כ-25–30 דק׳</strong>, ולכן הזמנים בכותרות (שמסתכמים בהרבה יותר) הם למעבר מלא ולא לכיתה. סדר עדיפויות מומלץ: חידת הסדר של setTimeout (5), ‏Promise כקבלה ו-await עם דוגמת הבישול (8), ‏fetch בשלושה צעדים ו-res.ok עם 404 (7), ההדגמה של מצבי הטעינה ב-Network עם האטה ל-3G (8). חיפוש, POST, ‏Promise.all ו-CORS נשארים לקריאה בבית. אם נשאר זמן, אתגר 6 (ספר מתכונים) מחבר את כל החלק והוא הבסיס לפרויקט.</p>
+      </aside>
+
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>
