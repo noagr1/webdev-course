@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 1 · חלק ב׳: עיצוב עם CSS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="1" data-part="css" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 1 · חלק ב׳</span>
+      <h1>עיצוב עם CSS</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 35 דק׳ בכיתה</span>
+        <span class="chip">📚 2–3 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: חלק א׳ (HTML)</span>
+      </div>
+
+      <p>בחלק הקודם למדנו לכתוב HTML, כלומר להגיד לדפדפן <strong>מה</strong> יש בדף: כותרת, פסקה, תמונה, רשימה. הדף עבד, אבל נראה כמו מסמך משנות ה-90: טקסט שחור על רקע לבן, הכול צמוד לשמאל או לימין. בחלק הזה נלמד <strong>CSS</strong>, השפה שקובעת <strong>איך</strong> הדף נראה: צבעים, גופנים, ריווחים, סידור של אלמנטים זה ליד זה, והתאמה לטלפון.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>לחבר קובץ CSS לדף HTML, ולהסביר למה עדיף קובץ נפרד</li>
+          <li>לקרוא ולכתוב חוק CSS: בורר, מאפיין וערך</li>
+          <li>לבחור אלמנטים לפי תגית, ‏class, ‏id ומיקום, ולהבין מי "מנצח" כשיש סתירה</li>
+          <li>להשתמש בצבעים, ביחידות מידה ובגופנים</li>
+          <li>להסביר את מודל הקופסה: ‏content, ‏padding, ‏border ו-margin</li>
+          <li>לסדר אלמנטים בשורה או בעמודה עם Flexbox, ולמרכז כל דבר</li>
+          <li>לגרום לדף להיראות טוב גם בטלפון, בעזרת media queries</li>
+          <li>להשתמש בכלי המפתחים של הדפדפן כדי לבדוק ולתקן עיצוב</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך ללמוד מהעמוד הזה:</strong> כמעט בכל נושא יש עורך חי עם שתי לשוניות, <strong>HTML</strong> ו-<strong>CSS</strong>. ה-HTML כבר כתוב בשבילכם. עברו ללשונית CSS, שנו ערכים וראו מה קורה בתוצאה. אם משהו נשבר, הכפתור "↺ איפוס" מחזיר את הקוד המקורי.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>בכיתה (35 דק׳):</strong> אנטומיה של חוק ובוררים (8), צבעים ויחידות בקצרה (4), מודל הקופסה עם DevTools (8), ‏Flexbox עם החוקר האינטראקטיבי (10), ‏media query אחד (5). ‏Grid, משתנים וטבלת המאפיינים נשארים ללימוד עצמי.</p>
+        <p>כדאי לפתוח בהדגמה מרשימה: לפתוח אתר מוכר (למשל ynet), ובכלי המפתחים לכבות את כל ה-CSS (בלשונית Sources או עם תוסף), או פשוט לשנות צבע רקע בזמן אמת. הסטודנטים מבינים מיד מה התפקיד של CSS.</p>
+      </aside>
+
+      <h2 id="what">מה זה CSS ואיך מחברים אותו <span class="time">5 דק׳</span></h2>
+      <p>‏<strong>CSS</strong> הם ראשי תיבות של Cascading Style Sheets, "גיליונות עיצוב מדורגים". זו שפה נפרדת מ-HTML, עם תפקיד אחר:</p>
+      <table>
+        <tr><th>שפה</th><th>תפקיד</th><th>דימוי</th></tr>
+        <tr><td>HTML</td><td>התוכן והמבנה: מה יש בדף</td><td>השלד והקירות של הבית</td></tr>
+        <tr><td>CSS</td><td>העיצוב: איך זה נראה</td><td>הצבע על הקירות, הרהיטים, התאורה</td></tr>
+        <tr><td>JavaScript</td><td>ההתנהגות: מה קורה כשלוחצים</td><td>החשמל והאינסטלציה (נלמד בשיעור 2)</td></tr>
+      </table>
+      <p>יש שלוש דרכים להוסיף CSS לדף. כדאי להכיר את שלושתן, אבל בפועל משתמשים כמעט תמיד בשלישית.</p>
+
+      <h3>דרך 1: מאפיין <code>style</code> על התגית (inline)</h3>
+      <p>כותבים את העיצוב ישירות על האלמנט. זה עובד, אבל רק על האלמנט הזה. אם יש 20 כותרות, צריך לכתוב את אותו הדבר 20 פעמים.</p>
+      <div class="playground" id="pg-inline" data-height="140">
+        <script type="text/plain" data-lang="html">
+          <h1 style="color: purple;">כותרת סגולה</h1>
+          <p style="color: gray; font-size: 20px;">פסקה אפורה וגדולה</p>
+          <p>פסקה רגילה, בלי עיצוב</p>
+        </script>
+      </div>
+
+      <h3>דרך 2: תגית <code>&lt;style&gt;</code> בתוך ה-head</h3>
+      <p>כותבים את כל העיצוב במקום אחד בראש הדף. עכשיו חוק אחד משפיע על כל הפסקאות בדף. החיסרון: אם יש לאתר חמישה דפים, צריך להעתיק את ה-CSS לכל אחד מהם.</p>
+      <pre><code class="language-html">&lt;head&gt;
+  &lt;style&gt;
+    p { color: gray; }
+  &lt;/style&gt;
+&lt;/head&gt;</code></pre>
+
+      <h3>דרך 3 (המומלצת): קובץ CSS נפרד עם <code>&lt;link&gt;</code></h3>
+      <p>יוצרים קובץ בשם <code>style.css</code> לצד <code>index.html</code>, ומחברים אותו בתוך ה-<code>head</code>:</p>
+      <pre><code class="language-html">&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;האתר שלי&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;</code></pre>
+      <pre><code class="language-css">/* style.css — קובץ שמכיל רק CSS, בלי תגיות HTML */
+p {
+  color: gray;
+}</code></pre>
+      <ul>
+        <li><code>rel="stylesheet"</code> אומר לדפדפן "הקובץ הזה הוא גיליון עיצוב".</li>
+        <li><code>href="style.css"</code> הוא הנתיב לקובץ, בדיוק כמו בקישורים. אם הקובץ בתיקייה <code>css</code>, כותבים <code>href="css/style.css"</code>.</li>
+        <li>קובץ אחד יכול לעצב את כל דפי האתר. משנים צבע במקום אחד, והוא משתנה בכל הדפים.</li>
+      </ul>
+      <div class="box tip">
+        <p>בעורכים החיים בעמוד הזה, הלשונית <strong>CSS</strong> מתנהגת כמו קובץ <code>style.css</code> שכבר מחובר לדף. לא צריך לכתוב <code>&lt;link&gt;</code> או <code>&lt;style&gt;</code>.</p>
+      </div>
+      <div class="box warn">
+        <p><strong>הדף לא מתעצב?</strong> זו התקלה הנפוצה ביותר בהתחלה. בדקו: (1) שם הקובץ זהה בדיוק, כולל אותיות גדולות וקטנות; (2) הקבצים באותה תיקייה; (3) שמרתם את קובץ ה-CSS (נקודה לבנה בלשונית ב-VS Code = לא נשמר); (4) ה-<code>&lt;link&gt;</code> נמצא בתוך <code>&lt;head&gt;</code>.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: לאתר יש 10 דפים, ורוצים שכל הכותרות בכולם יהיו כחולות. מה הדרך הנכונה?</p>
+        <ul>
+          <li>להוסיף <code>style="color: blue"</code> לכל כותרת</li>
+          <li>להוסיף תגית <code>&lt;style&gt;</code> לכל אחד מעשרת הדפים</li>
+          <li data-correct>קובץ <code>style.css</code> אחד עם חוק לכותרות, ו-<code>&lt;link&gt;</code> אליו מכל דף</li>
+        </ul>
+        <p class="quiz-explain">נכון! קובץ חיצוני אחד = מקום אחד לשנות. מחר רוצים ירוק? משנים שורה אחת.</p>
+      </div>
+
+      <h2 id="anatomy">אנטומיה של חוק CSS <span class="time">3 דק׳</span></h2>
+      <p>קובץ CSS הוא רשימה של <strong>חוקים</strong> (rules). כל חוק אומר: "את האלמנטים האלה, תעצב ככה". הנה חוק אחד, מפורק לחלקים:</p>
+      <pre><code class="language-css">h1 {
+  color: navy;
+  font-size: 32px;
+}</code></pre>
+      <table>
+        <tr><th>חלק</th><th>בדוגמה</th><th>מה הוא אומר</th></tr>
+        <tr><td><strong>בורר</strong> (selector)</td><td><code>h1</code></td><td>על מי החוק חל: כל תגיות ה-h1 בדף</td></tr>
+        <tr><td><strong>סוגריים מסולסלים</strong></td><td><code>{ }</code></td><td>בתוכם כל ההגדרות של החוק</td></tr>
+        <tr><td><strong>מאפיין</strong> (property)</td><td><code>color</code></td><td>מה משנים: צבע טקסט</td></tr>
+        <tr><td><strong>ערך</strong> (value)</td><td><code>navy</code></td><td>למה משנים: כחול כהה</td></tr>
+        <tr><td><strong>נקודתיים</strong> ו<strong>נקודה-פסיק</strong></td><td><code>:</code> &nbsp; <code>;</code></td><td>נקודתיים בין מאפיין לערך, נקודה-פסיק בסוף כל הגדרה</td></tr>
+      </table>
+      <p>צמד של מאפיין וערך (<code>color: navy;</code>) נקרא <strong>הצהרה</strong> (declaration). בחוק אחד אפשר לשים כמה הצהרות שרוצים.</p>
+      <div class="playground" id="pg-anatomy" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <h1>שלום עולם</h1>
+          <p>נסו לשנות את הצבע ל-red או ל-green, ואת הגודל ל-50px.</p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          h1 {
+            color: navy;
+            font-size: 32px;
+          }
+
+          /* זו הערה: הדפדפן מתעלם ממנה */
+          p {
+            color: gray;
+          }
+        </script>
+      </div>
+      <div class="box warn">
+        <p><strong>טעויות תחביר נפוצות:</strong> שכחתם <code>;</code> בסוף שורה (ההצהרה הבאה תיכשל), שכחתם לסגור <code>}</code> (כל החוקים שאחריו יישברו), או כתבתם <code>color = red</code> במקום <code>color: red</code>. ב-CSS אין הודעת שגיאה. הדפדפן פשוט מתעלם מהשורה השגויה. נסו בעורך שלמעלה למחוק את הנקודה-פסיק אחרי <code>navy</code> ותראו מה קורה.</p>
+      </div>
+
+      <h2 id="selectors">בוררים: איך בוחרים מה לעצב <span class="time">8 דק׳</span></h2>
+      <p>הבורר הוא החלק הכי חשוב בחוק: הוא קובע <strong>על אילו אלמנטים</strong> החוק חל. אלה הבוררים שתשתמשו בהם 95% מהזמן.</p>
+
+      <h3>1. בורר תגית</h3>
+      <p>כותבים את שם התגית בלי הסוגריים המשולשים. החוק חל על <strong>כל</strong> התגיות מהסוג הזה בדף.</p>
+      <pre><code class="language-css">p { color: gray; }        /* כל הפסקאות */
+li { margin-bottom: 8px; } /* כל פריטי הרשימות */</code></pre>
+
+      <h3>2. בורר class (מחלקה) — עם נקודה</h3>
+      <p>נותנים לאלמנט ב-HTML מאפיין <code>class</code> עם שם שבוחרים, ובCSS כותבים נקודה ואז את השם. כך מעצבים רק אלמנטים מסוימים. זה הבורר הנפוץ ביותר.</p>
+      <ul>
+        <li>אותו class יכול להופיע על כמה אלמנטים.</li>
+        <li>לאלמנט אחד יכולים להיות כמה classes, מופרדים ברווח: <code>class="card featured"</code>.</li>
+        <li>שמות classes באנגלית, בלי רווחים. נהוג להשתמש במקף: <code>main-title</code>.</li>
+      </ul>
+
+      <h3>3. בורר id — עם סולמית</h3>
+      <p>‏<code>id</code> הוא שם <strong>ייחודי</strong>: מותר שרק אלמנט אחד בדף יחזיק אותו. ב-CSS כותבים <code>#</code> ואז את השם. בפועל, לעיצוב עדיף להשתמש ב-class. ‏id שומרים לקישורים פנימיים (<code>href="#contact"</code>) ול-JavaScript.</p>
+
+      <div class="playground" id="pg-selectors" data-height="260">
+        <script type="text/plain" data-lang="html">
+          <h2>רשימת קניות</h2>
+          <ul>
+            <li>חלב</li>
+            <li class="urgent">לחם</li>
+            <li>ביצים</li>
+            <li class="urgent">קפה</li>
+          </ul>
+          <p id="note">לא לשכוח את השקיות!</p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          /* בורר תגית: כל ה-li */
+          li {
+            color: #334155;
+          }
+
+          /* בורר class: רק מה שיש לו class="urgent" */
+          .urgent {
+            color: crimson;
+            font-weight: bold;
+          }
+
+          /* בורר id: רק האלמנט עם id="note" */
+          #note {
+            background: lightyellow;
+          }
+        </script>
+      </div>
+
+      <h3>4. בורר צאצא — רווח בין שני בוררים</h3>
+      <p><code>nav a</code> פירושו "כל <code>a</code> שנמצא <strong>בתוך</strong> <code>nav</code>". קישורים במקום אחר בדף לא יושפעו.</p>
+
+      <h3>5. קיבוץ — פסיק בין בוררים</h3>
+      <p><code>h1, h2, h3</code> פירושו "החוק חל על h1, וגם על h2, וגם על h3". חוסך לכתוב את אותו חוק שלוש פעמים.</p>
+
+      <h3>6. מצבים (pseudo-classes) — נקודתיים</h3>
+      <p><code>a:hover</code> חל רק <strong>כשהעכבר מעל</strong> הקישור. יש עוד: <code>:focus</code> (כשהאלמנט בפוקוס, למשל שדה טופס שלחצו עליו), <code>:first-child</code> (הילד הראשון).</p>
+
+      <div class="playground" id="pg-selectors2" data-height="260">
+        <script type="text/plain" data-lang="html">
+          <nav>
+            <a href="#">בית</a>
+            <a href="#">אודות</a>
+            <a href="#">צור קשר</a>
+          </nav>
+          <h1>כותרת ראשית</h1>
+          <h2>כותרת משנה</h2>
+          <p>קישור שלא בתוך nav: <a href="#">לחצו כאן</a></p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          /* צאצא: רק קישורים בתוך nav */
+          nav a {
+            color: white;
+            background: #4f46e5;
+            padding: 6px 12px;
+            text-decoration: none;
+          }
+
+          /* מצב: כשהעכבר מעל קישור ב-nav */
+          nav a:hover {
+            background: #312e81;
+          }
+
+          /* קיבוץ: גם h1 וגם h2 */
+          h1, h2 {
+            color: #4f46e5;
+          }
+        </script>
+      </div>
+      <p>העבירו את העכבר מעל הקישורים ב-nav בתוצאה. שימו לב שהקישור "לחצו כאן" נשאר רגיל, כי הוא לא בתוך <code>nav</code>.</p>
+
+      <h3>כשיש סתירה: מי מנצח? (Cascade ו-Specificity)</h3>
+      <p>מה קורה אם שני חוקים קובעים צבע שונה לאותו אלמנט? יש שני כללים פשוטים:</p>
+      <ol>
+        <li><strong>ספציפיות (specificity):</strong> בורר מדויק יותר מנצח. הסדר מהחלש לחזק: תגית &lt; class &lt; id &lt; <code>style</code> על התגית.</li>
+        <li><strong>סדר (cascade, "מפל"):</strong> אם שני הבוררים חזקים באותה מידה, החוק ש<strong>כתוב אחרון</strong> בקובץ מנצח.</li>
+      </ol>
+      <div class="playground" id="pg-cascade" data-height="230">
+        <script type="text/plain" data-lang="html">
+          <p>פסקה רגילה</p>
+          <p class="special">פסקה עם class</p>
+          <p class="special" id="unique">פסקה עם class ועם id</p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          #unique  { color: green; }  /* id: הכי חזק */
+          .special { color: blue; }   /* class: חזק מתגית */
+          p        { color: red; }    /* תגית: הכי חלש */
+
+          /* נסו להוסיף כאן עוד חוק p { color: orange; }
+             איזו פסקה תשתנה? רק הראשונה! */
+        </script>
+      </div>
+      <p>שימו לב: למרות ש-<code>p { color: red; }</code> כתוב אחרון, הוא משפיע רק על הפסקה הראשונה, כי לשתי האחרות יש בורר חזק יותר.</p>
+      <p><strong>ירושה:</strong> חלק מהמאפיינים, בעיקר של טקסט (<code>color</code>, <code>font-family</code>, <code>font-size</code>), <strong>עוברים בירושה</strong> לאלמנטים שבפנים. לכן נהוג לקבוע את הגופן פעם אחת על <code>body</code>, וכל הדף מקבל אותו. מאפיינים של קופסה (<code>border</code>, <code>padding</code>, <code>background</code>) לא עוברים בירושה.</p>
+
+      <aside class="box lecturer-note">
+        <p>אין צורך להיכנס לחישוב ספציפיות מספרי (0-1-0 וכו׳). מספיק הכלל "id &gt; class &gt; תגית, ובשוויון האחרון מנצח". כדאי להמליץ לסטודנטים לעצב כמעט רק עם classes. כך הם כמעט לא ייתקלו בבעיות ספציפיות. כדאי גם להזכיר שאת <code>!important</code> לא משתמשים, וזו לרוב סימן לבעיה במבנה.</p>
+      </aside>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: איזה בורר יבחר את <code>&lt;li class="done"&gt;</code>?</p>
+        <ul>
+          <li><code>#done</code></li>
+          <li data-correct><code>.done</code></li>
+          <li><code>done</code></li>
+          <li><code>li done</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! נקודה = class. ‏<code>#done</code> מחפש id, ‏<code>done</code> מחפש תגית בשם done (שלא קיימת), ו-<code>li done</code> מחפש תגית done בתוך li.</p>
+      </div>
+
+      <h3>🎯 אתגר 1: רשימת משימות <span class="level easy">קל</span></h3>
+      <p>בלשונית CSS:</p>
+      <ol>
+        <li>צבעו את הכותרת <code>h1</code> בצבע <code>teal</code>.</li>
+        <li>למשימות שהושלמו (עם <code>class="done"</code>) תנו צבע <code>gray</code> וקו חוצה בעזרת <code>text-decoration: line-through</code>.</li>
+      </ol>
+      <p>לחצו "✓ בדיקה" כדי לבדוק.</p>
+      <div class="playground challenge" id="ch-selectors" data-check="ch-selectors" data-height="260">
+        <script type="text/plain" data-lang="html">
+          <h1>המשימות שלי</h1>
+          <ul>
+            <li>לקנות מצרכים</li>
+            <li class="done">לכבס</li>
+            <li>להתקשר לסבתא</li>
+            <li class="done">לשטוף כלים</li>
+          </ul>
+        </script>
+        <script type="text/plain" data-lang="css">
+          /* כתבו כאן את ה-CSS */
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          h1 {
+            color: teal;
+          }
+
+          .done {
+            color: gray;
+            text-decoration: line-through;
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-selectors': (doc, win) => {
+            const css = (e, p) => win.getComputedStyle(e)[p];
+            const h1 = doc.querySelector('h1');
+            const done = [...doc.querySelectorAll('li.done')];
+            const notDone = [...doc.querySelectorAll('li:not(.done)')];
+            return [
+              [h1 && css(h1, 'color') === 'rgb(0, 128, 128)', 'הכותרת h1 צריכה להיות בצבע teal'],
+              [done.length === 2 && done.every((li) => css(li, 'textDecorationLine').includes('line-through')), 'למשימות עם class="done" צריך קו חוצה (text-decoration: line-through)'],
+              [done.length === 2 && done.every((li) => css(li, 'color') === 'rgb(128, 128, 128)'), 'המשימות שהושלמו צריכות להיות בצבע gray'],
+              [notDone.every((li) => !css(li, 'textDecorationLine').includes('line-through')), 'רק המשימות שהושלמו צריכות קו חוצה. השתמשו בבורר .done ולא li'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="colors">צבעים ורקעים <span class="time">2 דק׳</span></h2>
+      <p>שני המאפיינים הבסיסיים: <code>color</code> קובע את צבע <strong>הטקסט</strong>, ו-<code>background-color</code> (או בקיצור <code>background</code>) קובע את צבע <strong>הרקע</strong>. יש ארבע דרכים לכתוב צבע:</p>
+      <table>
+        <tr><th>שיטה</th><th>דוגמה</th><th>הסבר</th></tr>
+        <tr><td>שם</td><td><code>tomato</code></td><td>יש כ-140 שמות מוכנים באנגלית. נוח לניסויים, אבל מוגבל.</td></tr>
+        <tr><td>Hex</td><td><code>#4f46e5</code></td><td>הנפוץ ביותר. ‏<code>#</code> ואחריו 6 תווים: שניים לאדום, שניים לירוק, שניים לכחול (00 עד ff). ‏<code>#000000</code> שחור, ‏<code>#ffffff</code> לבן.</td></tr>
+        <tr><td>RGB</td><td><code>rgb(79, 70, 229)</code></td><td>אותו רעיון, במספרים מ-0 עד 255. אפשר להוסיף שקיפות: <code>rgb(0 0 0 / 50%)</code>.</td></tr>
+        <tr><td>HSL</td><td><code>hsl(243, 75%, 59%)</code></td><td>גוון (0–360 על גלגל הצבעים), רוויה ובהירות. נוח ליצירת גוונים בהירים וכהים של אותו צבע.</td></tr>
+      </table>
+      <div class="playground" id="pg-colors" data-height="250">
+        <script type="text/plain" data-lang="html">
+          <div class="a">שם: tomato</div>
+          <div class="b">Hex: #4f46e5</div>
+          <div class="c">RGB: rgb(16, 185, 129)</div>
+          <div class="d">HSL: hsl(40, 90%, 55%)</div>
+          <div class="e">שקיפות: rgb(0 0 0 / 40%)</div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          div { padding: 8px; margin-bottom: 6px; color: white; }
+
+          .a { background: tomato; }
+          .b { background: #4f46e5; }
+          .c { background: rgb(16, 185, 129); }
+          .d { background: hsl(40, 90%, 55%); color: black; }
+          .e { background: rgb(0 0 0 / 40%); }
+
+          /* נסו: שנו את 40 ב-hsl ל-200 או ל-300 */
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>איך בוחרים צבעים?</strong> ב-VS Code, ליד כל צבע בקובץ CSS מופיע ריבוע קטן. לחיצה עליו פותחת בוחר צבעים. לפלטות מוכנות: <a href="https://coolors.co/" target="_blank" rel="noopener">coolors.co</a>. ודאו שיש מספיק <strong>ניגודיות</strong> בין טקסט לרקע (טקסט אפור בהיר על לבן קשה לקריאה).</p>
+      </div>
+      <p>לרקע אפשר לשים גם <strong>מעבר צבע</strong> (gradient) או <strong>תמונה</strong>:</p>
+      <pre><code class="language-css">.hero {
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+}
+.banner {
+  background-image: url("images/sea.jpg");
+  background-size: cover;      /* התמונה ממלאת את כל האלמנט */
+  background-position: center;
+}</code></pre>
+
+      <h2 id="units">יחידות מידה <span class="time">2 דק׳</span></h2>
+      <p>כמעט כל גודל ב-CSS (רוחב, גובה, גודל גופן, ריווח) צריך מספר <strong>ויחידה</strong>, צמודים בלי רווח: <code>16px</code> ולא <code>16 px</code>. היוצא מן הכלל: <code>0</code> לא צריך יחידה.</p>
+      <table>
+        <tr><th>יחידה</th><th>מה היא</th><th>מתי משתמשים</th></tr>
+        <tr><td><code>px</code></td><td>פיקסל. גודל קבוע.</td><td>גבולות (<code>border</code>), צללים, פרטים קטנים</td></tr>
+        <tr><td><code>%</code></td><td>אחוז מגודל <strong>האלמנט ההורה</strong></td><td>רוחב: <code>width: 50%</code> = חצי מהקופסה שמכילה אותו</td></tr>
+        <tr><td><code>rem</code></td><td>כפולה של גודל הגופן הבסיסי של הדף (בדרך כלל 16px). ‏<code>1.5rem</code> = 24px.</td><td>גדלי גופן וריווחים. <strong>מומלץ</strong>: אם המשתמש הגדיל את הגופן בדפדפן, הכול גדל יחד.</td></tr>
+        <tr><td><code>em</code></td><td>כפולה של גודל הגופן של <strong>האלמנט עצמו</strong></td><td>ריווח שגדל עם הטקסט, למשל padding של כפתור</td></tr>
+        <tr><td><code>vw</code> / <code>vh</code></td><td>אחוז מרוחב / גובה <strong>החלון</strong>. ‏<code>100vh</code> = כל גובה המסך.</td><td>אזור פתיחה שממלא את המסך</td></tr>
+      </table>
+      <div class="playground" id="pg-units" data-height="270">
+        <script type="text/plain" data-lang="html">
+          <div class="parent">
+            <div class="px">200px — תמיד אותו רוחב</div>
+            <div class="pct">50% — חצי מההורה</div>
+            <div class="rem">רוחב 15rem, גופן 1.25rem</div>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .parent { border: 2px dashed gray; padding: 8px; }
+          .parent div { background: #e0e7ff; margin-bottom: 6px; padding: 4px; }
+
+          .px  { width: 200px; }
+          .pct { width: 50%; }
+          .rem { width: 15rem; font-size: 1.25rem; }
+
+          /* לחצו "⤢ הרחבה" כדי לשנות את רוחב התוצאה,
+             ותראו שרק ה-50% משתנה */
+        </script>
+      </div>
+
+      <h2 id="text">גופנים וטקסט <span class="time">3 דק׳</span></h2>
+      <p>המאפיינים שקובעים איך הטקסט נראה:</p>
+      <table>
+        <tr><th>מאפיין</th><th>דוגמה</th><th>מה עושה</th></tr>
+        <tr><td><code>font-family</code></td><td><code>'Heebo', sans-serif</code></td><td>הגופן. אפשר לתת רשימה: אם הראשון לא קיים, הדפדפן עובר לבא. ‏<code>sans-serif</code> בסוף = "כל גופן בלי תגים".</td></tr>
+        <tr><td><code>font-size</code></td><td><code>1.25rem</code></td><td>גודל האותיות</td></tr>
+        <tr><td><code>font-weight</code></td><td><code>400</code> / <code>700</code> / <code>bold</code></td><td>עובי: 400 רגיל, 700 מודגש</td></tr>
+        <tr><td><code>line-height</code></td><td><code>1.6</code></td><td>גובה שורה, כפולה של גודל הגופן. 1.5–1.7 נוח לקריאה.</td></tr>
+        <tr><td><code>text-align</code></td><td><code>center</code> / <code>start</code></td><td>יישור. ‏<code>start</code> = ימין בעברית, שמאל באנגלית.</td></tr>
+        <tr><td><code>text-decoration</code></td><td><code>none</code> / <code>underline</code></td><td>קו תחתון. ‏<code>none</code> מוריד את הקו מקישורים.</td></tr>
+        <tr><td><code>letter-spacing</code></td><td><code>1px</code></td><td>מרווח בין אותיות</td></tr>
+      </table>
+
+      <h3>גופן מ-Google Fonts</h3>
+      <p>הגופנים המותקנים על כל מחשב מוגבלים. ב-<a href="https://fonts.google.com/" target="_blank" rel="noopener">Google Fonts</a> יש מאות גופנים חינמיים, וחלקם תומכים בעברית (Heebo, ‏Rubik, ‏Assistant, ‏Frank Ruhl Libre). בוחרים גופן, לוחצים "Get embed code", ומעתיקים את ה-<code>&lt;link&gt;</code> ל-<code>head</code>, <strong>לפני</strong> ה-link לקובץ ה-CSS שלכם:</p>
+      <pre><code class="language-html">&lt;link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&amp;display=swap" rel="stylesheet"&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;</code></pre>
+      <pre><code class="language-css">body {
+  font-family: 'Heebo', sans-serif;
+}</code></pre>
+
+      <div class="playground" id="pg-text" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;800&family=Frank+Ruhl+Libre:wght@700&display=swap" rel="stylesheet">
+          <h1>מתכון לשקשוקה</h1>
+          <p class="lead">ארוחת בוקר ישראלית קלאסית, מוכנה בעשרים דקות.</p>
+          <p>מחממים שמן במחבת, מוסיפים בצל ופלפל ומטגנים עד שהם רכים. מוסיפים עגבניות ותבלינים, ומבשלים עשר דקות. שוברים ביצים לתוך הרוטב, מכסים ומחכים שיתייצבו.</p>
+          <p class="note">טיפ: מגישים עם הרבה לחם.</p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          body {
+            font-family: 'Heebo', sans-serif;
+            line-height: 1.7;
+            color: #1e293b;
+          }
+          h1 {
+            font-family: 'Frank Ruhl Libre', serif;
+            font-size: 2.5rem;
+            text-align: center;
+          }
+          .lead {
+            font-size: 1.25rem;
+            font-weight: 800;
+          }
+          .note {
+            font-size: 0.875rem;
+            color: gray;
+            font-style: italic;
+          }
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>עברית וכיווניות:</strong> אם בתגית <code>&lt;html&gt;</code> כתוב <code>dir="rtl"</code>, הכול מתחיל מימין אוטומטית. לכן עדיף לכתוב <code>text-align: start</code> במקום <code>right</code>: ‏<code>start</code> פירושו "תחילת השורה", וזה נכון גם בעברית וגם באנגלית. מאותה סיבה יש מאפיינים כמו <code>margin-inline-start</code>, שמתהפכים אוטומטית לפי השפה.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: גודל הגופן הבסיסי בדפדפן הוא 16px. כמה זה <code>2rem</code>?</p>
+        <ul>
+          <li>2px</li>
+          <li>18px</li>
+          <li data-correct>32px</li>
+          <li>תלוי ברוחב המסך</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏rem = כפולה של גודל הגופן הבסיסי: 2 × 16 = 32px.</p>
+      </div>
+
+      <h2 id="box-model">מודל הקופסה <span class="time">8 דק׳</span></h2>
+      <p>זה הרעיון הכי חשוב ב-CSS: <strong>כל אלמנט בדף הוא קופסה מלבנית</strong>. גם פסקה, גם כותרת, גם קישור. לכל קופסה יש ארבע שכבות, מבפנים החוצה:</p>
+      <div class="box-model" aria-label="תרשים מודל הקופסה">
+        <div class="bm-margin">margin
+          <div class="bm-border">border
+            <div class="bm-padding">padding
+              <div class="bm-content">content</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <table>
+        <tr><th>שכבה</th><th>מה זה</th><th>דימוי: תמונה ממוסגרת על קיר</th></tr>
+        <tr><td><strong>content</strong></td><td>התוכן עצמו: הטקסט או התמונה. גודלו נקבע ב-<code>width</code> ו-<code>height</code>.</td><td>התמונה</td></tr>
+        <tr><td><strong>padding</strong></td><td>ריווח <strong>פנימי</strong>, בין התוכן לגבול. צבע הרקע ממלא גם אותו.</td><td>הפספרטו (השוליים הלבנים סביב התמונה)</td></tr>
+        <tr><td><strong>border</strong></td><td>הגבול (קו המסגרת)</td><td>המסגרת</td></tr>
+        <tr><td><strong>margin</strong></td><td>ריווח <strong>חיצוני</strong>, בין הקופסה לקופסאות שסביבה. תמיד שקוף.</td><td>הרווח על הקיר בין תמונה לתמונה</td></tr>
+      </table>
+      <div class="playground" id="pg-box" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <div class="box">אני קופסה. שנו את המספרים ב-CSS.</div>
+          <div class="box">אני קופסה שנייה.</div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .box {
+            background: #bfdbfe;   /* ממלא את ה-content וה-padding */
+            padding: 20px;         /* ריווח פנימי */
+            border: 4px solid #1e3a8a;
+            margin: 16px;          /* ריווח חיצוני: שימו לב לרווח בין הקופסאות */
+          }
+        </script>
+      </div>
+
+      <h3>איך כותבים padding ו-margin</h3>
+      <p>אפשר לתת ערך אחד לכל הצדדים, או ערכים שונים לכל צד:</p>
+      <pre><code class="language-css">padding: 20px;                 /* כל ארבעת הצדדים */
+padding: 10px 20px;            /* למעלה ולמטה 10, לצדדים 20 */
+padding: 10px 20px 30px 40px;  /* למעלה, ימין, למטה, שמאל (עם כיוון השעון) */
+padding-top: 10px;             /* רק צד אחד: top / right / bottom / left */
+margin: 0 auto;                /* למעלה ולמטה 0, לצדדים "אוטומטי" (מרכוז! ראו בהמשך) */</code></pre>
+
+      <h3>border: שלושה ערכים בשורה אחת</h3>
+      <pre><code class="language-css">border: 2px solid #334155;     /* עובי, סגנון, צבע */
+/* סגנונות: solid (קו), dashed (מקפים), dotted (נקודות), none (בלי) */
+border-bottom: 1px solid #ddd; /* רק קו תחתון */
+border-radius: 12px;           /* פינות מעוגלות */
+border-radius: 50%;            /* על ריבוע: עיגול */</code></pre>
+
+      <h3><code>box-sizing: border-box</code>: הגדרה שכדאי לשים בכל פרויקט</h3>
+      <p>כברירת מחדל, <code>width</code> קובע רק את רוחב ה-<strong>content</strong>. אם כתבתם <code>width: 200px</code> והוספתם <code>padding: 20px</code> ו-<code>border: 5px</code>, הקופסה בפועל תהיה ברוחב 200 + 40 + 10 = <strong>250px</strong>. זה מבלבל. עם <code>box-sizing: border-box</code>, ה-<code>width</code> כולל גם את ה-padding וה-border, והקופסה תהיה בדיוק 200px.</p>
+      <div class="playground" id="pg-boxsizing" data-height="230">
+        <script type="text/plain" data-lang="html">
+          <div class="a">content-box (ברירת מחדל)</div>
+          <div class="b">border-box</div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          div {
+            width: 200px;
+            padding: 20px;
+            border: 5px solid #4f46e5;
+            margin-bottom: 10px;
+            background: #e0e7ff;
+          }
+          .a { box-sizing: content-box; } /* רוחב בפועל: 250px */
+          .b { box-sizing: border-box; }  /* רוחב בפועל: 200px */
+        </script>
+      </div>
+      <p>לכן בראש כמעט כל קובץ CSS מקצועי תמצאו את החוק הזה. <code>*</code> הוא "בורר כוכבית", שבוחר את <strong>כל</strong> האלמנטים:</p>
+      <pre><code class="language-css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;   /* לדפדפן יש margin של 8px על body כברירת מחדל */
+}</code></pre>
+
+      <div class="box tip">
+        <p><strong>ראו את הקופסאות בעיניים:</strong> בדפדפן, לחצו קליק ימני על אלמנט ← "Inspect" (בדיקה). בתחתית הלשונית Styles (או בלשונית Computed) יש תרשים צבעוני בדיוק כמו זה שלמעלה, עם המספרים האמיתיים. ריחוף מעל אלמנט בקוד צובע את ה-padding בירוק ואת ה-margin בכתום. נרחיב על זה בהמשך.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>זה הרגע הכי טוב בחלק הזה לפתוח DevTools ולהראות את תרשים הקופסה על אתר אמיתי. כדאי לשנות בזמן אמת את ה-padding של כפתור ולהראות איך הוא גדל. הרבה סטודנטים מתבלבלים בין padding ל-margin. מבחן פשוט: "אם אשים רקע, האם הרווח יהיה צבוע?" אם כן, זה padding.</p>
+      </aside>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: לכפתור יש רקע כחול. רוצים שהטקסט לא יהיה צמוד לקצוות הכחולים. מה משנים?</p>
+        <ul>
+          <li><code>margin</code></li>
+          <li data-correct><code>padding</code></li>
+          <li><code>border</code></li>
+          <li><code>width</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏padding הוא הרווח בין התוכן לגבול, והרקע ממלא אותו. ‏margin היה מרחיק את הכפתור מאלמנטים אחרים, והרווח היה שקוף.</p>
+      </div>
+
+      <h3>🎯 אתגר 2: כרטיס <span class="level easy">קל</span></h3>
+      <p>עצבו את הכרטיס (<code>.card</code>) כך שיהיו לו:</p>
+      <ol>
+        <li>ריווח פנימי (<code>padding</code>) של <strong>לפחות 16px</strong> מכל הצדדים</li>
+        <li>גבול (<code>border</code>) מלא (<code>solid</code>) בעובי <strong>1px לפחות</strong></li>
+        <li>פינות מעוגלות (<code>border-radius</code>) של <strong>לפחות 8px</strong></li>
+        <li>צבע רקע שאינו לבן ואינו שקוף</li>
+      </ol>
+      <div class="playground challenge" id="ch-card" data-check="ch-card" data-height="280">
+        <script type="text/plain" data-lang="html">
+          <div class="card">
+            <h3>קפה הפינה</h3>
+            <p>בית קפה שכונתי עם מאפים טריים כל בוקר.</p>
+            <p>⭐ 4.8</p>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .card {
+            /* כתבו כאן */
+          }
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          .card {
+            padding: 20px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: #f8fafc;
+            max-width: 300px;
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-card': (doc, win) => {
+            const card = doc.querySelector('.card');
+            const s = win.getComputedStyle(card);
+            const px = (v) => parseFloat(v) || 0;
+            const sides = ['Top', 'Right', 'Bottom', 'Left'];
+            const bg = s.backgroundColor;
+            return [
+              [sides.every((d) => px(s[`padding${d}`]) >= 16), 'צריך padding של לפחות 16px מכל הצדדים'],
+              [sides.every((d) => s[`border${d}Style`] === 'solid' && px(s[`border${d}Width`]) >= 1), 'צריך border מלא (solid) בעובי 1px לפחות, למשל border: 1px solid gray;'],
+              [px(s.borderTopLeftRadius) >= 8, 'צריך border-radius של לפחות 8px'],
+              [bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent' && bg !== 'rgb(255, 255, 255)', 'צריך צבע רקע (background) שאינו לבן'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="display">display: איך קופסה מתנהגת ליד אחרות <span class="time">3 דק׳</span></h2>
+      <p>בחלק א׳ ראינו שיש אלמנטים של <strong>בלוק</strong> (כמו <code>div</code>, ‏<code>p</code>, ‏<code>h1</code>), שתופסים שורה שלמה, ואלמנטים <strong>שורתיים</strong> (כמו <code>span</code>, ‏<code>a</code>, ‏<code>strong</code>), שזורמים בתוך הטקסט. המאפיין <code>display</code> קובע את ההתנהגות הזו, ואפשר לשנות אותה:</p>
+      <table>
+        <tr><th>ערך</th><th>מתנהג כמו</th><th>width ו-height?</th><th>margin למעלה ולמטה?</th></tr>
+        <tr><td><code>block</code></td><td>שורה שלמה משלו. הבא אחריו יורד שורה.</td><td>✓ עובדים</td><td>✓ עובד</td></tr>
+        <tr><td><code>inline</code></td><td>זורם בתוך הטקסט, רוחבו כרוחב התוכן</td><td>✗ מתעלם</td><td>✗ מתעלם</td></tr>
+        <tr><td><code>inline-block</code></td><td>זורם בשורה כמו inline, אבל מכבד גדלים כמו block</td><td>✓ עובדים</td><td>✓ עובד</td></tr>
+        <tr><td><code>none</code></td><td>האלמנט נעלם לגמרי, כאילו לא קיים</td><td>—</td><td>—</td></tr>
+        <tr><td><code>flex</code></td><td>מסדר את <strong>הילדים</strong> שלו בשורה או בעמודה (הנושא הבא!)</td><td>✓</td><td>✓</td></tr>
+      </table>
+      <div class="playground" id="pg-display" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <p>אלה קישורים, והם inline:
+            <a href="#">ראשון</a> <a href="#">שני</a> <a href="#">שלישי</a></p>
+
+          <p class="as-block">וכאן הם block:
+            <a href="#">ראשון</a> <a href="#">שני</a> <a href="#">שלישי</a></p>
+
+          <p class="as-ib">וכאן inline-block:
+            <a href="#">ראשון</a> <a href="#">שני</a> <a href="#">שלישי</a></p>
+
+          <p class="hidden">את הפסקה הזו לא תראו.</p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          a {
+            background: #e0e7ff;
+            padding: 8px;
+            width: 80px;     /* עובד רק ב-block וב-inline-block */
+          }
+          .as-block a { display: block; margin-bottom: 4px; }
+          .as-ib a    { display: inline-block; text-align: center; }
+          .hidden     { display: none; }
+        </script>
+      </div>
+      <p>בשורה הראשונה, שימו לב שה-<code>width: 80px</code> לא משפיע (inline מתעלם ממנו), וה-padding של הקישורים "עולה" על השורה שמעליהם.</p>
+
+      <h2 id="width">רוחב, max-width ומרכוז <span class="time">2 דק׳</span></h2>
+      <p>אלמנט בלוק תופס כברירת מחדל את <strong>כל הרוחב</strong> שיש לו. על מסך רחב, שורות טקסט ארוכות מאוד קשות לקריאה. הפתרון המקובל:</p>
+      <ul>
+        <li><code>max-width</code>: "לכל היותר ברוחב הזה". על מסך צר האלמנט יתכווץ, על מסך רחב הוא ייעצר בגבול. עדיף בדרך כלל על <code>width</code> קבוע, שגורם לגלילה לרוחב בטלפון.</li>
+        <li><code>margin: 0 auto</code>: ‏<code>auto</code> בצדדים מחלק את המקום הפנוי שווה בשווה בין ימין לשמאל, ולכן הקופסה <strong>ממורכזת</strong>. עובד רק על אלמנט בלוק שיש לו רוחב.</li>
+      </ul>
+      <div class="playground" id="pg-center" data-height="260">
+        <script type="text/plain" data-lang="html">
+          <div class="container">
+            <h2>מאמר ממורכז</h2>
+            <p>הקופסה הזו לעולם לא תהיה רחבה מ-400px, והיא תמיד באמצע. לחצו "⤢ הרחבה" כדי לראות אותה על מסך רחב יותר. זו בדיוק הטכניקה שבה רוב האתרים ממרכזים את התוכן שלהם.</p>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .container {
+            max-width: 400px;
+            margin: 0 auto;      /* מרכוז אופקי */
+            padding: 16px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+          }
+          /* מרכוז טקסט זה משהו אחר: text-align: center */
+          h2 { text-align: center; }
+        </script>
+      </div>
+      <div class="box warn">
+        <p><strong>שני מרכוזים שונים:</strong> ‏<code>text-align: center</code> ממרכז את <strong>הטקסט בתוך</strong> הקופסה. ‏<code>margin: 0 auto</code> ממרכז את <strong>הקופסה עצמה</strong> בתוך ההורה שלה. למרכוז אנכי (למעלה-למטה) נשתמש ב-Flexbox.</p>
+      </div>
+
+      <h2 id="flexbox">Flexbox: סידור אלמנטים בשורה או בעמודה <span class="time">10 דק׳</span></h2>
+      <p>עד עכשיו כל בלוק ירד שורה. אבל באתר אמיתי רוצים תפריט עם קישורים <strong>זה ליד זה</strong>, שלושה כרטיסים <strong>בשורה</strong>, לוגו בצד אחד וכפתור בצד השני. בשביל זה יש <strong>Flexbox</strong>, הכלי המרכזי לפריסה ב-CSS המודרני.</p>
+
+      <h3>שני תפקידים: מכל ופריטים</h3>
+      <p>‏Flexbox עובד תמיד על <strong>זוג</strong>: אלמנט הורה, ו<strong>הילדים הישירים</strong> שלו.</p>
+      <ul>
+        <li><strong>המכל</strong> (flex container) הוא ההורה. עליו כותבים <code>display: flex</code> ואת רוב ההגדרות.</li>
+        <li><strong>הפריטים</strong> (flex items) הם הילדים הישירים שלו. הם מסתדרים אוטומטית.</li>
+      </ul>
+      <pre><code class="language-html">&lt;div class="container"&gt;   &lt;!-- המכל: display: flex --&gt;
+  &lt;div&gt;1&lt;/div&gt;            &lt;!-- פריט --&gt;
+  &lt;div&gt;2&lt;/div&gt;            &lt;!-- פריט --&gt;
+  &lt;div&gt;3&lt;/div&gt;            &lt;!-- פריט --&gt;
+&lt;/div&gt;</code></pre>
+      <div class="playground" id="pg-flex-basic" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <div class="container">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .container {
+            display: flex;   /* מחקו את השורה הזו ותראו מה קורה */
+            gap: 10px;
+            background: #f1f5f9;
+            padding: 10px;
+          }
+          .item {
+            background: #4f46e5;
+            color: white;
+            padding: 20px;
+          }
+        </script>
+      </div>
+      <p>שורה אחת, <code>display: flex</code>, והילדים עברו לשורה אחת. <code>gap</code> קובע את הרווח ביניהם.</p>
+
+      <h3>שני צירים</h3>
+      <p>כדי להבין Flexbox צריך להבין שיש שני כיוונים:</p>
+      <ul>
+        <li><strong>הציר הראשי</strong> (main axis): הכיוון שבו הפריטים מסודרים. ב-<code>row</code> (ברירת המחדל) הוא אופקי, ב-<code>column</code> הוא אנכי.</li>
+        <li><strong>הציר המשני</strong> (cross axis): הכיוון הניצב לו.</li>
+      </ul>
+      <p>שני המאפיינים החשובים ביותר מתייחסים לצירים האלה:</p>
+      <table>
+        <tr><th>מאפיין</th><th>פועל על</th><th>שאלה שהוא עונה עליה</th></tr>
+        <tr><td><code>justify-content</code></td><td>הציר <strong>הראשי</strong></td><td>איך לפזר את הפריטים לאורך השורה?</td></tr>
+        <tr><td><code>align-items</code></td><td>הציר <strong>המשני</strong></td><td>איך ליישר אותם למעלה-למטה בתוך השורה?</td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>בעברית, הכיוון הפוך:</strong> בדף RTL, ‏<code>row</code> מתחיל <strong>מימין</strong>. לכן <code>flex-start</code> = ימין ו-<code>flex-end</code> = שמאל. זה ההיגיון של "התחלה" ו"סוף" במקום "ימין" ו"שמאל".</p>
+      </div>
+
+      <h3>חוקר 1: justify-content</h3>
+      <p>לחצו על הערכים ותראו איך הפריטים מתפזרים לאורך הציר הראשי. מתחת לחוקר מופיע ה-CSS שמתאים למה שבחרתם.</p>
+      <div class="flex-explorer" data-items="3" data-props="justify-content"></div>
+      <table>
+        <tr><th>ערך</th><th>מה עושה</th><th>שימוש נפוץ</th></tr>
+        <tr><td><code>flex-start</code></td><td>כולם בהתחלה (ברירת מחדל)</td><td>—</td></tr>
+        <tr><td><code>center</code></td><td>כולם באמצע</td><td>מרכוז</td></tr>
+        <tr><td><code>flex-end</code></td><td>כולם בסוף</td><td>כפתורים בתחתית טופס</td></tr>
+        <tr><td><code>space-between</code></td><td>הראשון בהתחלה, האחרון בסוף, השאר מתפזרים ביניהם</td><td><strong>תפריט עליון</strong>: לוגו בצד אחד, קישורים בשני</td></tr>
+        <tr><td><code>space-around</code> / <code>space-evenly</code></td><td>רווח שווה סביב כל פריט</td><td>שורת אייקונים</td></tr>
+      </table>
+
+      <h3>חוקר 2: align-items</h3>
+      <p>לפריטים בחוקר יש גבהים שונים, כדי שתראו את ההבדל. ‏<code>stretch</code> (ברירת המחדל) מותח את כולם לגובה של הגבוה ביותר.</p>
+      <div class="flex-explorer" data-items="3" data-props="align-items"></div>
+
+      <h3>חוקר 3: flex-direction</h3>
+      <p>‏<code>column</code> הופך את הציר הראשי לאנכי. שימו לב: עכשיו <code>justify-content</code> פועל למעלה-למטה, ו-<code>align-items</code> פועל לרוחב!</p>
+      <div class="flex-explorer" data-items="3" data-props="flex-direction,justify-content,align-items"></div>
+
+      <h3>חוקר 4: flex-wrap ו-gap</h3>
+      <p>כברירת מחדל, כל הפריטים נדחסים לשורה אחת, גם אם אין להם מקום. ‏<code>flex-wrap: wrap</code> מאפשר להם לרדת לשורה הבאה. הוסיפו פריטים עם "+" ונסו את שני הערכים.</p>
+      <div class="flex-explorer" data-items="8" data-props="flex-wrap,gap"></div>
+
+      <h3>חוקר מלא</h3>
+      <p>כל המאפיינים יחד. נסו לבנות: שלושה פריטים ממורכזים לגמרי; פריטים בעמודה בצד שמאל; שורה עם רווחים שווים.</p>
+      <div class="flex-explorer" data-items="4"></div>
+
+      <aside class="box lecturer-note">
+        <p>מומלץ להקרין את החוקר המלא ולתת לסטודנטים לנחש לפני כל לחיצה: "מה יקרה אם נבחר space-between?". את <code>flex-direction: column</code> עם החלפת התפקידים של הצירים כדאי להראות לאט. זו נקודת הבלבול העיקרית. לשיעורי בית מומלץ מאוד <a href="https://flexboxfroggy.com/#he" target="_blank" rel="noopener">Flexbox Froggy</a> (יש גרסה בעברית).</p>
+      </aside>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: במכל עם <code>display: flex</code> (בכיוון row), איזה מאפיין ממקם את הפריטים <strong>באמצע הגובה</strong> של המכל?</p>
+        <ul>
+          <li><code>justify-content: center</code></li>
+          <li data-correct><code>align-items: center</code></li>
+          <li><code>text-align: center</code></li>
+          <li><code>margin: 0 auto</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ב-row, הגובה הוא הציר המשני, ו-<code>align-items</code> אחראי עליו. ‏<code>justify-content</code> היה ממרכז לרוחב.</p>
+      </div>
+
+      <h3>הגדרות על הפריטים עצמם: <code>flex</code></h3>
+      <p>עד עכשיו כתבנו הכול על המכל. יש מאפיין אחד חשוב שכותבים על <strong>פריט</strong>: <code>flex: 1</code> אומר "קח את כל המקום הפנוי". אם לכמה פריטים יש <code>flex: 1</code>, הם מתחלקים במקום שווה בשווה. ‏<code>flex: 2</code> מקבל פי שניים.</p>
+      <div class="playground" id="pg-flex-grow" data-height="220">
+        <script type="text/plain" data-lang="html">
+          <div class="row">
+            <div class="side">תפריט צד</div>
+            <div class="main">התוכן הראשי לוקח את כל השאר</div>
+          </div>
+          <div class="row">
+            <div class="third">1</div>
+            <div class="third">2</div>
+            <div class="third">3</div>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .row { display: flex; gap: 8px; margin-bottom: 12px; }
+          .row div { background: #e0e7ff; padding: 16px; }
+
+          .side  { width: 120px; }  /* רוחב קבוע */
+          .main  { flex: 1; }       /* כל המקום שנשאר */
+          .third { flex: 1; }       /* שלושה חלקים שווים */
+        </script>
+      </div>
+
+      <h3>דוגמה פתורה 1: מרכוז מושלם</h3>
+      <p>פעם, למרכז משהו גם לרוחב וגם לגובה היה אחת הבעיות המפורסמות ב-CSS. עם Flexbox זה שלוש שורות:</p>
+      <div class="playground" id="pg-flex-center" data-height="240">
+        <script type="text/plain" data-lang="html">
+          <div class="screen">
+            <div class="message">אני בדיוק באמצע 🎯</div>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .screen {
+            display: flex;
+            justify-content: center;  /* מרכוז לרוחב */
+            align-items: center;      /* מרכוז לגובה */
+            height: 200px;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+          }
+          .message {
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+          }
+        </script>
+      </div>
+
+      <h3>דוגמה פתורה 2: תפריט עליון (navbar)</h3>
+      <p>זה הדפוס הנפוץ ביותר באתרים: לוגו בצד אחד, קישורים בצד השני. שימו לב שיש כאן <strong>שני</strong> מכלי flex: ה-<code>nav</code> מסדר את הלוגו ואת הרשימה, וה-<code>ul</code> מסדר את הקישורים.</p>
+      <div class="playground" id="pg-navbar" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <nav class="navbar">
+            <a class="logo" href="#">🚀 הלוגו</a>
+            <ul class="links">
+              <li><a href="#">בית</a></li>
+              <li><a href="#">אודות</a></li>
+              <li><a href="#">צור קשר</a></li>
+            </ul>
+          </nav>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .navbar {
+            display: flex;
+            justify-content: space-between; /* לוגו בצד אחד, קישורים בשני */
+            align-items: center;
+            padding: 12px 20px;
+            background: #1e293b;
+          }
+          .logo { color: white; font-weight: bold; text-decoration: none; }
+
+          .links {
+            display: flex;      /* הקישורים בשורה */
+            gap: 20px;
+            list-style: none;   /* בלי נקודות של רשימה */
+            margin: 0;
+            padding: 0;
+          }
+          .links a { color: #cbd5e1; text-decoration: none; }
+          .links a:hover { color: white; }
+        </script>
+      </div>
+
+      <h3>דוגמה פתורה 3: שורת כרטיסים</h3>
+      <p>‏<code>flex-wrap: wrap</code> יחד עם <code>flex: 1</code> ו-<code>min-width</code> יוצרים כרטיסים שמסתדרים לבד: שלושה בשורה על מסך רחב, ויורדים שורה כשאין מקום. לחצו "⤢ הרחבה" ושנו את רוחב החלון כדי לראות.</p>
+      <div class="playground" id="pg-cards" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <div class="cards">
+            <div class="card"><h3>🎨 עיצוב</h3><p>אתרים יפים ונגישים.</p></div>
+            <div class="card"><h3>⚛️ React</h3><p>אפליקציות מהירות.</p></div>
+            <div class="card"><h3>🗄️ שרתים</h3><p>מידע שנשמר לאורך זמן.</p></div>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+          }
+          .card {
+            flex: 1;            /* כולם באותו רוחב */
+            min-width: 180px;   /* אבל לא צרים מזה: אחרת יורדים שורה */
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+          }
+          .card h3 { margin-top: 0; }
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 3: מרכוז <span class="level easy">קל</span></h3>
+      <p>הכפתור צריך להיות <strong>בדיוק באמצע</strong> האזור הכהה, גם לרוחב וגם לגובה. השתמשו ב-Flexbox על <code>.stage</code>. אל תשנו את הגובה שלו.</p>
+      <div class="playground challenge" id="ch-center" data-check="ch-center" data-height="260">
+        <script type="text/plain" data-lang="html">
+          <div class="stage">
+            <button class="cta">הרשמה</button>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .stage {
+            height: 200px;
+            background: #0f172a;
+          }
+          .cta {
+            padding: 12px 24px;
+            font-size: 1rem;
+          }
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          .stage {
+            height: 200px;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          .cta {
+            padding: 12px 24px;
+            font-size: 1rem;
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-center': (doc, win) => {
+            const stage = doc.querySelector('.stage').getBoundingClientRect();
+            const btn = doc.querySelector('.cta').getBoundingClientRect();
+            const near = (a, b) => Math.abs(a - b) <= 2;
+            return [
+              [win.getComputedStyle(doc.querySelector('.stage')).display === 'flex', 'כתבו display: flex על .stage'],
+              [near(btn.left + btn.width / 2, stage.left + stage.width / 2), 'הכפתור עדיין לא ממורכז לרוחב (רמז: justify-content)'],
+              [near(btn.top + btn.height / 2, stage.top + stage.height / 2), 'הכפתור עדיין לא ממורכז לגובה (רמז: align-items)'],
+              [near(stage.height, 200), 'הגובה של .stage צריך להישאר 200px'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 4: תפריט עליון <span class="level medium">בינוני</span></h3>
+      <p>בנו בעצמכם את התפריט מהדוגמה הפתורה, בלי להציץ:</p>
+      <ol>
+        <li>הלוגו והרשימה באותה שורה, הלוגו בצד אחד והקישורים בצד השני (<code>space-between</code>)</li>
+        <li>הקישורים עצמם בשורה אחת, זה ליד זה</li>
+        <li>בלי נקודות של רשימה (<code>list-style: none</code>)</li>
+        <li>רווח של לפחות 12px בין הקישורים</li>
+      </ol>
+      <div class="playground challenge wide" id="ch-navbar" data-check="ch-navbar" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <nav class="navbar">
+            <a class="logo" href="#">☕ קפה הפינה</a>
+            <ul class="links">
+              <li><a href="#">תפריט</a></li>
+              <li><a href="#">שעות פתיחה</a></li>
+              <li><a href="#">הזמנות</a></li>
+            </ul>
+          </nav>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .navbar {
+            background: #78350f;
+            padding: 12px 20px;
+          }
+          .navbar a {
+            color: white;
+            text-decoration: none;
+          }
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          .navbar {
+            background: #78350f;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .navbar a {
+            color: white;
+            text-decoration: none;
+          }
+          .links {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-navbar': (doc, win) => {
+            const css = (sel) => win.getComputedStyle(doc.querySelector(sel));
+            const nav = css('.navbar');
+            const ul = css('.links');
+            const items = [...doc.querySelectorAll('.links li')].map((li) => li.getBoundingClientRect());
+            const sameRow = items.every((r) => Math.abs(r.top - items[0].top) < 4);
+            const gaps = items.slice(1).map((r, i) => Math.abs(items[i].left - r.right));
+            return [
+              [nav.display === 'flex', 'כתבו display: flex על .navbar'],
+              [nav.justifyContent === 'space-between', 'הלוגו והקישורים צריכים להיות בקצוות: justify-content: space-between על .navbar'],
+              [ul.display === 'flex' && sameRow, 'הקישורים צריכים להיות בשורה אחת: display: flex על .links'],
+              [ul.listStyleType === 'none', 'הורידו את הנקודות: list-style: none על .links'],
+              [sameRow && gaps.every((g) => g >= 12), 'צריך רווח של לפחות 12px בין הקישורים (רמז: gap)'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="grid">הצצה ל-Grid <span class="time">לבית</span></h2>
+      <p>‏Flexbox מצוין לסידור ב<strong>כיוון אחד</strong>: שורה או עמודה. כשרוצים <strong>טבלה של שורות ועמודות</strong>, כמו גלריית תמונות, יש כלי נוסף: <strong>CSS Grid</strong>. לא נעמיק בו עכשיו, אבל כדאי להכיר את הדפוס הבסיסי:</p>
+      <div class="playground" id="pg-grid" data-height="260">
+        <script type="text/plain" data-lang="html">
+          <div class="gallery">
+            <div>1</div><div>2</div><div>3</div>
+            <div>4</div><div>5</div><div>6</div>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr; /* שלוש עמודות שוות */
+            gap: 10px;
+          }
+          .gallery div {
+            background: #06b6d4;
+            color: white;
+            padding: 24px;
+            text-align: center;
+            border-radius: 8px;
+          }
+          /* נסו: 2fr 1fr 1fr, או repeat(2, 1fr) */
+        </script>
+      </div>
+      <p>‏<code>fr</code> היא יחידה של "חלק מהמקום הפנוי". ‏<code>1fr 1fr 1fr</code> = שלושה חלקים שווים. הכלל המעשי: <strong>Flexbox לשורה של דברים, Grid לרשת</strong>.</p>
+
+      <h2 id="responsive">רספונסיביות: אתר שנראה טוב גם בטלפון <span class="time">5 דק׳</span></h2>
+      <p>יותר ממחצית הגלישה באינטרנט היא מטלפונים. אתר <strong>רספונסיבי</strong> (responsive) מתאים את עצמו לגודל המסך: שלוש עמודות במחשב, עמודה אחת בטלפון. לשם כך צריך שני דברים.</p>
+
+      <h3>1. תגית viewport ב-head</h3>
+      <p>בלי השורה הזו, הטלפון "מעמיד פנים" שהוא מסך ברוחב 980px ומקטין את כל הדף, והטקסט יוצא זעיר. היא כבר מופיעה בשלד שלמדנו בחלק א׳. ודאו שהיא תמיד שם:</p>
+      <pre><code class="language-html">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code></pre>
+
+      <h3>2. Media queries: חוקים שפועלים רק בגודל מסוים</h3>
+      <p>‏<code>@media</code> עוטף חוקי CSS בתנאי. החוקים בפנים פועלים רק כשהתנאי מתקיים:</p>
+      <pre><code class="language-css">/* פועל רק כשרוחב החלון 600px ומעלה */
+@media (min-width: 600px) {
+  .cards {
+    flex-direction: row;
+  }
+}</code></pre>
+      <ul>
+        <li><code>min-width: 600px</code> = "מ-600px <strong>ומעלה</strong>" (מסכים רחבים).</li>
+        <li><code>max-width: 600px</code> = "עד 600px" (מסכים צרים).</li>
+        <li>החוקים בתוך ה-<code>@media</code> <strong>נוספים</strong> לחוקים הרגילים. כותבים בפנים רק את מה שמשתנה.</li>
+        <li>את ה-<code>@media</code> כותבים <strong>בסוף</strong> הקובץ, כדי שינצח את החוקים הרגילים (זוכרים את ה-cascade?).</li>
+      </ul>
+
+      <h3>גישת Mobile First</h3>
+      <p>הגישה המקובלת היום: כותבים קודם את העיצוב <strong>לטלפון</strong> (בדרך כלל הכי פשוט: הכול בעמודה אחת), ואז מוסיפים <code>@media (min-width: ...)</code> שמשדרגים את הפריסה למסכים רחבים. כך הטלפון, שהוא בדרך כלל החלש, מקבל את הקוד הפשוט.</p>
+      <div class="playground" id="pg-responsive" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <div class="cards">
+            <div class="card">כרטיס 1</div>
+            <div class="card">כרטיס 2</div>
+            <div class="card">כרטיס 3</div>
+          </div>
+          <p class="hint">רוחב צר: עמודה, ורוד. רוחב רחב: שורה, כחול.</p>
+        </script>
+        <script type="text/plain" data-lang="css">
+          /* קודם: טלפון */
+          .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+          .card {
+            background: #fbcfe8;
+            padding: 20px;
+            flex: 1;
+          }
+
+          /* אחר כך: מ-500px ומעלה */
+          @media (min-width: 500px) {
+            .cards { flex-direction: row; }
+            .card  { background: #bfdbfe; }
+          }
+        </script>
+      </div>
+      <p>כאן התוצאה צרה, ולכן הכרטיסים בעמודה. לחצו "<strong>⤢ הרחבה</strong>": התוצאה תהיה ברוחב מלא, ותראו את הכרטיסים עוברים לשורה ומשנים צבע.</p>
+      <div class="box tip">
+        <p><strong>לבדוק איך האתר נראה בטלפון:</strong> בכלי המפתחים (F12) לחצו על אייקון הטלפון והטאבלט (Toggle device toolbar, או <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>, ב-Mac <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>). אפשר לבחור דגם טלפון מהרשימה למעלה, או לגרור את הקצה כדי לשנות רוחב.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מתי יפעלו החוקים שבתוך <code>@media (max-width: 700px) { ... }</code>?</p>
+        <ul>
+          <li>כשהחלון רחב מ-700px</li>
+          <li data-correct>כשהחלון ברוחב 700px או פחות</li>
+          <li>תמיד, אבל רק על טלפונים</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏max-width = "עד". הדפדפן לא יודע אם זה טלפון. הוא רק בודק את רוחב החלון.</p>
+      </div>
+
+      <h3>🎯 אתגר 5: Mobile First <span class="level medium">בינוני</span></h3>
+      <p>הגלריה מסודרת כרגע בשורה תמיד. שנו אותה לגישת mobile first:</p>
+      <ol>
+        <li>בחוק הרגיל של <code>.gallery</code>: ‏<code>flex-direction: column</code> (תמונות אחת מתחת לשנייה, לטלפון)</li>
+        <li>הוסיפו <code>@media</code> עם <code>min-width</code> (למשל 600px), ובתוכו חוק ל-<code>.gallery</code> עם <code>flex-direction: row</code></li>
+      </ol>
+      <p>הבדיקה קוראת את ה-CSS שכתבתם, כך שהיא עובדת בכל רוחב של התוצאה. אחרי שעובר, לחצו "⤢ הרחבה" וראו את השינוי.</p>
+      <div class="playground challenge" id="ch-responsive" data-check="ch-responsive" data-height="320">
+        <script type="text/plain" data-lang="html">
+          <div class="gallery">
+            <img src="https://picsum.photos/id/1015/300/200" alt="נהר בין הרים">
+            <img src="https://picsum.photos/id/1016/300/200" alt="קניון סלעים">
+            <img src="https://picsum.photos/id/1018/300/200" alt="הרים ירוקים">
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .gallery {
+            display: flex;
+            gap: 10px;
+          }
+          .gallery img {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            border-radius: 8px;
+          }
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+          .gallery img {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            border-radius: 8px;
+          }
+
+          @media (min-width: 600px) {
+            .gallery {
+              flex-direction: row;
+            }
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-responsive': (doc, win) => {
+            const rules = [...doc.styleSheets].flatMap((sheet) => [...sheet.cssRules]);
+            const isGallery = (r) => r.selectorText && r.selectorText.split(',').some((s) => s.trim() === '.gallery');
+            const base = rules.filter((r) => r instanceof win.CSSStyleRule && isGallery(r));
+            const medias = rules.filter((r) => r instanceof win.CSSMediaRule);
+            const minMedia = medias.filter((m) => /min-width/.test(m.conditionText || m.media.mediaText));
+            const rowInside = minMedia.some((m) => [...m.cssRules].some((r) => isGallery(r) && r.style.flexDirection === 'row'));
+            return [
+              [base.some((r) => r.style.flexDirection === 'column'), 'בחוק הרגיל של .gallery (מחוץ ל-@media) צריך flex-direction: column'],
+              [minMedia.length > 0, 'צריך @media עם min-width, למשל @media (min-width: 600px) { ... }'],
+              [rowInside, 'בתוך ה-@media צריך חוק .gallery עם flex-direction: row'],
+            ];
+          },
+        });
+      </script>
+
+      <aside class="box lecturer-note">
+        <p>בכיתה מספיק להראות media query אחד ואת מצב הטלפון ב-DevTools. כדאי להסביר למה הבדיקה של אתגר 5 קוראת את ה-CSS ולא את התוצאה: גודל התוצאה תלוי ברוחב המסך של כל סטודנט. זו גם הזדמנות להזכיר שבדיקה אוטומטית לא מחליפה הסתכלות בעיניים.</p>
+      </aside>
+
+      <h2 id="devtools">כלי המפתחים: לראות ולתקן CSS בזמן אמת <span class="time">3 דק׳</span></h2>
+      <p>כלי המפתחים (DevTools) הם החבר הכי טוב של מי שכותב CSS. הם מראים בדיוק אילו חוקים חלים על כל אלמנט, ומאפשרים לשנות אותם ולראות את התוצאה מיד, בלי לגעת בקובץ.</p>
+      <div class="step"><div class="step-num">1</div><div class="step-body">
+        <h4>פותחים</h4>
+        <p>קליק ימני על אלמנט בדף ← <strong>Inspect</strong> ("בדיקה"). או <kbd>F12</kbd> (ב-Mac: <kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>I</kbd>).</p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">
+        <h4>בוחרים אלמנט</h4>
+        <p>בלשונית <strong>Elements</strong> רואים את ה-HTML. לחיצה על שורה בוחרת את האלמנט, והוא מודגש בדף. אפשר גם ללחוץ על אייקון החץ בפינה (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>) ואז על משהו בדף.</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body">
+        <h4>קוראים את החוקים</h4>
+        <p>בחלונית <strong>Styles</strong> מופיעים כל החוקים שחלים על האלמנט, מהחזק לחלש, ולצד כל אחד שם הקובץ ומספר השורה. הצהרה <s>עם קו חוצה</s> = חוק אחר ניצח אותה. סימן ⚠️ צהוב = שגיאת כתיב בשם המאפיין או בערך.</p>
+      </div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body">
+        <h4>משנים בזמן אמת</h4>
+        <p>לוחצים על ערך ומשנים אותו (חצים למעלה/למטה מגדילים ומקטינים מספרים). תיבת הסימון ליד כל הצהרה מכבה ומדליקה אותה. <strong>שימו לב:</strong> השינויים לא נשמרים! כשמצאתם את הערך הנכון, העתיקו אותו לקובץ ה-CSS ב-VS Code.</p>
+      </div></div>
+      <div class="exercise">
+        <h3>תרגיל: חקירה באתר אמיתי <span class="level easy">קל</span></h3>
+        <ol>
+          <li>פתחו אתר שאתם אוהבים, ובדקו (Inspect) את הכותרת הראשית שלו.</li>
+          <li>מצאו ב-Styles את ה-<code>font-family</code> ואת ה-<code>font-size</code> שלה.</li>
+          <li>שנו את הצבע שלה לאדום, ואת הטקסט שלה (קליק כפול בלשונית Elements) לשם שלכם.</li>
+          <li>מצאו בתרשים הקופסה (Computed) כמה padding יש לכפתור כלשהו באתר.</li>
+          <li>רעננו את הדף. מה קרה לשינויים?</li>
+        </ol>
+        <details class="solution">
+          <summary>הצגת פתרון</summary>
+          <p>אחרי רענון כל השינויים נעלמים. הם היו רק בעותק של הדף שבדפדפן שלכם, לא בשרת. לכן אי אפשר "לפרוץ" לאתר ככה, ולכן אצלכם צריך להעתיק את השינוי לקובץ.</p>
+        </details>
+      </div>
+
+      <h2 id="variables">משתני CSS <span class="time">לבית</span></h2>
+      <p>באתר אמיתי, אותו צבע מותג מופיע ב-20 מקומות. אם רוצים לשנות אותו, צריך למצוא את כולם. <strong>משתני CSS</strong> (custom properties) פותרים את זה: מגדירים ערך פעם אחת עם שם שמתחיל ב-<code>--</code>, ומשתמשים בו עם <code>var()</code>.</p>
+      <pre><code class="language-css">:root {                  /* :root = כל הדף. מגדירים כאן משתנים גלובליים */
+  --brand: #4f46e5;
+  --radius: 12px;
+}
+.button {
+  background: var(--brand);
+  border-radius: var(--radius);
+}
+h1 {
+  color: var(--brand);   /* משנים את --brand במקום אחד, והכול משתנה */
+}</code></pre>
+
+      <h3>🎯 אתגר 6: צבע מותג במשתנה <span class="level medium">בינוני</span></h3>
+      <ol>
+        <li>ב-<code>:root</code>, הגדירו משתנה בשם <code>--brand</code> עם צבע לבחירתכם.</li>
+        <li>השתמשו בו בעזרת <code>var(--brand)</code> גם לצבע הטקסט של <code>h1</code>, וגם לצבע הרקע של <code>.btn</code>.</li>
+        <li>בונוס: שנו את הערך של <code>--brand</code> ותראו ששני האלמנטים משתנים יחד.</li>
+      </ol>
+      <div class="playground challenge" id="ch-vars" data-check="ch-vars" data-height="240">
+        <script type="text/plain" data-lang="html">
+          <h1>חנות הפרחים של מיכל</h1>
+          <p>זרים טריים עד הבית.</p>
+          <a class="btn" href="#">להזמנה</a>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .btn {
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+          }
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          :root {
+            --brand: #db2777;
+          }
+          h1 {
+            color: var(--brand);
+          }
+          .btn {
+            background: var(--brand);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-vars': (doc, win) => {
+            const brand = win.getComputedStyle(doc.documentElement).getPropertyValue('--brand').trim();
+            const rules = [...doc.styleSheets].flatMap((sheet) => [...sheet.cssRules]);
+            const uses = (sel, prop) => rules.some((r) => r.selectorText && r.selectorText.includes(sel) && /var\(\s*--brand\s*\)/.test(r.style.getPropertyValue(prop)));
+            return [
+              [brand !== '', 'הגדירו את המשתנה ב-:root, למשל :root { --brand: #db2777; }'],
+              [uses('h1', 'color'), 'ב-h1 כתבו color: var(--brand);'],
+              [uses('.btn', 'background-color') || uses('.btn', 'background'), 'ב-.btn כתבו background: var(--brand);'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="mistakes">טעויות נפוצות ואיך מתקנים</h2>
+      <table>
+        <tr><th>מה קורה</th><th>סיבה סבירה</th><th>תיקון</th></tr>
+        <tr><td>שום עיצוב לא עובד</td><td>קובץ ה-CSS לא מחובר, או לא נשמר</td><td>בדקו את ה-<code>&lt;link&gt;</code> ואת שם הקובץ. ב-DevTools, ‏Network יראה 404 אם הקובץ לא נמצא.</td></tr>
+        <tr><td>חוק אחד לא עובד</td><td>שגיאת כתיב: <code>colour</code>, ‏<code>font-size: 16 px</code>, חסר <code>;</code></td><td>ב-DevTools תופיע ⚠️ ליד ההצהרה השגויה</td></tr>
+        <tr><td>החוק מופיע ב-DevTools עם קו חוצה</td><td>חוק חזק יותר ניצח</td><td>השתמשו בבורר class מדויק יותר, או בדקו את הסדר בקובץ</td></tr>
+        <tr><td>הבורר לא תופס</td><td>שכחתם נקודה (<code>card</code> במקום <code>.card</code>), או ששם ה-class שונה ב-HTML</td><td>העתיקו את השם מה-HTML לCSS כדי למנוע טעויות</td></tr>
+        <tr><td><code>width</code> לא משפיע על קישור או span</td><td>הם <code>inline</code></td><td><code>display: inline-block</code> או <code>block</code></td></tr>
+        <tr><td><code>justify-content</code> לא עושה כלום</td><td>אין <code>display: flex</code> על <strong>ההורה</strong>, או שכתבתם אותו על הילדים</td><td>‏Flexbox תמיד נכתב על המכל</td></tr>
+        <tr><td>הקופסה רחבה יותר ממה שכתבתי</td><td>padding ו-border נוספו לרוחב</td><td><code>* { box-sizing: border-box; }</code></td></tr>
+        <tr><td>יש גלילה לרוחב בטלפון</td><td><code>width</code> קבוע בפיקסלים, או תמונה גדולה</td><td><code>max-width: 100%</code> לתמונות, <code>max-width</code> במקום <code>width</code></td></tr>
+        <tr><td>ה-media query לא עובד</td><td>כתוב לפני החוקים הרגילים, או שחסרה תגית viewport</td><td>העבירו את ה-<code>@media</code> לסוף הקובץ</td></tr>
+      </table>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: כתבתם <code>.menu li { display: flex; }</code> אבל פריטי התפריט עדיין אחד מתחת לשני. למה?</p>
+        <ul>
+          <li>צריך <code>flex-direction: row</code></li>
+          <li data-correct><code>display: flex</code> צריך להיות על ההורה (<code>.menu</code>), לא על כל <code>li</code></li>
+          <li>אי אפשר להשתמש ב-flex על רשימות</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏Flexbox מסדר את <strong>הילדים</strong> של המכל. כאן כל li הפך למכל של התוכן שלו, אבל ה-li-ים עצמם לא בתוך מכל flex.</p>
+      </div>
+
+      <h2 id="cheatsheet">דף מאפיינים לסיכום</h2>
+      <table>
+        <tr><th>נושא</th><th>מאפיינים</th></tr>
+        <tr><td>טקסט</td><td><code>color</code>, ‏<code>font-family</code>, ‏<code>font-size</code>, ‏<code>font-weight</code>, ‏<code>line-height</code>, ‏<code>text-align</code>, ‏<code>text-decoration</code></td></tr>
+        <tr><td>רקע</td><td><code>background</code>, ‏<code>background-color</code>, ‏<code>background-image</code>, ‏<code>background-size</code></td></tr>
+        <tr><td>קופסה</td><td><code>width</code>, ‏<code>max-width</code>, ‏<code>height</code>, ‏<code>padding</code>, ‏<code>border</code>, ‏<code>border-radius</code>, ‏<code>margin</code>, ‏<code>box-sizing</code>, ‏<code>box-shadow</code></td></tr>
+        <tr><td>תצוגה</td><td><code>display: block | inline | inline-block | none | flex | grid</code></td></tr>
+        <tr><td>Flexbox (מכל)</td><td><code>flex-direction</code>, ‏<code>justify-content</code>, ‏<code>align-items</code>, ‏<code>flex-wrap</code>, ‏<code>gap</code></td></tr>
+        <tr><td>Flexbox (פריט)</td><td><code>flex: 1</code>, ‏<code>min-width</code></td></tr>
+        <tr><td>Grid</td><td><code>grid-template-columns</code>, ‏<code>gap</code></td></tr>
+        <tr><td>רשימות</td><td><code>list-style: none</code></td></tr>
+        <tr><td>רספונסיביות</td><td><code>@media (min-width: …) { … }</code>, תגית viewport</td></tr>
+      </table>
+      <p>תבנית התחלה מומלצת לכל קובץ CSS חדש:</p>
+      <pre><code class="language-css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: 'Heebo', sans-serif;
+  line-height: 1.6;
+  color: #1e293b;
+}
+img {
+  max-width: 100%;   /* תמונות לא יחרגו מהמסך */
+}
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 16px;
+}</code></pre>
+
+      <h2 id="summary">סיכום</h2>
+      <div class="box goals">
+        <ul>
+          <li>‏CSS קובע איך הדף נראה. כותבים אותו בקובץ <code>style.css</code> נפרד ומחברים עם <code>&lt;link&gt;</code>.</li>
+          <li>חוק = בורר + <code>{ מאפיין: ערך; }</code>. הבוררים העיקריים: תגית, ‏<code>.class</code>, ‏<code>#id</code>, צאצא, ‏<code>:hover</code>.</li>
+          <li>בסתירה: בורר ספציפי יותר מנצח, ובשוויון האחרון מנצח.</li>
+          <li>כל אלמנט הוא קופסה: content ← padding ← border ← margin. תמיד <code>box-sizing: border-box</code>.</li>
+          <li>‏<code>display: flex</code> על ההורה מסדר את הילדים. ‏<code>justify-content</code> לאורך, ‏<code>align-items</code> לרוחב, ‏<code>gap</code> לרווחים.</li>
+          <li>רספונסיביות: viewport ב-head, עיצוב לטלפון קודם, ו-<code>@media (min-width)</code> למסכים רחבים.</li>
+          <li>‏DevTools מראים אילו חוקים חלים ומאפשרים לנסות שינויים בזמן אמת.</li>
+        </ul>
+      </div>
+      <div class="box tip">
+        <p><strong>מה הלאה:</strong> בחלק ג׳ נשמור את העבודה ב-Git ונעלה אותה ל-GitHub. אחר כך, בעמוד הפרויקט, נשלב את כל מה שלמדנו בדף פרופיל אישי.</p>
+      </div>
+
+      <h3>מקורות להעמקה</h3>
+      <ul>
+        <li><a href="https://developer.mozilla.org/he/docs/Learn/CSS" target="_blank" rel="noopener">MDN: לימוד CSS</a>: התיעוד הרשמי והמפורט ביותר (רוב התוכן באנגלית)</li>
+        <li><a href="https://flexboxfroggy.com/#he" target="_blank" rel="noopener">Flexbox Froggy</a>: משחק לתרגול Flexbox, בעברית</li>
+        <li><a href="https://cssgridgarden.com/#he" target="_blank" rel="noopener">Grid Garden</a>: אותו רעיון, ל-Grid</li>
+        <li><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank" rel="noopener">CSS-Tricks: A Complete Guide to Flexbox</a>: דף עזר עם ציורים לכל מאפיין</li>
+        <li><a href="https://fonts.google.com/?subset=hebrew" target="_blank" rel="noopener">Google Fonts בעברית</a></li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p>לסיום החלק בכיתה כדאי לשאול: "מה ההבדל בין padding ל-margin?" ו"על מי כותבים display: flex?". אם רוב הכיתה עונה נכון, אפשר לעבור ל-Git. אתגרים 5–6, ‏Grid ומשתנים נשארים לבית. את Flexbox Froggy כדאי לתת כמשימת חובה לפני השיעור הבא.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

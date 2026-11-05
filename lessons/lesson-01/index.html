@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 1: ווב מודרני: HTML, CSS ו-Git</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body data-page="lesson" data-lesson="1" data-part="index" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 1</span>
+      <h1>ווב מודרני: HTML, CSS ו-Git</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ שעתיים בכיתה</span>
+        <span class="chip">📚 4–6 שעות לימוד עצמי</span>
+        <span class="chip">🧑‍🎓 לא נדרש ידע קודם</span>
+      </div>
+
+      <p>ברוכים הבאים לקורס! בשיעור הראשון נבנה את הבסיס לכל מה שיבוא אחר כך. נבין איך אתרי אינטרנט עובדים, נכתוב את דף ה-HTML הראשון שלנו, נעצב אותו עם CSS, ונשמור אותו ב-Git וב-GitHub, כמו שעושים מפתחים אמיתיים.</p>
+
+      <div class="box goals">
+        <h3>מטרות השיעור</h3>
+        <p>בסוף השיעור תדעו:</p>
+        <ul>
+          <li>להסביר מה קורה מרגע שמקלידים כתובת בדפדפן ועד שהדף מוצג</li>
+          <li>לכתוב דף HTML עם כותרות, פסקאות, קישורים, תמונות, רשימות וטפסים</li>
+          <li>להבין את ההבדל בין <code>div</code>, ‏<code>span</code> ותגיות סמנטיות, ולבחור את התגית הנכונה</li>
+          <li>לעצב דף עם CSS: צבעים, גופנים, ריווחים ומודל הקופסה</li>
+          <li>לסדר אלמנטים בעזרת Flexbox ולהתאים את הדף לטלפון</li>
+          <li>לשמור פרויקט ב-Git, להעלות אותו ל-GitHub ולפרסם אותו באינטרנט</li>
+        </ul>
+      </div>
+
+      <h2 id="parts">חלקי השיעור</h2>
+      <p>השיעור מחולק לארבעה עמודים. מומלץ לעבור עליהם לפי הסדר:</p>
+      <div class="features">
+        <a class="lesson-card" href="html.html">
+          <span class="lesson-num">חלק א׳</span>
+          <h3>HTML מאפס</h3>
+          <p>איך הווב עובד, תגיות, כותרות, טקסט, קישורים, תמונות, רשימות, ‏div ו-span, תגיות סמנטיות, טבלאות וטפסים</p>
+        </a>
+        <a class="lesson-card" href="css.html">
+          <span class="lesson-num">חלק ב׳</span>
+          <h3>עיצוב עם CSS</h3>
+          <p>בוררים, צבעים, גופנים, מודל הקופסה, ‏display, ‏Flexbox לעומק ורספונסיביות</p>
+        </a>
+        <a class="lesson-card" href="git.html">
+          <span class="lesson-num">חלק ג׳</span>
+          <h3>Git ו-GitHub</h3>
+          <p>הטרמינל, שמירת גרסאות, ‏commit, ‏push, ‏GitHub, פתרון תקלות נפוצות ופרסום ב-Netlify</p>
+        </a>
+        <a class="lesson-card" href="project.html">
+          <span class="lesson-num">פרויקט</span>
+          <h3>דף פרופיל ותרגול מסכם</h3>
+          <p>בונים דף פרופיל אישי צעד אחר צעד, ומעלים אותו לאוויר</p>
+        </a>
+      </div>
+
+      <h2 id="how">איך לומדים מהאתר</h2>
+      <p>האתר בנוי כך שאפשר ללמוד ממנו לבד, גם אם פספסתם שיעור:</p>
+      <table>
+        <tr><th>מה רואים</th><th>מה עושים עם זה</th></tr>
+        <tr><td><strong>עורך קוד חי</strong> (קוד מימין, תוצאה משמאל)</td><td>משנים את הקוד ורואים את התוצאה מיד. אל תפחדו לשבור דברים: הכפתור "↺ איפוס" מחזיר את הקוד המקורי. הקוד שלכם נשמר בדפדפן גם אחרי רענון.</td></tr>
+        <tr><td><strong>אתגר</strong> (עורך עם מסגרת סגולה)</td><td>כותבים קוד לפי ההוראות ולוחצים "✓ בדיקה". האתר בודק את הפתרון ואומר מה עוד חסר. הכפתור "💡 פתרון" מציג פתרון מלא, אבל נסו קודם לבד.</td></tr>
+        <tr><td><strong>🤔 בדקו את עצמכם</strong></td><td>שאלה קצרה. לוחצים על התשובה שנראית לכם נכונה.</td></tr>
+        <tr><td><strong>בלוק קוד</strong></td><td>הכפתור "העתקה" מעתיק את הקוד, ואפשר להדביק אותו ב-VS Code.</td></tr>
+        <tr><td><strong>טרמינל</strong> (רקע כחול כהה)</td><td>שורה שמתחילה ב-<code>$</code> היא פקודה שמקלידים. אין צורך להקליד את ה-<code>$</code> עצמו. השורות האחרות הן מה שהמחשב מחזיר.</td></tr>
+      </table>
+
+      <div class="box tip">
+        <p><strong>טיפ ללמידה:</strong> אל תסתפקו בקריאה. כל דוגמה שאתם רואים, שנו בה משהו: צבע, מילה או תגית, ותראו מה קורה. ככה לומדים לתכנת.</p>
+      </div>
+
+      <h2 id="setup">מה צריך להתקין לפני השיעור</h2>
+      <ol>
+        <li><strong>דפדפן Chrome או Firefox</strong>: לשניהם יש כלי מפתחים טובים.</li>
+        <li><strong><a href="https://code.visualstudio.com/" target="_blank" rel="noopener">VS Code</a></strong>: עורך הקוד שנעבוד איתו בכל הקורס. הוראות מפורטות יש בחלק א׳.</li>
+        <li><strong><a href="https://git-scm.com/downloads" target="_blank" rel="noopener">Git</a></strong>: הוראות התקנה מפורטות ל-Windows ול-Mac יש בחלק ג׳.</li>
+        <li><strong>חשבון ב-<a href="https://github.com/signup" target="_blank" rel="noopener">GitHub</a></strong>: חינמי. כדאי לבחור שם משתמש מקצועי, כי מעסיקים יראו אותו.</li>
+      </ol>
+      <p>‏Node.js עדיין לא נדרש. נתקין אותו בשיעור 4, כשנתחיל לעבוד עם React.</p>
+
+      <aside class="box lecturer-note">
+        <p><strong>תוכנית לשעתיים בכיתה.</strong> העמודים באתר מפורטים יותר ממה שאפשר להספיק בשיעור. הם מיועדים גם ללמידה עצמית. בכיתה כדאי להתמקד בעיקר ולהשאיר את השאר לבית:</p>
+        <table>
+          <tr><th>זמן</th><th>מה עושים</th><th>עמוד</th></tr>
+          <tr><td>10 דק׳</td><td>פתיחה: היכרות, מבנה הקורס, איך משתמשים באתר (להדגים עורך חי ואתגר)</td><td>סקירה</td></tr>
+          <tr><td>10 דק׳</td><td>איך הווב עובד, עם הדגמה בלשונית Network</td><td>חלק א׳</td></tr>
+          <tr><td>30 דק׳</td><td>‏HTML: תגיות, טקסט, קישורים, תמונות, רשימות, ‏div/span וסמנטיקה. טבלאות וטפסים לבית</td><td>חלק א׳</td></tr>
+          <tr><td>35 דק׳</td><td>‏CSS: בוררים, מודל הקופסה, ‏Flexbox עם החוקר האינטראקטיבי, ‏media query</td><td>חלק ב׳</td></tr>
+          <tr><td>25 דק׳</td><td>‏Git: הדגמה חיה מ-<code>git init</code> ועד <code>push</code>, וכל הסטודנטים עושים push ראשון</td><td>חלק ג׳</td></tr>
+          <tr><td>10 דק׳</td><td>סיכום והצגת הפרויקט כשיעורי בית</td><td>פרויקט</td></tr>
+        </table>
+        <p>‏<strong>ההתקנות הן הסיכון הגדול</strong> בשיעור הראשון. מומלץ לשלוח לסטודנטים את הקישור לעמוד הזה כמה ימים לפני השיעור, ולבקש שיגיעו עם VS Code ו-Git מותקנים וחשבון GitHub פתוח.</p>
+        <p>מצב המרצה נשמר בדפדפן. כדי לפתוח אותו ישירות במחשב אחר, אפשר להוסיף <code>?lecturer</code> לסוף הכתובת.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

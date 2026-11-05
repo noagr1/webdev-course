@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 1 · חלק א׳: HTML מאפס</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="1" data-part="html" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 1 · חלק א׳</span>
+      <h1>HTML מאפס</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ כ-40 דקות בכיתה</span>
+        <span class="chip">📚 2–3 שעות לימוד עצמי</span>
+        <span class="chip">🧑‍🎓 לא נדרש ידע קודם</span>
+      </div>
+
+      <p>‏HTML היא השפה שבה כותבים את <strong>התוכן והמבנה</strong> של כל דף אינטרנט: כותרות, פסקאות, תמונות, קישורים, טפסים. כל אתר שאתם מכירים, מגוגל ועד אינסטגרם, מגיע לדפדפן בסופו של דבר כ-HTML. בעמוד הזה נלמד אותה מאפס, תגית אחרי תגית, ועם המון דוגמאות שאפשר לשנות ולראות את התוצאה מיד.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף העמוד תדעו:</p>
+        <ul>
+          <li>להסביר מה קורה כשמקלידים כתובת בדפדפן</li>
+          <li>להתקין VS Code ולעבוד איתו עם Live Server</li>
+          <li>להבין מה זו תגית, מה זה אלמנט ומה זה מאפיין</li>
+          <li>לכתוב שלד של דף HTML ולהסביר כל שורה בו</li>
+          <li>להשתמש בכותרות, פסקאות, קישורים, תמונות, רשימות, טבלאות וטפסים</li>
+          <li>להבין את ההבדל בין <code>div</code> ל-<code>span</code>, ומתי משתמשים בתגיות סמנטיות</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בכל דוגמה יש <strong>עורך חי</strong>. הקוד מימין, התוצאה משמאל. שנו משהו בקוד והתוצאה תתעדכן מיד. אם משהו נשבר, הכפתור "↺ איפוס" מחזיר את הקוד המקורי.</p>
+      </div>
+
+      <h2 id="web">איך הווב עובד <span class="time">10 דק׳</span></h2>
+      <p>לפני שכותבים שורת קוד, כדאי להבין מה קורה כשאתם מקלידים בדפדפן כתובת כמו <code>https://www.ynet.co.il/news</code> ולוחצים Enter.</p>
+
+      <h3>שני צדדים: לקוח ושרת</h3>
+      <ul>
+        <li><strong>הלקוח (Client)</strong> הוא הדפדפן שלכם: Chrome, ‏Firefox, ‏Safari. הוא מבקש דפים ומציג אותם.</li>
+        <li><strong>השרת (Server)</strong> הוא מחשב שנמצא איפשהו בעולם ומחובר לאינטרנט כל הזמן. הוא שומר את קבצי האתר ושולח אותם למי שמבקש.</li>
+      </ul>
+
+      <div class="flow">
+        <span class="node">🧑‍💻 הדפדפן</span><span class="arrow">←</span><span class="node">📖 DNS: "מה הכתובת של ynet?"</span><span class="arrow">←</span><span class="node">📨 בקשת HTTP לשרת</span><span class="arrow">←</span><span class="node">🖥️ השרת מחזיר HTML</span><span class="arrow">←</span><span class="node">🎨 הדפדפן מצייר את הדף</span>
+      </div>
+
+      <h3>שלב אחר שלב</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>פירוק הכתובת (URL)</h4>
+          <p>לכתובת יש חלקים, ולכל חלק תפקיד:</p>
+          <table>
+            <tr><th>חלק</th><th>בדוגמה</th><th>מה זה אומר</th></tr>
+            <tr><td>פרוטוקול</td><td><code>https://</code></td><td>"השפה" שבה הדפדפן והשרת מדברים. ה-s בסוף אומר שהתקשורת מוצפנת (מאובטחת).</td></tr>
+            <tr><td>דומיין</td><td><code>www.ynet.co.il</code></td><td>השם של השרת. קל לזכור שם, קשה לזכור מספר.</td></tr>
+            <tr><td>נתיב</td><td><code>/news</code></td><td>איזה דף בתוך האתר אנחנו רוצים.</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>‏DNS: ספר הטלפונים של האינטרנט</h4>
+          <p>מחשבים לא מבינים שמות כמו <code>ynet.co.il</code>. הם מדברים במספרים שנקראים <strong>כתובות IP</strong>, למשל <code>151.101.1.91</code>. הדפדפן שואל שרת DNS "מה המספר של ynet?" ומקבל תשובה. בדיוק כמו שמחפשים שם באנשי הקשר בטלפון ומקבלים מספר.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>בקשת HTTP</h4>
+          <p>הדפדפן שולח לשרת הודעה שנקראת <strong>בקשה (Request)</strong>: "תן לי בבקשה את הדף <code>/news</code>". השרת מחזיר <strong>תשובה (Response)</strong> עם קוד מצב וגם עם תוכן הדף. קודי מצב נפוצים:</p>
+          <ul>
+            <li><code>200</code>: הכול בסדר, הנה הדף.</li>
+            <li><code>404</code>: הדף לא נמצא. בטח נתקלתם בזה.</li>
+            <li><code>500</code>: תקלה בשרת.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>הדפדפן מצייר את הדף</h4>
+          <p>התשובה היא קובץ HTML, טקסט רגיל. הדפדפן קורא אותו, מגלה שצריך עוד קבצים (CSS לעיצוב, תמונות, JavaScript), מבקש גם אותם, ובסוף מציג לכם את הדף המעוצב.</p>
+        </div>
+      </div>
+
+      <h3>שלוש השפות של הדפדפן</h3>
+      <table>
+        <tr><th>שפה</th><th>תפקיד</th><th>דימוי של בית</th></tr>
+        <tr><td><strong>HTML</strong></td><td>תוכן ומבנה: מה יש בדף</td><td>הקירות, החדרים, הדלתות</td></tr>
+        <tr><td><strong>CSS</strong></td><td>עיצוב: איך זה נראה</td><td>הצבע על הקירות, הריהוט</td></tr>
+        <tr><td><strong>JavaScript</strong></td><td>התנהגות: מה קורה כשלוחצים</td><td>החשמל: מתג שמדליק אור</td></tr>
+      </table>
+      <p>בחלק הזה נתמקד ב-HTML. ‏CSS נלמד בחלק ב׳, ו-JavaScript בשיעורים 2 ו-3.</p>
+
+      <div class="box tip">
+        <p><strong>נסו בעצמכם:</strong> פתחו אתר כלשהו ב-Chrome, לחצו על F12 (ב-Mac: ‏<kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>I</kbd>), עברו ללשונית <strong>Network</strong> ורעננו את הדף. כל שורה היא בקשה אחת שהדפדפן שלח. לחצו על השורה הראשונה ותראו את ה-HTML שהשרת החזיר. אפשר גם ללחוץ קליק ימני על דף ולבחור "הצגת מקור הדף" (View Page Source).</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>הדגמה מומלצת (5 דק׳):</strong> לפתוח את לשונית Network מול הכיתה, לרענן אתר מוכר ולהראות את הבקשה הראשונה, את קוד 200 ואת ה-HTML בתשובה. אחר כך לגלוש לכתובת שלא קיימת באותו אתר ולהראות 404. זה ממחיש שהדפדפן "רק" מבקש קבצים ומציג אותם.</p>
+      </aside>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה התפקיד של DNS?</p>
+        <ul>
+          <li>לעצב את הדף</li>
+          <li data-correct>לתרגם שם של אתר (דומיין) לכתובת IP מספרית</li>
+          <li>להצפין את התקשורת</li>
+          <li>לשמור את קבצי האתר</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏DNS הוא כמו ספר טלפונים: מקבל שם (<code>ynet.co.il</code>) ומחזיר מספר (כתובת IP). ההצפנה היא תפקיד של ה-s ב-https.</p>
+      </div>
+
+      <h2 id="tools">הכלים: VS Code ו-Live Server</h2>
+      <p>את רוב הדוגמאות בעמוד הזה אפשר לנסות ישר באתר. אבל מפתחים אמיתיים כותבים קוד ב<strong>עורך קוד</strong> על המחשב. נעבוד עם <strong>VS Code</strong>: חינמי, פופולרי מאוד, ועובד ב-Windows וב-Mac.</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>התקנת VS Code</h4>
+          <ol>
+            <li>היכנסו ל-<a href="https://code.visualstudio.com/" target="_blank" rel="noopener">code.visualstudio.com</a> ולחצו על כפתור ההורדה הכחול.</li>
+            <li><strong>Windows:</strong> הריצו את הקובץ שהורד. במסך האפשרויות סמנו את <em>Add "Open with Code" action</em> ואת <em>Add to PATH</em>.</li>
+            <li><strong>Mac:</strong> פתחו את קובץ ה-zip וגררו את Visual Studio Code לתיקיית Applications.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>התקנת תוספים (Extensions)</h4>
+          <p>בסרגל השמאלי של VS Code יש סמל של ארבעה ריבועים (Extensions). חפשו והתקינו:</p>
+          <ul>
+            <li><strong>Live Server</strong> (של Ritwick Dey): פותח את הדף בדפדפן ומרענן אותו אוטומטית בכל שמירה.</li>
+            <li><strong>Prettier</strong>: מסדר את הקוד (רווחים, הזחות) בלחיצה אחת.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>הדף הראשון</h4>
+          <ol>
+            <li>צרו במחשב תיקייה חדשה, למשל <code>my-first-site</code>.</li>
+            <li>ב-VS Code: ‏<strong>File ← Open Folder</strong> ובחרו את התיקייה.</li>
+            <li>לחצו על סמל "קובץ חדש" ליד שם התיקייה וקראו לקובץ <code>index.html</code>. השם <code>index.html</code> מיוחד: זה הדף שנפתח ראשון באתר.</li>
+            <li>הקלידו <code>!</code> ולחצו Tab. ‏VS Code ימלא שלד שלם של דף (נסביר אותו בהמשך).</li>
+            <li>קליק ימני על הקובץ ← <strong>Open with Live Server</strong>. הדף ייפתח בדפדפן.</li>
+          </ol>
+        </div>
+      </div>
+
+      <h3>‏Emmet: קיצורי דרך לכתיבת HTML</h3>
+      <p>ה-<code>!</code> שהקלדתם הוא חלק מ-<strong>Emmet</strong>, כלי שמובנה ב-VS Code. כותבים קיצור, לוחצים Tab, ומקבלים קוד מלא:</p>
+      <table>
+        <tr><th>מקלידים</th><th>מקבלים</th></tr>
+        <tr><td><code>p</code> + Tab</td><td><code>&lt;p&gt;&lt;/p&gt;</code></td></tr>
+        <tr><td><code>h1</code> + Tab</td><td><code>&lt;h1&gt;&lt;/h1&gt;</code></td></tr>
+        <tr><td><code>ul&gt;li*3</code> + Tab</td><td>רשימה עם 3 פריטים</td></tr>
+        <tr><td><code>div.card</code> + Tab</td><td><code>&lt;div class="card"&gt;&lt;/div&gt;</code></td></tr>
+      </table>
+
+      <div class="box tip">
+        <p><strong>קיצורי מקלדת שכדאי להכיר:</strong> שמירה: <kbd>Ctrl</kbd>+<kbd>S</kbd> (ב-Mac: <kbd>Cmd</kbd>+<kbd>S</kbd>). סידור הקוד עם Prettier: <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd> (ב-Mac: <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>F</kbd>). הפיכת שורה להערה: <kbd>Ctrl</kbd>+<kbd>/</kbd>.</p>
+      </div>
+      <div class="box warn">
+        <p><strong>תקלה נפוצה:</strong> "שיניתי את הקוד ושום דבר לא השתנה בדפדפן". ברוב המקרים פשוט לא שמרתם. נקודה לבנה ליד שם הקובץ בלשונית אומרת שיש שינויים שלא נשמרו. כדאי להפעיל שמירה אוטומטית: <strong>File ← Auto Save</strong>.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>בכיתה לא כדאי להשקיע זמן בהתקנות. מומלץ לבקש מראש שיגיעו עם VS Code מותקן, ולהדגים רק את <code>!</code> + Tab ואת Live Server. מי שנתקע בהתקנה יכול לעבוד בינתיים עם העורכים החיים באתר.</p>
+      </aside>
+
+      <h2 id="tags">מהי תגית?</h2>
+      <p>‏HTML בנויה מ<strong>תגיות (tags)</strong>. תגית היא מילה בתוך סוגריים משולשים, שאומרת לדפדפן "מה זה" הטקסט שבתוכה. רוב התגיות באות בזוג: תגית פתיחה ותגית סגירה. בתגית הסגירה יש לוכסן <code>/</code>.</p>
+
+      <pre><code class="language-html">&lt;p&gt;שלום עולם&lt;/p&gt;</code></pre>
+
+      <table>
+        <tr><th>חלק</th><th>שם</th><th>הסבר</th></tr>
+        <tr><td><code>&lt;p&gt;</code></td><td>תגית פתיחה</td><td>"כאן מתחילה פסקה"</td></tr>
+        <tr><td><code>שלום עולם</code></td><td>תוכן</td><td>מה שיוצג על המסך</td></tr>
+        <tr><td><code>&lt;/p&gt;</code></td><td>תגית סגירה</td><td>"כאן הפסקה נגמרת"</td></tr>
+      </table>
+      <p>הכול ביחד, פתיחה + תוכן + סגירה, נקרא <strong>אלמנט (element)</strong>. כשאומרים "אלמנט p" מתכוונים לכל הפסקה.</p>
+
+      <p>נסו: שנו את הטקסט, או החליפו את <code>p</code> ב-<code>h1</code> (גם בפתיחה וגם בסגירה) ותראו מה קורה.</p>
+      <div class="playground" id="pg-first-tag" data-height="120">
+        <script type="text/plain" data-lang="html">
+          <p>שלום עולם</p>
+        </script>
+      </div>
+
+      <h3>מאפיינים (attributes)</h3>
+      <p>לתגית אפשר להוסיף <strong>מאפיינים</strong>: מידע נוסף שכותבים בתוך תגית הפתיחה, בצורה <code>שם="ערך"</code>. למשל, לקישור צריך לומר לאן הוא מוביל:</p>
+      <pre><code class="language-html">&lt;a href="https://google.com"&gt;לגוגל&lt;/a&gt;</code></pre>
+      <ul>
+        <li><code>a</code>: שם התגית (קישור).</li>
+        <li><code>href</code>: שם המאפיין.</li>
+        <li><code>"https://google.com"</code>: הערך, תמיד בתוך מירכאות.</li>
+      </ul>
+      <p>לתגית יכולים להיות כמה מאפיינים, מופרדים ברווח: <code>&lt;img src="cat.jpg" alt="חתול"&gt;</code>.</p>
+
+      <h3>תגיות ריקות (void)</h3>
+      <p>יש תגיות שאין להן תוכן, ולכן גם אין להן תגית סגירה. למשל <code>&lt;br&gt;</code> (ירידת שורה), <code>&lt;hr&gt;</code> (קו מפריד), <code>&lt;img&gt;</code> (תמונה) ו-<code>&lt;input&gt;</code> (שדה בטופס). לפעמים תראו אותן כתובות <code>&lt;br /&gt;</code>, עם לוכסן. זה אותו דבר, ושתי הצורות תקינות.</p>
+
+      <h3>קינון: תגית בתוך תגית</h3>
+      <p>אפשר לשים תגיות בתוך תגיות. זה נקרא <strong>קינון (nesting)</strong>. הכלל החשוב: <strong>מה שנפתח אחרון נסגר ראשון</strong>, כמו קופסה בתוך קופסה.</p>
+      <div class="playground" id="pg-nesting" data-height="140">
+        <script type="text/plain" data-lang="html">
+          <p>זו פסקה עם <strong>מילה מודגשת</strong> בתוכה.</p>
+
+          <!-- נכון: strong נפתח בתוך p ונסגר לפני ש-p נסגר -->
+          <!-- לא נכון: <p><strong>טקסט</p></strong> -->
+        </script>
+      </div>
+      <p>האלמנטים יוצרים <strong>עץ</strong>: לכל אלמנט יש "הורה" (האלמנט שעוטף אותו), ויכולים להיות לו "ילדים". בדוגמה למעלה, <code>p</code> הוא ההורה ו-<code>strong</code> הוא הילד. נשתמש במילים האלה הרבה, גם ב-CSS וגם ב-React.</p>
+      <pre><code class="nohighlight">html
+├── head
+│   └── title
+└── body
+    ├── h1
+    └── p
+        └── strong</code></pre>
+
+      <h3>הערות</h3>
+      <p>הערה היא טקסט שהדפדפן מתעלם ממנו. היא נועדה לאנשים שקוראים את הקוד. כותבים אותה בין <code>&lt;!--</code> ל-<code>--&gt;</code>. ראיתם הערות בדוגמה הקודמת: הן לא מופיעות בתוצאה.</p>
+
+      <div class="box tip">
+        <p><strong>אותיות קטנות:</strong> ‏HTML לא מבחינה בין אותיות גדולות לקטנות (<code>&lt;P&gt;</code> ו-<code>&lt;p&gt;</code> זהות), אבל המוסכמה היא לכתוב תמיד באותיות קטנות.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בקוד <code>&lt;img src="dog.jpg" alt="כלב"&gt;</code>, מה זה <code>alt</code>?</p>
+        <ul>
+          <li>שם של תגית</li>
+          <li data-correct>מאפיין</li>
+          <li>תגית סגירה</li>
+          <li>הערה</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>img</code> היא התגית, ו-<code>src</code> ו-<code>alt</code> הם מאפיינים שלה. לתגית img אין תגית סגירה, כי היא תגית ריקה.</p>
+      </div>
+
+      <h2 id="skeleton">שלד הדף, שורה אחרי שורה</h2>
+      <p>כל דף HTML מתחיל באותו שלד. זה מה ש-VS Code יוצר כשמקלידים <code>!</code> + Tab (עם שינוי קטן לעברית):</p>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="he" dir="rtl"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;הדף שלי&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;שלום!&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <table>
+        <tr><th>שורה</th><th>מה היא עושה</th></tr>
+        <tr><td><code>&lt;!DOCTYPE html&gt;</code></td><td>מודיעה לדפדפן "זה HTML מודרני (HTML5)". זו לא באמת תגית, וצריכה להיות תמיד השורה הראשונה.</td></tr>
+        <tr><td><code>&lt;html lang="he" dir="rtl"&gt;</code></td><td>האלמנט שעוטף את כל הדף. ‏<code>lang="he"</code> אומר שהשפה עברית (חשוב לקוראי מסך ולגוגל). ‏<code>dir="rtl"</code> אומר שהכיוון מימין לשמאל. בלי זה, דף בעברית ייראה הפוך.</td></tr>
+        <tr><td><code>&lt;head&gt;</code></td><td>"הראש": מידע <strong>על</strong> הדף, שלא מוצג בתוכו.</td></tr>
+        <tr><td><code>&lt;meta charset="UTF-8"&gt;</code></td><td>קידוד התווים. בלי השורה הזו, עברית עלולה להופיע כג׳יבריש (סימני שאלה וריבועים).</td></tr>
+        <tr><td><code>&lt;meta name="viewport" ...&gt;</code></td><td>אומרת לטלפון להציג את הדף ברוחב המסך האמיתי, בלי להקטין אותו. נצטרך אותה כשנעשה את הדף מתאים לטלפון.</td></tr>
+        <tr><td><code>&lt;title&gt;</code></td><td>הכותרת שמופיעה <strong>בלשונית</strong> של הדפדפן ובתוצאות החיפוש בגוגל.</td></tr>
+        <tr><td><code>&lt;body&gt;</code></td><td>"הגוף": כל מה שרואים על המסך נכתב כאן.</td></tr>
+      </table>
+
+      <div class="box tip">
+        <p><strong>הזחה (indentation):</strong> שימו לב שכל אלמנט שנמצא בתוך אלמנט אחר מוזז פנימה בשני רווחים. לדפדפן זה לא משנה, אבל לנו זה מאוד עוזר לראות מה נמצא בתוך מה. Prettier עושה את זה בשבילכם.</p>
+      </div>
+      <div class="box warn">
+        <p><strong>הערה על העורכים באתר:</strong> בעורכים החיים בעמוד הזה לא צריך לכתוב את השלד. כותבים רק את מה שבתוך <code>&lt;body&gt;</code>, והאתר מוסיף את השאר (כולל עברית ו-RTL). בקובץ אמיתי ב-VS Code, צריך תמיד שלד מלא.</p>
+      </div>
+
+      <h2 id="headings">כותרות: h1 עד h6</h2>
+      <p>יש שש רמות של כותרות. <code>h1</code> היא הכותרת הראשית, ו-<code>h6</code> הכי קטנה. ‏h הוא קיצור של heading (כותרת).</p>
+      <div class="playground" id="pg-headings" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <h1>כותרת ראשית (h1)</h1>
+          <h2>כותרת משנה (h2)</h2>
+          <h3>תת-כותרת (h3)</h3>
+          <h4>רמה 4</h4>
+          <h5>רמה 5</h5>
+          <h6>רמה 6</h6>
+        </script>
+      </div>
+      <h3>כללים לכותרות</h3>
+      <ul>
+        <li><strong>‏h1 אחד בכל דף.</strong> זה הנושא של הדף, כמו שם של ספר.</li>
+        <li><strong>לא מדלגים על רמות.</strong> אחרי <code>h2</code> בא <code>h3</code>, לא <code>h5</code>. הכותרות הן כמו תוכן עניינים: פרק (h2), תת-פרק (h3).</li>
+        <li><strong>לא בוחרים כותרת לפי הגודל.</strong> רוצים טקסט גדול? משנים את הגודל ב-CSS. בוחרים את רמת הכותרת לפי <em>החשיבות</em> שלה במבנה.</li>
+      </ul>
+      <p>למה זה חשוב? גוגל משתמש בכותרות כדי להבין על מה הדף. אנשים עיוורים שמשתמשים ב<strong>קורא מסך</strong> (תוכנה שמקריאה את הדף בקול) מדלגים בין כותרות כדי לנווט, כמו שאתם מעיפים מבט על הכותרות.</p>
+
+      <h2 id="text">טקסט: פסקאות, הדגשות ושורות</h2>
+      <h3>‏p: פסקה</h3>
+      <p>‏<code>p</code> (paragraph) היא התגית הבסיסית לטקסט. כל פסקה מתחילה בשורה חדשה, ויש רווח בינה לבין הפסקה הבאה.</p>
+      <div class="playground" id="pg-paragraphs" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <p>זו הפסקה הראשונה. היא יכולה להיות ארוכה מאוד, והדפדפן ישבור את השורות לבד כשהטקסט מגיע לקצה.</p>
+          <p>זו פסקה שנייה. שימו לב לרווח בין הפסקאות.</p>
+          <p>כאן     יש     הרבה     רווחים,
+          וגם ירידת שורה במקלדת. אבל בתוצאה הכול בשורה אחת!</p>
+        </script>
+      </div>
+      <div class="box warn">
+        <p><strong>הדפדפן מכווץ רווחים.</strong> כמה רווחים ברצף, או ירידת שורה ב-Enter, נהפכים לרווח <em>אחד</em>. זה מבלבל בהתחלה. כדי לרדת שורה משתמשים ב-<code>&lt;br&gt;</code> או מתחילים פסקה חדשה.</p>
+      </div>
+
+      <h3>‏br ו-hr</h3>
+      <ul>
+        <li><code>&lt;br&gt;</code> (break): ירידת שורה בתוך אותה פסקה. מתאים לשירים או לכתובות.</li>
+        <li><code>&lt;hr&gt;</code> (horizontal rule): קו אופקי שמפריד בין נושאים.</li>
+      </ul>
+      <div class="playground" id="pg-br-hr" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <p>
+            רחוב הרצל 10<br>
+            תל אביב<br>
+            ישראל
+          </p>
+          <hr>
+          <p>נושא חדש אחרי הקו.</p>
+        </script>
+      </div>
+
+      <h3>הדגשות בתוך הטקסט</h3>
+      <table>
+        <tr><th>תגית</th><th>משמעות</th><th>מראה ברירת מחדל</th></tr>
+        <tr><td><code>strong</code></td><td>חשוב מאוד</td><td><strong>מודגש</strong></td></tr>
+        <tr><td><code>em</code></td><td>דגש בהקראה (emphasis)</td><td><em>נטוי</em></td></tr>
+        <tr><td><code>mark</code></td><td>מסומן, כמו מרקר</td><td><mark>רקע צהוב</mark></td></tr>
+        <tr><td><code>small</code></td><td>הערת שוליים, אותיות קטנות</td><td><small>קטן</small></td></tr>
+      </table>
+      <div class="playground" id="pg-inline-text" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <p><strong>שימו לב:</strong> המבחן ביום ראשון.</p>
+          <p>אני <em>באמת</em> אוהב פיצה.</p>
+          <p>המילה <mark>החשובה</mark> מסומנת.</p>
+          <p><small>© כל הזכויות שמורות</small></p>
+        </script>
+      </div>
+      <p>יש גם <code>b</code> ו-<code>i</code>, שנראות בדיוק כמו <code>strong</code> ו-<code>em</code>. ההבדל הוא במשמעות: <code>strong</code> אומרת "זה חשוב" (וקורא מסך ידגיש את זה בקול), ו-<code>b</code> רק משנה את המראה. כדאי להעדיף את <code>strong</code> ו-<code>em</code>.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 כתבתם בקוד שתי שורות טקסט, אחת מתחת לשנייה, בתוך אותה <code>&lt;p&gt;</code>. מה יופיע בדפדפן?</p>
+        <ul>
+          <li>שתי שורות נפרדות</li>
+          <li data-correct>שורה אחת, עם רווח אחד במקום ירידת השורה</li>
+          <li>שגיאה</li>
+        </ul>
+        <p class="quiz-explain">נכון! הדפדפן מכווץ ירידות שורה ורווחים לרווח אחד. כדי לרדת שורה צריך <code>&lt;br&gt;</code> או פסקה חדשה.</p>
+      </div>
+
+      <h3>🏆 אתגר 1: כרטיס ביקור בטקסט</h3>
+      <div class="exercise">
+        <span class="level easy">קל</span>
+        <p>כתבו בעורך:</p>
+        <ol>
+          <li>כותרת <code>h1</code> עם השם שלכם</li>
+          <li>כותרת <code>h2</code> עם הכיתוב "קצת עליי"</li>
+          <li>פסקה אחת לפחות, ובתוכה מילה אחת מודגשת עם <code>strong</code></li>
+        </ol>
+        <p>לחצו "✓ בדיקה" כשסיימתם.</p>
+      </div>
+      <div class="playground challenge" id="ch-headings" data-check="ch-headings" data-height="200">
+        <script type="text/plain" data-lang="html">
+          <!-- כתבו כאן את הקוד שלכם -->
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <h1>דנה כהן</h1>
+          <h2>קצת עליי</h2>
+          <p>אני סטודנטית למדעי המחשב ואני <strong>אוהבת</strong> לבנות אתרים.</p>
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-headings': (doc) => {
+            const h2 = doc.querySelector('h2');
+            const p = doc.querySelector('p');
+            return [
+              [doc.querySelectorAll('h1').length === 1 && doc.querySelector('h1').textContent.trim(), 'צריך כותרת h1 אחת עם טקסט'],
+              [h2 && h2.textContent.includes('קצת עליי'), 'צריך כותרת h2 עם הכיתוב "קצת עליי"'],
+              [p && p.textContent.trim(), 'צריך לפחות פסקה אחת (p) עם טקסט'],
+              [doc.querySelector('p strong'), 'צריך מילה מודגשת עם strong בתוך הפסקה'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="links">קישורים: התגית a</h2>
+      <p>קישורים הם מה שהופך את הווב ל"רשת". התגית היא <code>a</code> (anchor, עוגן), והמאפיין <code>href</code> אומר לאן הקישור מוביל. הטקסט בין התגיות הוא מה שלוחצים עליו.</p>
+      <div class="playground" id="pg-links" data-height="180">
+        <script type="text/plain" data-lang="html">
+          <p><a href="https://www.wikipedia.org">לוויקיפדיה</a></p>
+          <p><a href="https://www.google.com" target="_blank" rel="noopener">גוגל בלשונית חדשה</a></p>
+          <p><a href="mailto:dana@example.com">שלחו לי מייל</a></p>
+          <p><a href="tel:+972501234567">התקשרו אליי</a></p>
+        </script>
+      </div>
+      <p><small>התוצאה בעורך החי רצה בסביבה מוגבלת, ולכן חלק מהקישורים לא ייפתחו בה (למשל לשונית חדשה). אם לחצתם על קישור והתוצאה השתנתה, שנו משהו קטן בקוד והיא תחזור. בקובץ אמיתי הקישורים יעבדו כרגיל.</small></p>
+
+      <h3>סוגי כתובות ב-href</h3>
+      <table>
+        <tr><th>סוג</th><th>דוגמה</th><th>מתי משתמשים</th></tr>
+        <tr><td>כתובת מלאה (מוחלטת)</td><td><code>https://github.com</code></td><td>קישור לאתר אחר</td></tr>
+        <tr><td>כתובת יחסית</td><td><code>about.html</code></td><td>קישור לדף אחר <strong>באותו אתר</strong></td></tr>
+        <tr><td>עוגן</td><td><code>#contact</code></td><td>קפיצה למקום בתוך אותו דף</td></tr>
+        <tr><td>מייל</td><td><code>mailto:me@mail.com</code></td><td>פותח את תוכנת המייל</td></tr>
+        <tr><td>טלפון</td><td><code>tel:+97250...</code></td><td>בטלפון: מתחיל שיחה</td></tr>
+      </table>
+
+      <h3>כתובות יחסיות לעומק</h3>
+      <p>כתובת יחסית מחושבת <strong>ביחס לתיקייה של הקובץ הנוכחי</strong>. נניח שזה מבנה הקבצים של האתר:</p>
+      <pre><code class="nohighlight">my-site/
+├── index.html
+├── about.html
+├── images/
+│   └── cat.jpg
+└── blog/
+    └── post1.html</code></pre>
+      <table>
+        <tr><th>מתוך הקובץ</th><th>רוצים להגיע אל</th><th>כותבים</th><th>הסבר</th></tr>
+        <tr><td><code>index.html</code></td><td><code>about.html</code></td><td><code>about.html</code></td><td>שניהם באותה תיקייה</td></tr>
+        <tr><td><code>index.html</code></td><td><code>post1.html</code></td><td><code>blog/post1.html</code></td><td>נכנסים לתיקייה blog</td></tr>
+        <tr><td><code>index.html</code></td><td><code>cat.jpg</code></td><td><code>images/cat.jpg</code></td><td>נכנסים לתיקייה images</td></tr>
+        <tr><td><code>blog/post1.html</code></td><td><code>index.html</code></td><td><code>../index.html</code></td><td><code>..</code> פירושו "תיקייה אחת למעלה"</td></tr>
+        <tr><td><code>blog/post1.html</code></td><td><code>cat.jpg</code></td><td><code>../images/cat.jpg</code></td><td>למעלה, ואז לתוך images</td></tr>
+      </table>
+      <div class="box warn">
+        <p><strong>טעויות נפוצות:</strong> (1) כתובת מהמחשב שלכם, כמו <code>C:\Users\dana\cat.jpg</code>. היא תעבוד אצלכם ותישבר אצל כל השאר. משתמשים רק בכתובות יחסיות. (2) אותיות גדולות וקטנות: <code>Cat.jpg</code> ו-<code>cat.jpg</code> הם קבצים <em>שונים</em> בשרת. כדאי לתת לקבצים שמות באנגלית, באותיות קטנות, בלי רווחים (<code>my-cat.jpg</code>).</p>
+      </div>
+
+      <h3>קפיצה בתוך הדף עם id</h3>
+      <p>נותנים לאלמנט מאפיין <code>id</code>, שם ייחודי בדף, ומקשרים אליו עם <code>#</code>. ככה עובד תוכן העניינים בצד העמוד הזה.</p>
+      <pre><code class="language-html">&lt;a href="#contact"&gt;ליצירת קשר&lt;/a&gt;
+...
+&lt;h2 id="contact"&gt;יצירת קשר&lt;/h2&gt;</code></pre>
+
+      <h3>‏target ו-rel</h3>
+      <p>‏<code>target="_blank"</code> פותח את הקישור בלשונית חדשה. משתמשים בזה בקישורים לאתרים אחרים, כדי שהגולש לא יעזוב את האתר שלכם. כשמשתמשים ב-<code>_blank</code> מוסיפים גם <code>rel="noopener"</code>, מטעמי אבטחה: זה מונע מהדף החדש לשלוט בלשונית שלכם.</p>
+      <div class="box tip">
+        <p><strong>טקסט טוב לקישור:</strong> "לחצו כאן" הוא טקסט גרוע. קורא מסך מקריא רשימה של כל הקישורים בדף, ו"לחצו כאן" חמש פעמים לא אומר כלום. עדיף: "לתקנון הקורס".</p>
+      </div>
+
+      <h2 id="images">תמונות: התגית img</h2>
+      <p>‏<code>img</code> היא תגית ריקה (בלי סגירה) עם שני מאפיינים חובה:</p>
+      <ul>
+        <li><code>src</code> (source): הכתובת של קובץ התמונה, מלאה או יחסית, בדיוק כמו ב-href.</li>
+        <li><code>alt</code> (alternative): תיאור מילולי של התמונה.</li>
+      </ul>
+      <div class="playground" id="pg-images" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <h3>הכלב שלי</h3>
+          <img src="https://picsum.photos/id/237/300/200" alt="גור כלבים שחור מביט למצלמה">
+
+          <h3>תמונה שבורה</h3>
+          <img src="no-such-file.jpg" alt="כאן הייתה אמורה להיות תמונה">
+        </script>
+      </div>
+      <p>שימו לב לתמונה השנייה: הקובץ לא קיים, ולכן הדפדפן מציג במקומה את טקסט ה-alt.</p>
+
+      <h3>למה alt כל כך חשוב?</h3>
+      <ul>
+        <li><strong>נגישות:</strong> קורא מסך מקריא את ה-alt לאנשים שלא רואים את התמונה.</li>
+        <li><strong>תמונה שלא נטענה:</strong> רשת איטית או כתובת שגויה. ה-alt מופיע במקום.</li>
+        <li><strong>גוגל:</strong> ככה מנועי חיפוש מבינים מה בתמונה.</li>
+      </ul>
+      <table>
+        <tr><th>‏alt גרוע</th><th>‏alt טוב</th></tr>
+        <tr><td><code>alt="תמונה"</code></td><td><code>alt="גור כלבים שחור מביט למצלמה"</code></td></tr>
+        <tr><td><code>alt="IMG_2041.jpg"</code></td><td><code>alt="הצוות שלנו בכנס 2026"</code></td></tr>
+        <tr><td>בלי alt בכלל</td><td>תמונה קישוטית בלבד (קו, צורה)? ‏<code>alt=""</code> ריק, כדי שקורא המסך ידלג עליה</td></tr>
+      </table>
+
+      <h3>גודל התמונה</h3>
+      <p>אפשר לקבוע גודל עם המאפיינים <code>width</code> ו-<code>height</code> (בפיקסלים, בלי "px"): <code>&lt;img src="cat.jpg" alt="חתול" width="150"&gt;</code>. אם נותנים רק אחד, השני מחושב לפי הפרופורציות. בדרך כלל נקבע את הגודל ב-CSS.</p>
+      <div class="box tip">
+        <p><strong>תמונה שהיא קישור:</strong> שמים את <code>img</code> בתוך <code>a</code>: <code>&lt;a href="gallery.html"&gt;&lt;img src="cat.jpg" alt="לגלריה"&gt;&lt;/a&gt;</code>.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>כתובות יחסיות הן המקור מספר אחת לתקלות בשבועות הראשונים ("התמונה לא מופיעה"). כדאי לצייר על הלוח את עץ התיקיות מהדוגמה ולשאול את הכיתה מה כותבים בכל מקרה, במיוחד את <code>../</code>. אחרי ההעלאה ל-Netlify צצה תקלת האותיות הגדולות והקטנות, כי Windows ו-Mac לא מבחינים בהן ושרתים כן.</p>
+      </aside>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 הקובץ <code>blog/post1.html</code> רוצה להציג את <code>images/cat.jpg</code> (שתי התיקיות נמצאות בתיקייה הראשית). מה כותבים ב-src?</p>
+        <ul>
+          <li><code>images/cat.jpg</code></li>
+          <li data-correct><code>../images/cat.jpg</code></li>
+          <li><code>blog/images/cat.jpg</code></li>
+          <li><code>C:/my-site/images/cat.jpg</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! מתוך blog עולים תיקייה אחת עם <code>..</code>, ואז נכנסים ל-images.</p>
+      </div>
+
+      <h3>🏆 אתגר 2: קישור ותמונה</h3>
+      <div class="exercise">
+        <span class="level easy">קל</span>
+        <ol>
+          <li>הוסיפו קישור ל-<code>https://github.com</code> עם הטקסט "הפרופיל שלי ב-GitHub", שנפתח <strong>בלשונית חדשה</strong> (ואל תשכחו את <code>rel</code>).</li>
+          <li>הוסיפו תמונה מהכתובת <code>https://picsum.photos/id/1025/300/200</code> עם <code>alt</code> שמתאר אותה (יש בה כלב עטוף בשמיכה). ה-alt צריך להיות לפחות 5 תווים.</li>
+        </ol>
+      </div>
+      <div class="playground challenge" id="ch-link" data-check="ch-link" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <h2>הקישורים שלי</h2>
+          <!-- הקישור כאן -->
+
+          <!-- התמונה כאן -->
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <h2>הקישורים שלי</h2>
+          <p><a href="https://github.com" target="_blank" rel="noopener">הפרופיל שלי ב-GitHub</a></p>
+
+          <img src="https://picsum.photos/id/1025/300/200" alt="כלב קטן עטוף בשמיכה">
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-link': (doc) => {
+            const a = doc.querySelector('a[href*="github.com"]');
+            const img = doc.querySelector('img');
+            return [
+              [a, 'צריך קישור (a) עם href לכתובת https://github.com'],
+              [a && a.textContent.includes('GitHub'), 'הטקסט של הקישור צריך להיות "הפרופיל שלי ב-GitHub"'],
+              [a && a.getAttribute('target') === '_blank', 'כדי לפתוח בלשונית חדשה צריך target="_blank"'],
+              [a && (a.getAttribute('rel') || '').includes('noopener'), 'עם target="_blank" מוסיפים גם rel="noopener"'],
+              [img && (img.getAttribute('src') || '').includes('picsum.photos/id/1025'), 'צריך תמונה (img) עם src מהכתובת שבהוראות'],
+              [img && (img.getAttribute('alt') || '').trim().length >= 5, 'לתמונה צריך alt שמתאר אותה (לפחות 5 תווים)'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="lists">רשימות</h2>
+      <p>יש שני סוגים עיקריים של רשימות. בשניהם כל פריט נכתב בתגית <code>li</code> (list item), והפריטים עטופים בתגית של הרשימה.</p>
+      <table>
+        <tr><th>תגית</th><th>שם</th><th>מתי משתמשים</th></tr>
+        <tr><td><code>ul</code></td><td>unordered list, רשימה לא ממוספרת</td><td>כשהסדר לא חשוב: רשימת קניות, תחביבים</td></tr>
+        <tr><td><code>ol</code></td><td>ordered list, רשימה ממוספרת</td><td>כשהסדר חשוב: שלבי מתכון, הוראות, דירוג</td></tr>
+      </table>
+      <div class="playground" id="pg-lists" data-height="320">
+        <script type="text/plain" data-lang="html">
+          <h3>רשימת קניות</h3>
+          <ul>
+            <li>חלב</li>
+            <li>לחם</li>
+            <li>ביצים</li>
+          </ul>
+
+          <h3>איך מכינים תה</h3>
+          <ol>
+            <li>מרתיחים מים</li>
+            <li>שמים שקית תה בכוס</li>
+            <li>מוזגים את המים ומחכים 3 דקות</li>
+          </ol>
+        </script>
+      </div>
+      <p>נסו: החליפו את <code>ul</code> ב-<code>ol</code> (בפתיחה ובסגירה) ותראו שהנקודות נהפכות למספרים.</p>
+
+      <h3>רשימה בתוך רשימה</h3>
+      <p>אפשר לקנן רשימה בתוך פריט של רשימה אחרת. שימו לב: הרשימה הפנימית נמצאת <strong>בתוך ה-li</strong>, לפני שהוא נסגר.</p>
+      <div class="playground" id="pg-nested-list" data-height="240">
+        <script type="text/plain" data-lang="html">
+          <ul>
+            <li>פירות
+              <ul>
+                <li>תפוח</li>
+                <li>בננה</li>
+              </ul>
+            </li>
+            <li>ירקות
+              <ul>
+                <li>מלפפון</li>
+                <li>עגבנייה</li>
+              </ul>
+            </li>
+          </ul>
+        </script>
+      </div>
+
+      <h3>מאפיינים שימושיים ל-ol</h3>
+      <ul>
+        <li><code>&lt;ol start="5"&gt;</code>: מתחילים למספר מ-5.</li>
+        <li><code>&lt;ol reversed&gt;</code>: ספירה לאחור (מתאים ל"10 הסרטים הכי טובים").</li>
+        <li><code>&lt;ol type="a"&gt;</code>: אותיות במקום מספרים.</li>
+      </ul>
+      <div class="box warn">
+        <p><strong>טעות נפוצה:</strong> לשים טקסט או תגית אחרת ישירות בתוך <code>ul</code>. בתוך <code>ul</code> ו-<code>ol</code> מותר לשים <strong>רק</strong> <code>li</code>. כל השאר נכנס לתוך ה-li.</p>
+      </div>
+      <div class="box tip">
+        <p>רשימות משמשות להרבה יותר מנקודות: כמעט כל תפריט ניווט באתרים בנוי כ-<code>ul</code> של קישורים. ב-CSS מעלימים את הנקודות ומסדרים את הפריטים בשורה.</p>
+      </div>
+
+      <h3>🏆 אתגר 3: רשימת תחביבים</h3>
+      <div class="exercise">
+        <span class="level easy">קל</span>
+        <p>צרו כותרת <code>h2</code> "התחביבים שלי", ומתחתיה רשימה <strong>לא ממוספרת</strong> עם לפחות 3 תחביבים. אחר כך כותרת <code>h2</code> "היעדים שלי לקורס" ומתחתיה רשימה <strong>ממוספרת</strong> עם לפחות 2 יעדים.</p>
+      </div>
+      <div class="playground challenge" id="ch-list" data-check="ch-list" data-height="320">
+        <script type="text/plain" data-lang="html">
+          <h2>התחביבים שלי</h2>
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <h2>התחביבים שלי</h2>
+          <ul>
+            <li>כדורסל</li>
+            <li>בישול</li>
+            <li>צילום</li>
+          </ul>
+
+          <h2>היעדים שלי לקורס</h2>
+          <ol>
+            <li>לבנות אתר אישי</li>
+            <li>להבין React</li>
+          </ol>
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-list': (doc) => {
+            const filled = (list) => list ? [...list.children].filter((li) => li.tagName === 'LI' && li.textContent.trim()).length : 0;
+            const ul = doc.querySelector('ul');
+            const ol = doc.querySelector('ol');
+            const titles = [...doc.querySelectorAll('h2')].map((h) => h.textContent);
+            return [
+              [ul, 'צריך רשימה לא ממוספרת (ul)'],
+              [filled(ul) >= 3, 'ברשימת התחביבים צריכים להיות לפחות 3 פריטים (li) עם טקסט'],
+              [titles.some((t) => t.includes('היעדים')), 'צריך כותרת h2 "היעדים שלי לקורס"'],
+              [ol, 'צריך רשימה ממוספרת (ol)'],
+              [filled(ol) >= 2, 'ברשימת היעדים צריכים להיות לפחות 2 פריטים (li) עם טקסט'],
+            ];
+          },
+        });
+      </script>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 איזו רשימה הכי מתאימה לשלבי התקנה של תוכנה?</p>
+        <ul>
+          <li><code>ul</code>, כי זו רשימה</li>
+          <li data-correct><code>ol</code>, כי הסדר חשוב</li>
+          <li>כמה פסקאות <code>p</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! בשלבים הסדר חשוב, ולכן רשימה ממוספרת. ‏<code>ul</code> מתאימה כשאפשר להחליף את סדר הפריטים בלי לשנות את המשמעות.</p>
+      </div>
+
+      <h2 id="div-span">‏div ו-span: קופסאות בלי משמעות</h2>
+      <p>כל התגיות שראינו עד עכשיו אומרות משהו: <code>h1</code> היא כותרת, <code>p</code> היא פסקה, <code>a</code> הוא קישור. לפעמים צריך פשוט <strong>קופסה</strong> שתעטוף כמה דברים, כדי לעצב אותם ביחד או לסדר אותם במקום. בשביל זה יש שתי תגיות שאין להן שום משמעות משלהן:</p>
+      <ul>
+        <li><code>div</code> (division, חלוקה): קופסה גדולה, שתופסת שורה שלמה.</li>
+        <li><code>span</code>: קופסה קטנה, בתוך שורת טקסט.</li>
+      </ul>
+      <p>ההבדל ביניהן הוא ההבדל החשוב ביותר ב-HTML: <strong>block</strong> מול <strong>inline</strong>.</p>
+
+      <table>
+        <tr><th></th><th>אלמנט block (בלוק)</th><th>אלמנט inline (בתוך השורה)</th></tr>
+        <tr><td>איפה מתחיל</td><td>תמיד בשורה חדשה</td><td>ממשיך באותה שורה, כמו מילה בטקסט</td></tr>
+        <tr><td>רוחב</td><td>כל הרוחב שיש</td><td>רק כמה שהתוכן צריך</td></tr>
+        <tr><td>דוגמאות</td><td><code>div</code>, <code>p</code>, <code>h1</code>–<code>h6</code>, <code>ul</code>, <code>li</code></td><td><code>span</code>, <code>a</code>, <code>strong</code>, <code>em</code>, <code>img</code></td></tr>
+      </table>
+
+      <p>בדוגמה הבאה הוספנו קצת CSS (בלשונית CSS של העורך) שמצייר מסגרת סביב כל div ו-span, כדי שתראו איפה כל אחד מתחיל ונגמר. את ה-CSS עצמו נלמד בחלק הבא. בינתיים רק תסתכלו על התוצאה:</p>
+      <div class="playground" id="pg-div-span" data-height="320">
+        <script type="text/plain" data-lang="html">
+          <div>אני div ראשון</div>
+          <div>אני div שני. גם אם אני קצר, אני תופס שורה שלמה.</div>
+
+          <p>
+            זו פסקה, ובתוכה <span>span אחד</span> ועוד <span>span שני</span>.
+            הם נשארים בתוך השורה.
+          </p>
+
+          <div>
+            div יכול לעטוף דברים אחרים:
+            <h3>כותרת</h3>
+            <p>ופסקה</p>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          div {
+            border: 2px solid #7c3aed;
+            background: #f3e8ff;
+            margin: 6px 0;
+            padding: 4px;
+          }
+          span {
+            border: 2px solid #ea580c;
+            background: #ffedd5;
+          }
+        </script>
+      </div>
+      <p>נסו: החליפו את אחד ה-<code>div</code> ב-<code>span</code> ותראו שהוא "נדבק" לשורה ומתכווץ לגודל הטקסט.</p>
+
+      <h3>אז מתי משתמשים בהם?</h3>
+      <ul>
+        <li><strong>‏div</strong>: כדי לקבץ כמה אלמנטים ביחד, למשל כרטיס של מוצר (תמונה + כותרת + מחיר), כשאין תגית סמנטית שמתאימה יותר.</li>
+        <li><strong>‏span</strong>: כדי לתפוס חלק מטקסט ולעצב רק אותו, למשל מחיר באדום בתוך משפט.</li>
+      </ul>
+      <p>כדי לעצב אותם נותנים להם מאפיין <code>class</code>, שם שבחרנו, ואז ב-CSS אומרים "כל מה שה-class שלו card ייראה כך":</p>
+      <div class="playground" id="pg-div-class" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <div class="card">
+            <h3>אוזניות אלחוטיות</h3>
+            <p>מחיר: <span class="price">199 ₪</span></p>
+          </div>
+          <div class="card">
+            <h3>מקלדת מכנית</h3>
+            <p>מחיר: <span class="price">349 ₪</span></p>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="css">
+          .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px 16px;
+            margin-bottom: 12px;
+          }
+          .price {
+            color: crimson;
+            font-weight: bold;
+          }
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>‏class לעומת id:</strong> ‏<code>class</code> אפשר לתת לכמה אלמנטים (כל הכרטיסים הם <code>card</code>), ולאלמנט אחד יכולים להיות כמה classes: <code>class="card featured"</code>. ‏<code>id</code> חייב להיות <strong>ייחודי</strong> בדף, ומשתמשים בו בעיקר לקישורי עוגן (<code>#contact</code>).</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 רוצים לצבוע באדום מילה אחת בתוך פסקה. באיזו תגית לעטוף אותה?</p>
+        <ul>
+          <li><code>div</code></li>
+          <li data-correct><code>span</code></li>
+          <li><code>p</code></li>
+          <li><code>h1</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>span</code> הוא inline, ולכן המילה תישאר בתוך השורה. ‏<code>div</code> היה שובר את השורה ומעביר את המילה לשורה משלה.</p>
+      </div>
+
+      <h2 id="semantic">תגיות סמנטיות</h2>
+      <p>"סמנטי" פירושו "בעל משמעות". אפשר לבנות דף שלם רק מ-<code>div</code>ים, והוא ייראה בדיוק אותו דבר. אבל ב-HTML5 יש תגיות שעובדות כמו div, ו<strong>גם אומרות מה התפקיד</strong> של כל חלק בדף:</p>
+      <table>
+        <tr><th>תגית</th><th>תפקיד</th></tr>
+        <tr><td><code>header</code></td><td>החלק העליון: לוגו, שם האתר, לפעמים תפריט</td></tr>
+        <tr><td><code>nav</code></td><td>תפריט ניווט: קבוצה של קישורים עיקריים</td></tr>
+        <tr><td><code>main</code></td><td>התוכן העיקרי של הדף. פעם אחת בלבד בדף</td></tr>
+        <tr><td><code>section</code></td><td>אזור בדף עם נושא משלו, בדרך כלל עם כותרת</td></tr>
+        <tr><td><code>article</code></td><td>תוכן שעומד בפני עצמו: פוסט, כתבה, כרטיס מוצר</td></tr>
+        <tr><td><code>aside</code></td><td>תוכן צדדי: סרגל צד, "כתבות קשורות"</td></tr>
+        <tr><td><code>footer</code></td><td>החלק התחתון: זכויות יוצרים, פרטי קשר</td></tr>
+      </table>
+
+      <h3>"מרק div" מול HTML סמנטי</h3>
+      <p>שני הקודים הבאים נראים אותו דבר בדפדפן. איזה מהם קל יותר להבין?</p>
+      <div class="features">
+        <div>
+          <p><strong>❌ מרק div</strong></p>
+          <pre><code class="language-html">&lt;div class="top"&gt;
+  &lt;div class="menu"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="content"&gt;
+  &lt;div class="post"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="bottom"&gt;...&lt;/div&gt;</code></pre>
+        </div>
+        <div>
+          <p><strong>✅ סמנטי</strong></p>
+          <pre><code class="language-html">&lt;header&gt;
+  &lt;nav&gt;...&lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;article&gt;...&lt;/article&gt;
+&lt;/main&gt;
+&lt;footer&gt;...&lt;/footer&gt;</code></pre>
+        </div>
+      </div>
+      <p>למה זה שווה את המאמץ?</p>
+      <ul>
+        <li><strong>קריאוּת:</strong> מי שקורא את הקוד (כולל אתם בעוד חודש) מבין מיד מה כל חלק.</li>
+        <li><strong>נגישות:</strong> קורא מסך מאפשר לקפוץ ישר ל-<code>main</code> או ל-<code>nav</code>.</li>
+        <li><strong>גוגל:</strong> מבין טוב יותר מה התוכן החשוב בדף.</li>
+      </ul>
+
+      <p>הנה דף שלם עם מבנה סמנטי. גם כאן יש CSS שמסמן כל אזור, כדי שתראו את המבנה:</p>
+      <div class="playground wide" id="pg-semantic" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <header>
+            <h1>הבלוג של דנה</h1>
+            <nav>
+              <a href="#">בית</a> |
+              <a href="#">פוסטים</a> |
+              <a href="#">אודות</a>
+            </nav>
+          </header>
+
+          <main>
+            <article>
+              <h2>איך התחלתי לתכנת</h2>
+              <p>הכול התחיל בקורס פיתוח ווב...</p>
+            </article>
+            <article>
+              <h2>5 טיפים ל-VS Code</h2>
+              <p>הטיפ הראשון: Emmet.</p>
+            </article>
+          </main>
+
+          <aside>
+            <h3>על הכותבת</h3>
+            <p>סטודנטית שאוהבת קפה וקוד.</p>
+          </aside>
+
+          <footer>
+            <small>© 2026 דנה כהן</small>
+          </footer>
+        </script>
+        <script type="text/plain" data-lang="css">
+          header, nav, main, article, aside, footer {
+            border: 2px dashed #94a3b8;
+            padding: 6px 10px;
+            margin: 6px 0;
+            position: relative;
+          }
+          /* מציג את שם התגית בפינה של כל אזור */
+          header::before { content: "header"; }
+          nav::before { content: "nav"; }
+          main::before { content: "main"; }
+          article::before { content: "article"; }
+          aside::before { content: "aside"; }
+          footer::before { content: "footer"; }
+          header::before, nav::before, main::before,
+          article::before, aside::before, footer::before {
+            position: absolute; top: 0; left: 4px;
+            font: 11px monospace; color: #7c3aed;
+          }
+        </script>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך בוחרים?</strong> שואלים: "יש תגית שמתארת את התפקיד של החלק הזה?" אם כן, משתמשים בה. אם לא, ורק צריך קופסה לעיצוב, משתמשים ב-<code>div</code>. ‏div הוא לא "אסור", הוא פשוט ברירת המחדל האחרונה.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>זה הרגע לחבר בין HTML לבין React: בשיעור 4 כל קומפוננטה תחזיר בדיוק עץ כזה של אלמנטים. כדאי לבקש מהכיתה לפתוח אתר חדשות ולזהות בכלי המפתחים (לשונית Elements) את ה-header, ה-nav וה-footer. ברוב האתרים יימצא גם "מרק div", וזו הזדמנות טובה לדיון.</p>
+      </aside>
+
+      <h3>🏆 אתגר 4: מ-div לסמנטי</h3>
+      <div class="exercise">
+        <span class="level medium">בינוני</span>
+        <p>הקוד בעורך בנוי כולו מ-<code>div</code>ים. החליפו כל div בתגית הסמנטית שמתאימה לו (ה-class של כל div רומז על התפקיד), כך שבסוף יהיו בדף <code>header</code>, ‏<code>nav</code>, ‏<code>main</code>, שני <code>article</code> ו-<code>footer</code>, ולא יישאר אף <code>div</code>. אפשר למחוק את ה-classes.</p>
+      </div>
+      <div class="playground challenge" id="ch-semantic" data-check="ch-semantic" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <div class="header">
+            <h1>מתכונים של סבתא</h1>
+            <div class="nav">
+              <a href="#">עוגות</a> | <a href="#">מרקים</a>
+            </div>
+          </div>
+          <div class="main">
+            <div class="article">
+              <h2>עוגת שוקולד</h2>
+              <p>העוגה הכי טעימה בעולם.</p>
+            </div>
+            <div class="article">
+              <h2>מרק עוף</h2>
+              <p>מושלם לחורף.</p>
+            </div>
+          </div>
+          <div class="footer">
+            <small>© סבתא רחל</small>
+          </div>
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <header>
+            <h1>מתכונים של סבתא</h1>
+            <nav>
+              <a href="#">עוגות</a> | <a href="#">מרקים</a>
+            </nav>
+          </header>
+          <main>
+            <article>
+              <h2>עוגת שוקולד</h2>
+              <p>העוגה הכי טעימה בעולם.</p>
+            </article>
+            <article>
+              <h2>מרק עוף</h2>
+              <p>מושלם לחורף.</p>
+            </article>
+          </main>
+          <footer>
+            <small>© סבתא רחל</small>
+          </footer>
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-semantic': (doc) => [
+            [doc.querySelector('header h1'), 'הכותרת h1 צריכה להיות בתוך header'],
+            [doc.querySelector('header nav a, nav a'), 'הקישורים צריכים להיות בתוך nav'],
+            [doc.querySelectorAll('main').length === 1, 'צריך main אחד שעוטף את התוכן העיקרי'],
+            [doc.querySelectorAll('main article').length === 2, 'כל מתכון צריך להיות article, בתוך main'],
+            [doc.querySelector('footer'), 'החלק התחתון צריך להיות footer'],
+            [!doc.querySelector('div'), 'נשארו עוד div בדף. החליפו את כולם (וזכרו לשנות גם את תגית הסגירה)'],
+          ],
+        });
+      </script>
+
+      <h2 id="tables">טבלאות</h2>
+      <p>טבלאות מיועדות ל<strong>נתונים בטבלה</strong>: מערכת שעות, מחירון, תוצאות. בנייה של טבלה נעשית שורה אחרי שורה:</p>
+      <table>
+        <tr><th>תגית</th><th>מה היא</th></tr>
+        <tr><td><code>table</code></td><td>עוטפת את כל הטבלה</td></tr>
+        <tr><td><code>tr</code></td><td>table row: שורה</td></tr>
+        <tr><td><code>th</code></td><td>table header: תא כותרת (מודגש וממורכז)</td></tr>
+        <tr><td><code>td</code></td><td>table data: תא רגיל</td></tr>
+        <tr><td><code>thead</code>, <code>tbody</code></td><td>מחלקים את הטבלה לראש ולגוף. לא חובה, אבל מומלץ</td></tr>
+        <tr><td><code>caption</code></td><td>כותרת לטבלה כולה</td></tr>
+      </table>
+      <div class="playground" id="pg-table" data-height="320">
+        <script type="text/plain" data-lang="html">
+          <table>
+            <caption>מערכת שעות</caption>
+            <thead>
+              <tr>
+                <th>שעה</th>
+                <th>ראשון</th>
+                <th>שני</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>08:30</td>
+                <td>פיתוח ווב</td>
+                <td>מתמטיקה</td>
+              </tr>
+              <tr>
+                <td>10:30</td>
+                <td>אנגלית</td>
+                <td>פיתוח ווב</td>
+              </tr>
+            </tbody>
+          </table>
+        </script>
+        <script type="text/plain" data-lang="css">
+          /* בלי CSS לטבלה אין קווים בכלל. נסו למחוק את זה */
+          table { border-collapse: collapse; }
+          th, td { border: 1px solid #999; padding: 6px 12px; }
+          th { background: #eef2ff; }
+        </script>
+      </div>
+      <p>נסו להוסיף שורה שלישית לשעה 12:30. העתיקו <code>&lt;tr&gt;</code> שלם עם כל ה-<code>td</code> שבתוכו.</p>
+
+      <h3>מיזוג תאים</h3>
+      <p>‏<code>colspan="2"</code> גורם לתא להתפרס על פני שתי עמודות, ו-<code>rowspan="2"</code> על פני שתי שורות. למשל: <code>&lt;td colspan="2"&gt;יום ספורט&lt;/td&gt;</code>.</p>
+      <div class="box warn">
+        <p><strong>לא משתמשים בטבלאות לעימוד.</strong> פעם (לפני 20 שנה) בנו דפים שלמים מטבלאות כדי לסדר דברים בעמודות. היום עושים את זה עם CSS (‏Flexbox ו-Grid). טבלה מיועדת רק לנתונים שבאמת יש להם שורות ועמודות.</p>
+      </div>
+
+      <h2 id="forms">טפסים</h2>
+      <p>טפסים הם הדרך של הגולש <strong>לשלוח מידע</strong>: הרשמה, התחברות, חיפוש, יצירת קשר. בשלב הזה נלמד לבנות את הטופס. מה עושים עם המידע שנשלח נלמד ב-JavaScript ובשיעורי React.</p>
+
+      <h3>אבני הבניין</h3>
+      <table>
+        <tr><th>תגית</th><th>תפקיד</th></tr>
+        <tr><td><code>form</code></td><td>עוטפת את כל הטופס</td></tr>
+        <tr><td><code>label</code></td><td>התווית: הטקסט שמסביר מה למלא בשדה</td></tr>
+        <tr><td><code>input</code></td><td>שדה קלט. תגית ריקה. הסוג נקבע במאפיין <code>type</code></td></tr>
+        <tr><td><code>textarea</code></td><td>שדה טקסט ארוך, עם כמה שורות</td></tr>
+        <tr><td><code>select</code> + <code>option</code></td><td>רשימה נפתחת</td></tr>
+        <tr><td><code>button</code></td><td>כפתור</td></tr>
+      </table>
+
+      <h3>‏label: למה זה כל כך חשוב</h3>
+      <p>לכל שדה צריכה להיות תווית. מחברים בין השניים כך: נותנים לשדה <code>id</code>, ול-label מאפיין <code>for</code> עם <strong>אותו ערך בדיוק</strong>.</p>
+      <div class="playground" id="pg-label" data-height="160">
+        <script type="text/plain" data-lang="html">
+          <label for="username">שם משתמש:</label>
+          <input type="text" id="username" name="username">
+
+          <p>נסו ללחוץ על המילים "שם משתמש". הסמן קופץ לשדה!</p>
+        </script>
+      </div>
+      <p>החיבור הזה עושה שני דברים: לחיצה על התווית מעבירה את הסמן לשדה (נוח מאוד בטלפון, כשהשדות קטנים), וקורא מסך מקריא "שם משתמש" כשנכנסים לשדה. בלי label, משתמש עיוור לא יודע מה למלא.</p>
+      <p>המאפיין <code>name</code> הוא השם שבו המידע יישלח לשרת. ‏<code>id</code> מיועד ל-label, ו-<code>name</code> מיועד לשליחה. לרוב נותנים לשניהם אותו ערך.</p>
+
+      <h3>סוגים של input</h3>
+      <p>אותה תגית <code>input</code> נראית ומתנהגת אחרת לפי ה-<code>type</code>. בטלפון, סוגים כמו email ו-tel גם פותחים מקלדת מתאימה.</p>
+      <div class="playground wide" id="pg-input-types" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <p><label for="t1">text:</label> <input type="text" id="t1" placeholder="טקסט חופשי"></p>
+          <p><label for="t2">email:</label> <input type="email" id="t2" placeholder="name@mail.com"></p>
+          <p><label for="t3">password:</label> <input type="password" id="t3" value="secret"></p>
+          <p><label for="t4">number:</label> <input type="number" id="t4" min="1" max="10"></p>
+          <p><label for="t5">date:</label> <input type="date" id="t5"></p>
+          <p><label for="t6">color:</label> <input type="color" id="t6" value="#7c3aed"></p>
+          <p><label for="t7">range:</label> <input type="range" id="t7" min="0" max="100"></p>
+          <p><input type="checkbox" id="t8"> <label for="t8">checkbox: אני מסכים לתנאים</label></p>
+        </script>
+      </div>
+      <p>‏<code>placeholder</code> הוא טקסט אפור שמופיע בשדה ריק, כרמז. הוא <strong>לא</strong> תחליף ל-label, כי הוא נעלם ברגע שמתחילים להקליד.</p>
+
+      <h3>כפתורי בחירה (radio)</h3>
+      <p>כפתורי radio מאפשרים לבחור <strong>אפשרות אחת בלבד</strong> מתוך קבוצה. מה שהופך אותם לקבוצה הוא <strong>אותו <code>name</code></strong>. נסו למחוק את ה-name מאחד מהם ותראו שאפשר לבחור את שניהם.</p>
+      <div class="playground" id="pg-radio" data-height="180">
+        <script type="text/plain" data-lang="html">
+          <p>באיזו שעה נוח לכם?</p>
+          <input type="radio" id="morning" name="time" value="morning">
+          <label for="morning">בוקר</label>
+
+          <input type="radio" id="evening" name="time" value="evening">
+          <label for="evening">ערב</label>
+        </script>
+      </div>
+
+      <h3>טופס שלם</h3>
+      <div class="playground wide" id="pg-form" data-height="460">
+        <script type="text/plain" data-lang="html">
+          <form>
+            <p>
+              <label for="name">שם מלא</label><br>
+              <input type="text" id="name" name="name" required>
+            </p>
+            <p>
+              <label for="email">אימייל</label><br>
+              <input type="email" id="email" name="email" required>
+            </p>
+            <p>
+              <label for="topic">נושא הפנייה</label><br>
+              <select id="topic" name="topic">
+                <option value="question">שאלה</option>
+                <option value="bug">דיווח על תקלה</option>
+                <option value="other">אחר</option>
+              </select>
+            </p>
+            <p>
+              <label for="message">הודעה</label><br>
+              <textarea id="message" name="message" rows="4"></textarea>
+            </p>
+            <button type="submit">שליחה</button>
+          </form>
+        </script>
+        <script type="text/plain" data-lang="css">
+          input, select, textarea { width: 260px; padding: 4px; font: inherit; }
+          input:invalid { border-color: crimson; }
+        </script>
+      </div>
+      <ul>
+        <li><code>required</code>: השדה חובה. הדפדפן לא ישלח את הטופס אם הוא ריק, ויציג הודעה. בקובץ אמיתי נסו ללחוץ "שליחה" עם שדות ריקים.</li>
+        <li><code>type="email"</code> בודק גם שהערך נראה כמו כתובת מייל (יש בו @).</li>
+        <li><code>&lt;button type="submit"&gt;</code> שולח את הטופס. ‏<code>type="button"</code> יוצר כפתור שלא שולח כלום (נשתמש בו עם JavaScript).</li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p>בכיתה אפשר לדלג על טבלאות ועל רוב הטפסים ולהשאיר אותם ללימוד עצמי. שווה רק להדגים את הקשר בין <code>label for</code> ל-<code>id</code> (הלחיצה על התווית תמיד מפתיעה סטודנטים), ואת <code>name</code> המשותף ב-radio. בשיעור 6 נחזור לטפסים עם React.</p>
+      </aside>
+
+      <h3>🏆 אתגר 5: טופס הרשמה</h3>
+      <div class="exercise">
+        <span class="level medium">בינוני</span>
+        <p>בנו טופס הרשמה לסדנה, בתוך <code>form</code>, עם:</p>
+        <ol>
+          <li>שדה טקסט לשם, ושדה <code>email</code> לאימייל. שניהם <code>required</code>.</li>
+          <li>שני כפתורי <code>radio</code> לבחירת מסלול ("בוקר" ו"ערב") עם אותו <code>name</code>.</li>
+          <li>לכל שדה (כולל כל radio) תהיה <code>label</code> שמחוברת אליו עם <code>for</code> ו-<code>id</code>.</li>
+          <li>כפתור שליחה.</li>
+        </ol>
+      </div>
+      <div class="playground challenge wide" id="ch-form" data-check="ch-form" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <h2>הרשמה לסדנה</h2>
+          <form>
+            <!-- כתבו כאן את השדות -->
+          </form>
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <h2>הרשמה לסדנה</h2>
+          <form>
+            <p>
+              <label for="name">שם</label>
+              <input type="text" id="name" name="name" required>
+            </p>
+            <p>
+              <label for="email">אימייל</label>
+              <input type="email" id="email" name="email" required>
+            </p>
+            <p>
+              מסלול:
+              <input type="radio" id="track-morning" name="track" value="morning">
+              <label for="track-morning">בוקר</label>
+              <input type="radio" id="track-evening" name="track" value="evening">
+              <label for="track-evening">ערב</label>
+            </p>
+            <button type="submit">הרשמה</button>
+          </form>
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-form': (doc) => {
+            const form = doc.querySelector('form');
+            const q = (sel) => (form ? [...form.querySelectorAll(sel)] : []);
+            const text = q('input[type="text"]')[0];
+            const email = q('input[type="email"]')[0];
+            const radios = q('input[type="radio"]');
+            const labelled = (input) => input && input.id && doc.querySelector(`label[for="${input.id}"]`);
+            const fields = [text, email, ...radios].filter(Boolean);
+            const submit = q('button').find((b) => (b.getAttribute('type') || 'submit') === 'submit') || q('input[type="submit"]')[0];
+            return [
+              [form, 'כל השדות צריכים להיות בתוך form'],
+              [text && text.required, 'צריך שדה טקסט (type="text") לשם, עם required'],
+              [email && email.required, 'צריך שדה email לאימייל, עם required'],
+              [radios.length >= 2, 'צריך לפחות שני כפתורי radio'],
+              [radios.length >= 2 && radios.every((r) => r.name && r.name === radios[0].name), 'לכל כפתורי ה-radio צריך להיות אותו name'],
+              [fields.length >= 4 && fields.every(labelled), 'לכל שדה צריך label עם for שזהה ל-id של השדה'],
+              [submit, 'צריך כפתור שליחה (button)'],
+            ];
+          },
+        });
+      </script>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 יש שלושה כפתורי radio, ואפשר לסמן את שלושתם ביחד. מה כנראה הבעיה?</p>
+        <ul>
+          <li>חסר להם label</li>
+          <li data-correct>יש להם name שונה (או שאין להם name)</li>
+          <li>חסר required</li>
+          <li>צריך להחליף אותם ב-checkbox</li>
+        </ul>
+        <p class="quiz-explain">נכון! כפתורי radio עם אותו <code>name</code> הם קבוצה אחת, ובקבוצה אפשר לבחור רק אחד.</p>
+      </div>
+
+      <h2 id="a11y">נגישות: צ׳קליסט</h2>
+      <p><strong>נגישות (Accessibility, בקיצור a11y)</strong> פירושה שכל אחד יכול להשתמש באתר: אנשים עיוורים עם קורא מסך, אנשים שמנווטים רק במקלדת, אנשים עם ראייה חלשה. בישראל זו גם <strong>חובה בחוק</strong> לרוב האתרים. החדשות הטובות: רוב הנגישות מגיעה בחינם, אם כותבים HTML נכון.</p>
+      <ul>
+        <li>☐ ‏<code>&lt;html lang="he" dir="rtl"&gt;</code>, כדי שקורא המסך ידבר עברית.</li>
+        <li>☐ ‏<code>h1</code> אחד, וכותרות לפי הסדר בלי לדלג על רמות.</li>
+        <li>☐ לכל <code>img</code> יש <code>alt</code> שמתאר אותה (או <code>alt=""</code> לתמונה קישוטית).</li>
+        <li>☐ לכל שדה בטופס יש <code>label</code> מחוברת.</li>
+        <li>☐ טקסט של קישור אומר לאן הוא מוביל (לא "לחצו כאן").</li>
+        <li>☐ משתמשים בתגיות סמנטיות: <code>header</code>, ‏<code>nav</code>, ‏<code>main</code>, ‏<code>footer</code>.</li>
+        <li>☐ כפתור הוא <code>button</code> וקישור הוא <code>a</code>, ולא <code>div</code> שעושה את עצמו כפתור.</li>
+      </ul>
+      <div class="box tip">
+        <p><strong>נסו בעצמכם:</strong> פתחו את הדף שלכם ונסו להשתמש בו רק עם המקלדת: <kbd>Tab</kbd> עובר לאלמנט הבא, <kbd>Enter</kbd> לוחץ. אם אפשר להגיע לכל קישור ולכל שדה, אתם בכיוון הנכון. ב-Chrome יש גם בדיקה אוטומטית: כלי המפתחים ← לשונית <strong>Lighthouse</strong> ← Accessibility.</p>
+      </div>
+
+      <h2 id="glossary">מילון תגיות</h2>
+      <p>כל התגיות שלמדנו בעמוד הזה, במקום אחד. כדאי לחזור לכאן כשאתם כותבים את הפרויקט.</p>
+      <table>
+        <tr><th>תגית</th><th>מה היא</th><th>סוג</th></tr>
+        <tr><td><code>h1</code>–<code>h6</code></td><td>כותרות, מהחשובה לפחות חשובה</td><td>block</td></tr>
+        <tr><td><code>p</code></td><td>פסקה</td><td>block</td></tr>
+        <tr><td><code>br</code></td><td>ירידת שורה (ריקה)</td><td>inline</td></tr>
+        <tr><td><code>hr</code></td><td>קו מפריד (ריקה)</td><td>block</td></tr>
+        <tr><td><code>strong</code>, <code>em</code></td><td>חשוב, דגש</td><td>inline</td></tr>
+        <tr><td><code>mark</code>, <code>small</code></td><td>מסומן, הערת שוליים</td><td>inline</td></tr>
+        <tr><td><code>a</code></td><td>קישור (<code>href</code>, <code>target</code>, <code>rel</code>)</td><td>inline</td></tr>
+        <tr><td><code>img</code></td><td>תמונה (<code>src</code>, <code>alt</code>), ריקה</td><td>inline</td></tr>
+        <tr><td><code>ul</code>, <code>ol</code>, <code>li</code></td><td>רשימה לא ממוספרת, ממוספרת, פריט</td><td>block</td></tr>
+        <tr><td><code>div</code></td><td>קופסה כללית</td><td>block</td></tr>
+        <tr><td><code>span</code></td><td>קופסה כללית בתוך טקסט</td><td>inline</td></tr>
+        <tr><td><code>header</code>, <code>nav</code>, <code>main</code>, <code>section</code>, <code>article</code>, <code>aside</code>, <code>footer</code></td><td>תגיות סמנטיות למבנה הדף</td><td>block</td></tr>
+        <tr><td><code>table</code>, <code>tr</code>, <code>th</code>, <code>td</code></td><td>טבלה, שורה, תא כותרת, תא</td><td>טבלה</td></tr>
+        <tr><td><code>form</code>, <code>label</code>, <code>input</code>, <code>textarea</code>, <code>select</code>, <code>option</code>, <code>button</code></td><td>טפסים</td><td>‏form הוא block, השאר inline</td></tr>
+      </table>
+
+      <h2 id="practice">תרגול מסכם</h2>
+      <h3>🏆 אתגר 6: דף מתכון</h3>
+      <div class="exercise">
+        <span class="level hard">מאתגר</span>
+        <p>בנו דף מתכון שלם, עם כל מה שלמדנו. הדרישות:</p>
+        <ol>
+          <li>‏<code>header</code> ובו <code>h1</code> עם שם המתכון.</li>
+          <li>‏<code>main</code> ובו:
+            <ul>
+              <li>תמונה עם <code>alt</code> (אפשר להשתמש ב-<code>https://picsum.photos/id/292/400/250</code>)</li>
+              <li>כותרת <code>h2</code> "מצרכים" ורשימה <strong>לא ממוספרת</strong> עם לפחות 4 מצרכים</li>
+              <li>כותרת <code>h2</code> "אופן ההכנה" ורשימה <strong>ממוספרת</strong> עם לפחות 3 שלבים</li>
+              <li>טבלה קטנה עם שורת כותרת (<code>th</code>) ולפחות שורת נתונים אחת (למשל זמן הכנה ומספר מנות)</li>
+            </ul>
+          </li>
+          <li>‏<code>footer</code> ובו קישור למקור המתכון.</li>
+        </ol>
+      </div>
+      <div class="playground challenge wide" id="ch-recipe" data-check="ch-recipe" data-height="460">
+        <script type="text/plain" data-lang="html">
+          <!-- דף המתכון שלכם -->
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <header>
+            <h1>שקשוקה</h1>
+          </header>
+
+          <main>
+            <img src="https://picsum.photos/id/292/400/250" alt="מחבת עם ירקות טריים">
+
+            <h2>מצרכים</h2>
+            <ul>
+              <li>4 ביצים</li>
+              <li>5 עגבניות</li>
+              <li>פלפל אדום</li>
+              <li>שן שום</li>
+            </ul>
+
+            <h2>אופן ההכנה</h2>
+            <ol>
+              <li>מטגנים את הפלפל והשום</li>
+              <li>מוסיפים עגבניות ומבשלים 15 דקות</li>
+              <li>שוברים את הביצים פנימה ומכסים</li>
+            </ol>
+
+            <table>
+              <tr><th>זמן הכנה</th><th>מנות</th></tr>
+              <tr><td>30 דקות</td><td>4</td></tr>
+            </table>
+          </main>
+
+          <footer>
+            <a href="https://example.com/shakshuka">למקור המתכון</a>
+          </footer>
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-recipe': (doc) => {
+            const items = (sel) => { const list = doc.querySelector(sel); return list ? list.querySelectorAll('li').length : 0; };
+            const titles = [...doc.querySelectorAll('main h2')].map((h) => h.textContent);
+            const img = doc.querySelector('main img');
+            return [
+              [doc.querySelector('header h1'), 'צריך header ובתוכו h1 עם שם המתכון'],
+              [doc.querySelector('main'), 'צריך main שעוטף את התוכן'],
+              [img && (img.getAttribute('alt') || '').trim(), 'צריך תמונה בתוך main, עם alt'],
+              [titles.some((t) => t.includes('מצרכים')), 'צריך כותרת h2 "מצרכים" בתוך main'],
+              [items('main ul') >= 4, 'צריך רשימה לא ממוספרת (ul) עם לפחות 4 מצרכים'],
+              [titles.some((t) => t.includes('אופן ההכנה')), 'צריך כותרת h2 "אופן ההכנה" בתוך main'],
+              [items('main ol') >= 3, 'צריך רשימה ממוספרת (ol) עם לפחות 3 שלבים'],
+              [doc.querySelector('main table th') && doc.querySelector('main table td'), 'צריך טבלה עם תא כותרת (th) ותא נתונים (td)'],
+              [doc.querySelector('footer a[href]'), 'צריך footer ובו קישור למקור'],
+            ];
+          },
+        });
+      </script>
+
+      <div class="exercise">
+        <span class="level medium">בינוני</span>
+        <h4>תרגיל בית: עמוד "אודות" ב-VS Code</h4>
+        <p>צרו בתיקייה חדשה שני קבצים: <code>index.html</code> ו-<code>about.html</code>, עם שלד מלא. בכל אחד מהם שימו <code>nav</code> עם קישורים יחסיים לשני הדפים, כך שאפשר לעבור ביניהם. פתחו עם Live Server ובדקו שהקישורים עובדים.</p>
+        <details class="solution">
+          <summary>הצגת פתרון</summary>
+          <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="he" dir="rtl"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;אודות&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;header&gt;
+      &lt;nav&gt;
+        &lt;a href="index.html"&gt;בית&lt;/a&gt; |
+        &lt;a href="about.html"&gt;אודות&lt;/a&gt;
+      &lt;/nav&gt;
+    &lt;/header&gt;
+    &lt;main&gt;
+      &lt;h1&gt;אודות&lt;/h1&gt;
+      &lt;p&gt;כאן כותבים קצת על עצמכם.&lt;/p&gt;
+    &lt;/main&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          <p>ב-<code>index.html</code> אותו דבר, רק עם כותרת ותוכן אחרים. שני הקבצים באותה תיקייה, ולכן הכתובת היא רק שם הקובץ.</p>
+        </details>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>אתגר 6 מתאים כתרגול עצמי בסוף השיעור או בבית. מי שמסיים מהר יכול לקבל משימה נוספת: להעביר את המתכון לקובץ ב-VS Code עם שלד מלא. בפרויקט של השיעור (דף הפרופיל) הסטודנטים ישתמשו בכל התגיות האלה שוב, הפעם עם עיצוב.</p>
+      </aside>
+
+      <h2 id="summary">סיכום</h2>
+      <div class="box goals">
+        <ul>
+          <li>הדפדפן מבקש קבצים מהשרת ב-HTTP ומציג אותם. ‏HTML הוא התוכן, CSS העיצוב, JavaScript ההתנהגות.</li>
+          <li>אלמנט = תגית פתיחה + תוכן + תגית סגירה. מאפיינים נותנים מידע נוסף: <code>href</code>, ‏<code>src</code>, ‏<code>alt</code>.</li>
+          <li>כל דף מתחיל בשלד: DOCTYPE, ‏<code>html lang dir</code>, ‏<code>head</code> עם charset ו-title, ו-<code>body</code>.</li>
+          <li>אלמנטי block מתחילים שורה חדשה (<code>div</code>, ‏<code>p</code>), ואלמנטי inline נשארים בשורה (<code>span</code>, ‏<code>a</code>).</li>
+          <li>בוחרים תגית לפי <strong>המשמעות</strong>, לא לפי המראה. את המראה קובעים ב-CSS.</li>
+          <li>‏HTML נכון הוא HTML נגיש: alt, ‏label, כותרות מסודרות ותגיות סמנטיות.</li>
+        </ul>
+      </div>
+      <p>בחלק הבא נלמד <a href="css.html">לעצב את כל זה עם CSS</a>.</p>
+
+      <h3>מקורות להעמקה</h3>
+      <ul>
+        <li><a href="https://developer.mozilla.org/he/docs/Learn/HTML" target="_blank" rel="noopener">MDN: לימוד HTML</a>: התיעוד הכי טוב ברשת. חלק מהדפים מתורגמים לעברית.</li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element" target="_blank" rel="noopener">MDN: רשימת כל תגיות ה-HTML</a></li>
+        <li><a href="https://www.w3schools.com/html/" target="_blank" rel="noopener">W3Schools HTML</a>: הסברים קצרים עם "Try it Yourself".</li>
+        <li><a href="https://web.dev/learn/html" target="_blank" rel="noopener">web.dev: Learn HTML</a> של גוגל.</li>
+      </ul>
+
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

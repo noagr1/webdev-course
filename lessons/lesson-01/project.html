@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 1 · פרויקט: דף פרופיל ותרגול מסכם</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body data-page="lesson" data-lesson="1" data-part="project" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 1 · פרויקט</span>
+      <h1>דף פרופיל אישי: מאפס ועד לאוויר</h1>
+      <div class="lesson-meta">
+        <span class="chip">HTML</span>
+        <span class="chip">CSS</span>
+        <span class="chip">Flexbox</span>
+        <span class="chip">Git</span>
+        <span class="chip">Netlify</span>
+      </div>
+
+      <p>בעמוד הזה נחבר את כל מה שלמדנו בשיעור לפרויקט אחד: דף פרופיל אישי שנראה טוב במחשב ובטלפון, שמור ב-GitHub ומפורסם באינטרנט. נבנה אותו בשלבים. בכל שלב יש עורך חי עם כל הקוד עד אותו שלב, כך שאפשר לראות בדיוק מה כל תוספת עושה.</p>
+      <p><a class="btn" href="../../examples/lesson-01/profile/index.html" target="_blank">👀 לצפייה בתוצאה הסופית</a></p>
+
+      <div class="box goals">
+        <h3>מה נתרגל כאן</h3>
+        <ul>
+          <li>לתכנן דף לפני שכותבים קוד</li>
+          <li>לבנות מבנה HTML סמנטי</li>
+          <li>לעצב בשכבות: בסיס, סרגל ניווט, תוכן, ובסוף התאמה לטלפון</li>
+          <li>להעביר את הקוד ל-VS Code, לשמור ב-Git ולפרסם</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>בכיתה מספיק להציג את התוצאה הסופית ואת שלבי העבודה (5–10 דק׳), ולתת את הפרויקט כשיעורי בית. סטודנטים שמסיימים מוקדם יכולים להתחיל כבר בשיעור. מחוון לבדיקה מופיע בסוף העמוד, בהערת מרצה.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="plan">שלב 0: מתכננים לפני שכותבים</h2>
+      <p>מפתחים מנוסים לא מתחילים מהקוד. הם מתחילים מ<strong>סקיצה</strong>. קחו דף ועט וציירו קופסאות: מה יש בדף, ומה נמצא ליד מה?</p>
+      <div class="flow" dir="rtl" style="flex-direction: column; align-items: stretch; max-width: 420px;">
+        <div class="node">header: שם (לוגו) ‏+ ‏nav עם 3 קישורים<small>בשורה אחת, בשני הצדדים</small></div>
+        <div class="node">section ‏"עליי": עיגול עם ראשי תיבות + כותרת וטקסט<small>זה לצד זה</small></div>
+        <div class="node">section ‏"מה אני לומדת": שלושה כרטיסים<small>בשורה, ועוברים שורה כשאין מקום</small></div>
+        <div class="node">section ‏"צרו קשר": טקסט עם קישור למייל</div>
+        <div class="node">footer: זכויות יוצרים</div>
+      </div>
+      <p>כל קופסה בסקיצה תהפוך לתגית HTML. כל מקום שבו כתוב "זה לצד זה" או "בשורה" יהפוך ל-<code>display: flex</code>.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="step-html">שלב 1: המבנה ב-HTML</h2>
+      <p>מתרגמים את הסקיצה לתגיות סמנטיות. לכל <code>section</code> יש <code>id</code>, כדי שהקישורים בתפריט יוכלו לקפוץ אליו (ראו "קישורים פנימיים" בחלק א׳). את ה-<code>class</code>-ים מוסיפים כבר עכשיו, כי בהם נשתמש ב-CSS.</p>
+      <p>שימו לב שבתוצאה אין עדיין שום עיצוב. ככה נראה HTML "ערום":</p>
+
+      <div class="playground" id="pg-step1" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <header class="site-header">
+            <span class="logo">דנה כהן</span>
+            <nav>
+              <a href="#about">עליי</a>
+              <a href="#skills">מה אני לומדת</a>
+              <a href="#contact">צרו קשר</a>
+            </nav>
+          </header>
+
+          <main>
+            <section class="hero" id="about">
+              <div class="avatar">דכ</div>
+              <div>
+                <h1>שלום, אני דנה 👋</h1>
+                <p>סטודנטית למדעי המחשב שלומדת לבנות אתרים מודרניים.</p>
+              </div>
+            </section>
+
+            <section id="skills">
+              <h2>מה אני לומדת</h2>
+              <div class="cards">
+                <article class="card">
+                  <h3>HTML</h3>
+                  <p>המבנה של הדף</p>
+                </article>
+                <article class="card">
+                  <h3>CSS</h3>
+                  <p>עיצוב ופריסה</p>
+                </article>
+                <article class="card">
+                  <h3>React</h3>
+                  <p>בקרוב...</p>
+                </article>
+              </div>
+            </section>
+
+            <section id="contact">
+              <h2>צרו קשר</h2>
+              <p>אפשר לכתוב לי ל-<a href="mailto:dana@example.com">dana@example.com</a></p>
+            </section>
+          </main>
+
+          <footer>© 2026 דנה כהן</footer>
+        </script>
+      </div>
+
+      <div class="box tip">
+        <p><strong>נסו:</strong> החליפו את "דנה כהן" בשם שלכם ואת הטקסט בטקסט עליכם. מעכשיו זה הדף שלכם.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">למה כל כרטיס עטוף ב-<code>&lt;article&gt;</code> ולא ב-<code>&lt;div&gt;</code>?</p>
+        <ul>
+          <li>כי <code>article</code> מעוצב אוטומטית ככרטיס</li>
+          <li data-correct>כי כל כרטיס הוא יחידת תוכן שעומדת בפני עצמה, ו-<code>article</code> מתאר את המשמעות הזו</li>
+          <li>כי אסור לשים <code>h3</code> בתוך <code>div</code></li>
+        </ul>
+        <p class="quiz-explain"><code>article</code> לא מוסיף שום עיצוב. הוא אומר לדפדפן, לקוראי מסך ולמפתחים אחרים "זו יחידה שלמה". את המראה של הכרטיס נקבע ב-CSS.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-base">שלב 2: עיצוב בסיס</h2>
+      <p>מתחילים מהכללים שחלים על כל הדף:</p>
+      <ul>
+        <li><strong>משתני צבע</strong> ב-<code>:root</code>, כדי שאפשר יהיה לשנות את צבעי הדף במקום אחד.</li>
+        <li><strong>איפוס</strong>: <code>box-sizing: border-box</code>, ו-<code>margin: 0</code> שמבטל את המרווחים שהדפדפן מוסיף לבד.</li>
+        <li><strong>גופן, צבע רקע וגובה שורה</strong> על ה-<code>body</code>. הילדים יורשים אותם.</li>
+        <li><strong>רוחב מקסימלי</strong> ל-<code>main</code>, ו-<code>margin: 0 auto</code> שממרכז אותו. בלי זה, במסך רחב שורות הטקסט נמתחות ולא נוח לקרוא.</li>
+      </ul>
+      <p>עברו ללשונית <strong>CSS</strong> בעורך כדי לראות את הקוד:</p>
+
+      <div class="playground" id="pg-step2" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <header class="site-header">
+            <span class="logo">דנה כהן</span>
+            <nav>
+              <a href="#about">עליי</a>
+              <a href="#skills">מה אני לומדת</a>
+              <a href="#contact">צרו קשר</a>
+            </nav>
+          </header>
+
+          <main>
+            <section class="hero" id="about">
+              <div class="avatar">דכ</div>
+              <div>
+                <h1>שלום, אני דנה 👋</h1>
+                <p>סטודנטית למדעי המחשב שלומדת לבנות אתרים מודרניים.</p>
+              </div>
+            </section>
+
+            <section id="skills">
+              <h2>מה אני לומדת</h2>
+              <div class="cards">
+                <article class="card"><h3>HTML</h3><p>המבנה של הדף</p></article>
+                <article class="card"><h3>CSS</h3><p>עיצוב ופריסה</p></article>
+                <article class="card"><h3>React</h3><p>בקרוב...</p></article>
+              </div>
+            </section>
+
+            <section id="contact">
+              <h2>צרו קשר</h2>
+              <p>אפשר לכתוב לי ל-<a href="mailto:dana@example.com">dana@example.com</a></p>
+            </section>
+          </main>
+
+          <footer>© 2026 דנה כהן</footer>
+        </script>
+        <script type="text/plain" data-lang="css">
+          :root {
+            --primary: #4f46e5;
+            --bg: #f8fafc;
+            --text: #1e293b;
+          }
+
+          * {
+            box-sizing: border-box;
+            margin: 0;
+          }
+
+          body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+          }
+
+          main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+          }
+
+          section {
+            margin-bottom: 3rem;
+          }
+
+          h2 {
+            margin-bottom: 1rem;
+          }
+        </script>
+      </div>
+
+      <div class="box tip">
+        <p><strong>נסו:</strong> שנו את <code>--bg</code> ל-<code>#fef3c7</code> ואת <code>--text</code> ל-<code>#7c2d12</code>. כל הדף משתנה, אבל נגעתם רק בשתי שורות. זה הכוח של משתני CSS.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-nav">שלב 3: סרגל הניווט</h2>
+      <p>בסקיצה כתבנו "בשורה אחת, בשני הצדדים". בשפת Flexbox זה:</p>
+      <ul>
+        <li><code>display: flex</code> על ה-<code>header</code>: הלוגו וה-<code>nav</code> עומדים בשורה.</li>
+        <li><code>justify-content: space-between</code>: הראשון (הלוגו) נדחף לימין, והאחרון (התפריט) לשמאל. זה דף בעברית, אז השורה מתחילה מימין.</li>
+        <li><code>align-items: center</code>: שניהם ממורכזים לגובה.</li>
+        <li>גם ה-<code>nav</code> עצמו הוא flex, עם <code>gap</code> שיוצר רווח קבוע בין הקישורים.</li>
+      </ul>
+
+      <div class="playground" id="pg-step3" data-height="360">
+        <script type="text/plain" data-lang="html">
+          <header class="site-header">
+            <span class="logo">דנה כהן</span>
+            <nav>
+              <a href="#about">עליי</a>
+              <a href="#skills">מה אני לומדת</a>
+              <a href="#contact">צרו קשר</a>
+            </nav>
+          </header>
+
+          <main>
+            <section class="hero" id="about">
+              <div class="avatar">דכ</div>
+              <div>
+                <h1>שלום, אני דנה 👋</h1>
+                <p>סטודנטית למדעי המחשב שלומדת לבנות אתרים מודרניים.</p>
+              </div>
+            </section>
+          </main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          :root {
+            --primary: #4f46e5;
+            --bg: #f8fafc;
+            --text: #1e293b;
+          }
+
+          * { box-sizing: border-box; margin: 0; }
+
+          body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+          }
+
+          main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+          /* ---- חדש בשלב הזה ---- */
+          .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            box-shadow: 0 1px 4px rgb(0 0 0 / 0.08);
+          }
+
+          .logo {
+            font-weight: 700;
+            color: var(--primary);
+          }
+
+          nav {
+            display: flex;
+            gap: 1.5rem;
+          }
+
+          nav a {
+            color: var(--text);
+            text-decoration: none;
+          }
+
+          nav a:hover {
+            color: var(--primary);
+          }
+        </script>
+      </div>
+
+      <div class="box tip">
+        <p><strong>נסו:</strong> מחקו את השורה <code>justify-content: space-between;</code> ותראו שהכול נצמד לימין. אחר כך החזירו אותה. עברו עם העכבר מעל הקישורים כדי לראות את ה-<code>:hover</code>.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-content">שלב 4: אזור הפתיחה והכרטיסים</h2>
+      <p>שלושה טריקים בשלב הזה:</p>
+      <ol>
+        <li><strong>עיגול:</strong> רוחב וגובה שווים ו-<code>border-radius: 50%</code>. כדי שראשי התיבות יעמדו בדיוק באמצע, גם העיגול הוא קופסת flex עם <code>justify-content: center</code> ו-<code>align-items: center</code>. זה המתכון הקלאסי למרכוז.</li>
+        <li><strong><code>flex-shrink: 0</code></strong>: בלי זה, כשאין מספיק מקום, Flexbox מכווץ את העיגול והוא נהיה אליפסה.</li>
+        <li><strong>כרטיסים שעוברים שורה:</strong> <code>flex-wrap: wrap</code> על המיכל, ו-<code>flex: 1 1 200px</code> על כל כרטיס. המשמעות: "רוחב בסיס של 200px, ומותר לגדול ולהתכווץ". כשאין מקום לשלושה כרטיסים של 200px, האחרון יורד שורה, והכרטיסים בכל שורה גדלים וממלאים את הרוחב.</li>
+      </ol>
+
+      <div class="playground" id="pg-step4" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <main>
+            <section class="hero" id="about">
+              <div class="avatar">דכ</div>
+              <div>
+                <h1>שלום, אני דנה 👋</h1>
+                <p>סטודנטית למדעי המחשב שלומדת לבנות אתרים מודרניים.</p>
+              </div>
+            </section>
+
+            <section id="skills">
+              <h2>מה אני לומדת</h2>
+              <div class="cards">
+                <article class="card"><h3>HTML</h3><p>המבנה של הדף</p></article>
+                <article class="card"><h3>CSS</h3><p>עיצוב ופריסה</p></article>
+                <article class="card"><h3>React</h3><p>בקרוב...</p></article>
+              </div>
+            </section>
+          </main>
+
+          <footer>© 2026 דנה כהן</footer>
+        </script>
+        <script type="text/plain" data-lang="css">
+          :root {
+            --primary: #4f46e5;
+            --bg: #f8fafc;
+            --text: #1e293b;
+          }
+
+          * { box-sizing: border-box; margin: 0; }
+
+          body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+          }
+
+          main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+          section { margin-bottom: 3rem; }
+          h2 { margin-bottom: 1rem; }
+
+          /* ---- חדש בשלב הזה ---- */
+          .hero {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+          }
+
+          .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+          }
+
+          .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+          }
+
+          .card {
+            flex: 1 1 200px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+          }
+
+          footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+          }
+        </script>
+      </div>
+
+      <div class="box tip">
+        <p><strong>נסו:</strong> לחצו "⤢ הרחבה" כדי שהתוצאה תתפרס על כל הרוחב, ותראו את שלושת הכרטיסים בשורה אחת. לחצו שוב, והתוצאה תחזור לחלון הצר: הכרטיסים עוברים שורה. אחר כך מחקו את <code>flex-wrap: wrap</code> ובדקו מה קורה בחלון הצר.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-responsive">שלב 5: התאמה לטלפון</h2>
+      <p>במסך צר אין מקום ללוגו ולתפריט באותה שורה, ולא לעיגול ולטקסט זה לצד זה. בעזרת media query הופכים אותם לעמודה, ורק במסכים ברוחב של עד 600px:</p>
+
+      <div class="playground" id="pg-step5" data-height="420">
+        <script type="text/plain" data-lang="html">
+          <header class="site-header">
+            <span class="logo">דנה כהן</span>
+            <nav>
+              <a href="#about">עליי</a>
+              <a href="#skills">מה אני לומדת</a>
+              <a href="#contact">צרו קשר</a>
+            </nav>
+          </header>
+
+          <main>
+            <section class="hero" id="about">
+              <div class="avatar">דכ</div>
+              <div>
+                <h1>שלום, אני דנה 👋</h1>
+                <p>סטודנטית למדעי המחשב שלומדת לבנות אתרים מודרניים.</p>
+              </div>
+            </section>
+          </main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          :root { --primary: #4f46e5; --bg: #f8fafc; --text: #1e293b; }
+          * { box-sizing: border-box; margin: 0; }
+          body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+          main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+          .site-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; box-shadow: 0 1px 4px rgb(0 0 0 / 0.08); }
+          .logo { font-weight: 700; color: var(--primary); }
+          nav { display: flex; gap: 1.5rem; }
+          nav a { color: var(--text); text-decoration: none; }
+
+          .hero { display: flex; align-items: center; gap: 2rem; }
+          .avatar { width: 120px; height: 120px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: 700; flex-shrink: 0; }
+
+          /* ---- חדש בשלב הזה ---- */
+          @media (max-width: 600px) {
+            .site-header {
+              flex-direction: column;
+              gap: 0.5rem;
+            }
+
+            .hero {
+              flex-direction: column;
+              text-align: center;
+            }
+          }
+        </script>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך בודקים?</strong> במצב הרגיל חלון התוצאה צר, בערך כמו טלפון, ורואים את הגרסה בעמודה. לחצו "⤢ הרחבה" והתוצאה תתרחב לגרסת מחשב. בדפדפן אמיתי בודקים עם כלי המפתחים: F12, ואז Ctrl+Shift+M (ב-Mac: ‏Cmd+Shift+M).</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-vscode">שלב 6: מעבירים ל-VS Code</h2>
+      <p>העורך באתר נועד לניסויים. פרויקט אמיתי נמצא בקבצים במחשב. כך מעבירים את הדף:</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>יוצרים תיקייה ופותחים אותה ב-VS Code</h4>
+          <pre class="terminal"><code class="nohighlight">$ mkdir profile
+$ cd profile
+$ code .</code></pre>
+          <p>אם הפקודה <code>code</code> לא מוכרת, פתחו את VS Code ובחרו בתפריט <strong>File ← Open Folder</strong>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>יוצרים <code>index.html</code></h4>
+          <p>מקלידים <code>!</code> ולוחצים Tab כדי לקבל שלד. משנים ל-<code>lang="he" dir="rtl"</code>, מוסיפים בתוך ה-<code>head</code> את השורה שמחברת את ה-CSS, ומדביקים את ה-HTML מהעורך לתוך ה-<code>body</code>:</p>
+          <p class="file-name">index.html</p>
+          <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="he" dir="rtl"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;דנה כהן | פרופיל&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- כאן מדביקים את ה-HTML מהעורך: header, main, footer --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>יוצרים <code>style.css</code></h4>
+          <p>מדביקים לתוכו את כל ה-CSS: הבסיס משלב 2, ואחריו התוספות משלבים 3, 4 ו-5. הקובץ המלא נמצא <a href="../../examples/lesson-01/profile/style.css" target="_blank">כאן</a>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>פותחים עם Live Server</h4>
+          <p>לוחצים בכפתור הימני על <code>index.html</code> ובוחרים <strong>Open with Live Server</strong>. אם הדף מופיע בלי עיצוב, כמעט תמיד הבעיה היא ששם הקובץ ב-<code>href</code> של ה-<code>link</code> לא תואם בדיוק לשם הקובץ, או שהקובץ לא שמור באותה תיקייה.</p>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-publish">שלב 7: שומרים ב-Git ומפרסמים</h2>
+      <p>עכשיו משתמשים במה שלמדנו ב<a href="git.html">חלק ג׳</a>. מומלץ לעשות commit אחרי כל שלב. ככה ההיסטוריה מספרת את סיפור הבנייה:</p>
+      <pre class="terminal"><code class="nohighlight">$ git init
+$ git add index.html
+$ git commit -m "Add page structure"
+$ git add style.css
+$ git commit -m "Add base styles, navbar and cards"
+# אחרי שמוסיפים את ה-media query:
+$ git add .
+$ git commit -m "Make page responsive"
+# יוצרים repo ריק ב-GitHub בשם profile, ואז:
+$ git branch -M main
+$ git remote add origin https://github.com/USERNAME/profile.git
+$ git push -u origin main</code></pre>
+      <p>לסיום מחברים את ה-repo ל-Netlify, לפי ההוראות ב<a href="git.html">חלק ג׳</a>. מקבלים כתובת כמו <code>https://dana-profile.netlify.app</code>, ומעכשיו כל <code>git push</code> מעדכן את האתר.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="challenges">אתגרים</h2>
+      <p>כל האתגרים מתחילים מהדף המוכן. כתבו את הקוד ולחצו "✓ בדיקה".</p>
+
+      <h3>אתגר 1: אזור תחביבים <span class="level easy">קל</span></h3>
+      <p>הוסיפו לדף:</p>
+      <ol>
+        <li>‏<code>section</code> עם <code>id="hobbies"</code> וכותרת <code>h2</code></li>
+        <li>בתוכו רשימה (<code>ul</code>) של <strong>לפחות 3</strong> תחביבים</li>
+        <li>בתוכו גם תמונה (<code>img</code>) עם <code>alt</code> שמתאר אותה. אפשר להשתמש ב-<code>https://picsum.photos/id/1015/400/200</code></li>
+        <li>קישור בתפריט ה-<code>nav</code> שקופץ לאזור החדש</li>
+      </ol>
+      <div class="playground challenge" id="ch-hobbies" data-check="ch-hobbies" data-height="380">
+        <script type="text/plain" data-lang="html">
+          <header class="site-header">
+            <span class="logo">דנה כהן</span>
+            <nav>
+              <a href="#about">עליי</a>
+              <a href="#contact">צרו קשר</a>
+            </nav>
+          </header>
+
+          <main>
+            <section class="hero" id="about">
+              <div class="avatar">דכ</div>
+              <div>
+                <h1>שלום, אני דנה 👋</h1>
+                <p>סטודנטית למדעי המחשב.</p>
+              </div>
+            </section>
+
+            <!-- הוסיפו כאן את אזור התחביבים -->
+
+            <section id="contact">
+              <h2>צרו קשר</h2>
+              <p>dana@example.com</p>
+            </section>
+          </main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          :root { --primary: #4f46e5; }
+          * { box-sizing: border-box; margin: 0; }
+          body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.6; }
+          main { padding: 1.5rem; }
+          section { margin-bottom: 2rem; }
+          .site-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; box-shadow: 0 1px 4px rgb(0 0 0 / 0.08); }
+          .logo { font-weight: 700; color: var(--primary); }
+          nav { display: flex; gap: 1rem; }
+          .hero { display: flex; align-items: center; gap: 1rem; }
+          .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; font-weight: 700; flex-shrink: 0; }
+          img { max-width: 100%; border-radius: 8px; }
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <header class="site-header">
+            <span class="logo">דנה כהן</span>
+            <nav>
+              <a href="#about">עליי</a>
+              <a href="#hobbies">תחביבים</a>
+              <a href="#contact">צרו קשר</a>
+            </nav>
+          </header>
+
+          <main>
+            <section class="hero" id="about">
+              <div class="avatar">דכ</div>
+              <div>
+                <h1>שלום, אני דנה 👋</h1>
+                <p>סטודנטית למדעי המחשב.</p>
+              </div>
+            </section>
+
+            <section id="hobbies">
+              <h2>תחביבים</h2>
+              <ul>
+                <li>טיולים</li>
+                <li>צילום</li>
+                <li>בישול</li>
+              </ul>
+              <img src="https://picsum.photos/id/1015/400/200" alt="נהר שזורם בין הרים ירוקים">
+            </section>
+
+            <section id="contact">
+              <h2>צרו קשר</h2>
+              <p>dana@example.com</p>
+            </section>
+          </main>
+        </script>
+      </div>
+
+      <h3>אתגר 2: צבעים משלכם <span class="level easy">קל</span></h3>
+      <p>תנו לדף צבעים משלכם:</p>
+      <ol>
+        <li>שנו את המשתנה <code>--primary</code> לצבע אחר. העיגול והלוגו ישתנו יחד.</li>
+        <li>תנו ל-<code>footer</code> רקע כהה (למשל <code>#1e293b</code>) וטקסט לבן.</li>
+      </ol>
+      <div class="playground challenge" id="ch-colors" data-check="ch-colors" data-height="300">
+        <script type="text/plain" data-lang="html">
+          <header class="site-header">
+            <span class="logo">דנה כהן</span>
+          </header>
+          <main>
+            <section class="hero">
+              <div class="avatar">דכ</div>
+              <h1>שלום, אני דנה 👋</h1>
+            </section>
+          </main>
+          <footer>© 2026 דנה כהן</footer>
+        </script>
+        <script type="text/plain" data-lang="css">
+          :root {
+            --primary: #4f46e5;
+          }
+
+          body { margin: 0; font-family: system-ui, sans-serif; }
+          .site-header { padding: 1rem; }
+          .logo { font-weight: 700; color: var(--primary); }
+          main { padding: 1rem; }
+          .hero { display: flex; align-items: center; gap: 1rem; }
+          .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; font-weight: 700; }
+
+          footer {
+            text-align: center;
+            padding: 1.5rem;
+          }
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          :root {
+            --primary: #db2777;
+          }
+
+          body { margin: 0; font-family: system-ui, sans-serif; }
+          .site-header { padding: 1rem; }
+          .logo { font-weight: 700; color: var(--primary); }
+          main { padding: 1rem; }
+          .hero { display: flex; align-items: center; gap: 1rem; }
+          .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; font-weight: 700; }
+
+          footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: #1e293b;
+            color: white;
+          }
+        </script>
+      </div>
+
+      <h3>אתגר 3: אזור פרויקטים <span class="level medium">בינוני</span></h3>
+      <p>הוסיפו אזור "הפרויקטים שלי":</p>
+      <ol>
+        <li>‏<code>section</code> עם <code>id="projects"</code> וכותרת <code>h2</code></li>
+        <li>בתוכו <code>div</code> עם <code>class="cards"</code>, ובו <strong>לפחות 2</strong> כרטיסי <code>article</code> עם <code>class="card"</code></li>
+        <li>בכל כרטיס: כותרת <code>h3</code>, פסקה <code>p</code> וקישור <code>a</code> שנפתח בלשונית חדשה (<code>target="_blank"</code>)</li>
+        <li>הכרטיסים צריכים לעמוד <strong>זה לצד זה</strong>. רמז: ב-CSS כבר מוכן כלל ל-<code>.card</code>, אבל משהו חסר ב-<code>.cards</code>…</li>
+      </ol>
+      <div class="playground challenge wide" id="ch-projects" data-check="ch-projects" data-height="340">
+        <script type="text/plain" data-lang="html">
+          <main>
+            <h1>דנה כהן</h1>
+
+            <!-- הוסיפו כאן את אזור הפרויקטים -->
+
+          </main>
+        </script>
+        <script type="text/plain" data-lang="css">
+          * { box-sizing: border-box; margin: 0; }
+          body { margin: 0; font-family: system-ui, sans-serif; background: #f8fafc; line-height: 1.6; }
+          main { padding: 1.5rem; }
+          h2 { margin: 1.5rem 0 1rem; }
+
+          .cards {
+            /* כאן חסר משהו */
+          }
+
+          .card {
+            flex: 1 1 200px;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+          }
+        </script>
+        <script type="text/plain" data-lang="solution-html">
+          <main>
+            <h1>דנה כהן</h1>
+
+            <section id="projects">
+              <h2>הפרויקטים שלי</h2>
+              <div class="cards">
+                <article class="card">
+                  <h3>דף פרופיל</h3>
+                  <p>הדף הזה! HTML ו-CSS.</p>
+                  <a href="https://github.com" target="_blank" rel="noopener">לקוד ב-GitHub</a>
+                </article>
+                <article class="card">
+                  <h3>אפליקציית משימות</h3>
+                  <p>נבנה בשיעורים הבאים עם React.</p>
+                  <a href="https://github.com" target="_blank" rel="noopener">לקוד ב-GitHub</a>
+                </article>
+              </div>
+            </section>
+          </main>
+        </script>
+        <script type="text/plain" data-lang="solution-css">
+          * { box-sizing: border-box; margin: 0; }
+          body { margin: 0; font-family: system-ui, sans-serif; background: #f8fafc; line-height: 1.6; }
+          main { padding: 1.5rem; }
+          h2 { margin: 1.5rem 0 1rem; }
+
+          .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+          }
+
+          .card {
+            flex: 1 1 200px;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+          }
+        </script>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="homework">משימת הגשה: דף הפרופיל שלכם</h2>
+      <div class="box goals">
+        <h3>מה מגישים</h3>
+        <p>דף פרופיל <strong>אישי</strong>: עליכם, לא על דנה 🙂. הוא צריך להיות שמור ב-GitHub ומפורסם ב-Netlify. מגישים שני קישורים: לריפו ולאתר.</p>
+      </div>
+
+      <h3>רשימת בדיקה לפני הגשה</h3>
+      <table>
+        <tr><th>נושא</th><th>דרישה</th></tr>
+        <tr><td>מבנה</td><td>‏<code>header</code> עם <code>nav</code>, ‏<code>main</code> עם לפחות 3 <code>section</code>, ו-<code>footer</code></td></tr>
+        <tr><td>תוכן</td><td>כותרת <code>h1</code> אחת, לפחות רשימה אחת, תמונה אחת עם <code>alt</code> וקישור חיצוני אחד</td></tr>
+        <tr><td>ניווט</td><td>כל קישור בתפריט קופץ לאזור המתאים</td></tr>
+        <tr><td>עיצוב</td><td>קובץ <code>style.css</code> נפרד, משתני צבע ב-<code>:root</code>, ולפחות שני מקומות עם <code>display: flex</code></td></tr>
+        <tr><td>רספונסיביות</td><td>‏media query אחד לפחות. הדף נראה טוב גם ברוחב 375px</td></tr>
+        <tr><td>Git</td><td>לפחות <strong>3 commits</strong> עם הודעות שמתארות את השינוי</td></tr>
+        <tr><td>פרסום</td><td>הדף עולה בכתובת Netlify, וכל push מעדכן אותו</td></tr>
+      </table>
+
+      <div class="exercise">
+        <h3>בונוס <span class="level hard">אתגר</span></h3>
+        <ul>
+          <li>חברו גופן מ-<a href="https://fonts.google.com/?subset=hebrew" target="_blank" rel="noopener">Google Fonts</a> שתומך בעברית, למשל Heebo, ‏Assistant או Rubik.</li>
+          <li>הוסיפו טופס "צרו קשר" עם <code>label</code> לכל שדה. בינתיים הוא לא שולח לשום מקום, ונחבר אותו בהמשך הקורס.</li>
+          <li>תנו לכרטיסים אפקט <code>:hover</code> קטן, למשל צל גדול יותר.</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>מחוון מוצע (100 נק׳):</strong> מבנה סמנטי 20, תוכן ונגישות (alt, היררכיית כותרות) 15, ‏CSS ו-Flexbox 25, רספונסיביות 15, ‏Git (לפחות 3 commits עם הודעות משמעותיות) 15, פרסום ב-Netlify 10. בונוס: עד 10 נק׳.</p>
+        <p>את מספר ה-commits ואת איכות ההודעות אפשר לבדוק מהר בדף <code>commits</code> של ה-repo ב-GitHub. ריפו עם commit יחיד בשם "upload files" מעיד שהקבצים הועלו דרך האתר ולא דרך Git.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="summary">סיכום שיעור 1</h2>
+      <ul>
+        <li><strong>הווב:</strong> הדפדפן (לקוח) שולח בקשת HTTP לשרת ומקבל בחזרה HTML, ‏CSS ו-JS.</li>
+        <li><strong>HTML</strong> בונה את המבנה. משתמשים בתגיות סמנטיות, ו-<code>div</code> או <code>span</code> רק כשאין תגית עם משמעות מתאימה.</li>
+        <li><strong>CSS</strong> מעצב: בוררים, מודל הקופסה, משתנים, ‏Flexbox ו-media queries.</li>
+        <li><strong>Git</strong> שומר היסטוריה (add, ‏commit, ‏push), ‏<strong>GitHub</strong> מאחסן אותה, ו-<strong>Netlify</strong> מפרסם את האתר.</li>
+      </ul>
+      <div class="box tip">
+        <p><strong>בשיעור הבא:</strong> ‏JavaScript. הדף שלנו יפה, אבל הוא לא <em>עושה</em> כלום. בשיעור 2 נלמד לכתוב קוד שמחשב, מחליט וחוזר על פעולות.</p>
+      </div>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script>
+    const text = (node) => (node?.textContent || '').trim();
+    window.PLAYGROUND_CHECKS = {
+      'ch-hobbies': (doc) => {
+        const section = doc.querySelector('section#hobbies');
+        return [
+          [section, 'אין section עם id="hobbies"'],
+          [section?.querySelector('h2') && text(section.querySelector('h2')), 'ל-section חסרה כותרת h2 עם טקסט'],
+          [(section?.querySelectorAll('ul > li') || []).length >= 3, 'צריך בתוך האזור רשימת ul עם לפחות 3 פריטי li'],
+          [section?.querySelector('img'), 'חסרה תמונה (img) בתוך האזור'],
+          [section && [...section.querySelectorAll('img')].every((img) => img.getAttribute('alt')?.trim()), 'לתמונה חסר alt שמתאר אותה'],
+          [doc.querySelector('nav a[href="#hobbies"]'), 'חסר קישור ב-nav עם href="#hobbies"'],
+        ];
+      },
+      'ch-colors': (doc, win) => {
+        const logo = doc.querySelector('.logo');
+        const footer = doc.querySelector('footer');
+        const fs = footer && win.getComputedStyle(footer);
+        const isDark = (rgb) => {
+          const [r, g, b, a = 1] = (rgb.match(/[\d.]+/g) || []).map(Number);
+          return a > 0 && (r * 299 + g * 587 + b * 114) / 1000 < 100;
+        };
+        return [
+          [logo && win.getComputedStyle(logo).color !== 'rgb(79, 70, 229)', 'צבע ה-‎--primary עדיין המקורי (#4f46e5). שנו אותו ב-:root'],
+          [fs && isDark(fs.backgroundColor), 'ל-footer צריך רקע כהה (background)'],
+          [fs && fs.color === 'rgb(255, 255, 255)', 'הטקסט ב-footer צריך להיות לבן (color: white)'],
+        ];
+      },
+      'ch-projects': (doc, win) => {
+        const section = doc.querySelector('section#projects');
+        const cards = [...(section?.querySelectorAll('.cards > article.card') || [])];
+        const tops = cards.map((c) => Math.round(c.getBoundingClientRect().top));
+        return [
+          [section, 'אין section עם id="projects"'],
+          [section?.querySelector('h2'), 'ל-section חסרה כותרת h2'],
+          [section?.querySelector('div.cards'), 'חסר div עם class="cards" בתוך האזור'],
+          [cards.length >= 2, 'צריך לפחות 2 כרטיסי article עם class="card" בתוך .cards'],
+          [cards.length && cards.every((c) => c.querySelector('h3') && c.querySelector('p')), 'בכל כרטיס צריכים להיות h3 ו-p'],
+          [cards.length && cards.every((c) => c.querySelector('a[target="_blank"]')), 'בכל כרטיס צריך קישור עם target="_blank"'],
+          [cards.length >= 2 && win.getComputedStyle(cards[0].parentElement).display === 'flex', 'ל-.cards חסר display: flex'],
+          [cards.length >= 2 && Math.abs(tops[0] - tops[1]) <= 2, 'שני הכרטיסים הראשונים צריכים לעמוד באותה שורה (לחצו "⤢ הרחבה" אם החלון צר)'],
+        ];
+      },
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

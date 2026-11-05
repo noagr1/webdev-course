@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פיתוח ווב מודרני עם React</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="home">
+  <header class="topbar">
+    <a class="brand" href="index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="home">
+    <section class="hero-home">
+      <h1>פיתוח ווב מודרני עם React</h1>
+      <p>עשרה שיעורים, שעתיים כל אחד: מ-HTML ו-JavaScript ועד אפליקציית Full-Stack מלאה שעולה לאוויר.</p>
+    </section>
+
+    <section class="features">
+      <div class="feature">
+        <h3>📖 הסבר</h3>
+        <p>כל שיעור מתחיל במטרות ובהסבר מסודר של הנושאים.</p>
+      </div>
+      <div class="feature">
+        <h3>✅ דוגמאות פתורות</h3>
+        <p>בונים משהו אמיתי צעד אחר צעד, עם כל הקוד.</p>
+      </div>
+      <div class="feature">
+        <h3>💪 תרגול</h3>
+        <p>תרגילים ברמות קושי שונות. הפתרון נפתח בלחיצה, אחרי שמנסים לבד.</p>
+      </div>
+      <div class="feature">
+        <h3>🚀 פרויקט מתגלגל</h3>
+        <p>אפליקציה אחת שגדלה משיעור לשיעור, עד לפרויקט הסיום.</p>
+      </div>
+    </section>
+
+    <h2>השיעורים</h2>
+    <div id="lessons-grid"></div>
+
+    <section class="box tip" style="margin-top: 3rem;">
+      <h3>מה צריך להביא לשיעור הראשון?</h3>
+      <p>מחשב נייד, ובו <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">VS Code</a> ו-<a href="https://git-scm.com/" target="_blank" rel="noopener">Git</a>. בנוסף צריך חשבון ב-<a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>. את ‏Node.js נתקין בשיעור 4. <a href="lessons/lesson-01/index.html#setup">להוראות המלאות ←</a></p>
+    </section>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

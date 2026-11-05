@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 1 · חלק ג׳: Git ו-GitHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body data-page="lesson" data-lesson="1" data-part="git" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 1 · חלק ג׳</span>
+      <h1>Git ו-GitHub: שומרים, מגבים ומשתפים קוד</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 25 דק׳ בכיתה</span>
+        <span class="chip">📚 שעתיים–שלוש לימוד עצמי</span>
+        <span class="chip">טרמינל</span>
+        <span class="chip">Git</span>
+        <span class="chip">GitHub</span>
+        <span class="chip">Netlify</span>
+      </div>
+
+      <p>עד עכשיו כתבנו קבצים ושמרנו אותם עם Ctrl+S. בחלק הזה נלמד את הכלי שכל מפתח ומפתחת בעולם משתמשים בו כל יום: <strong>Git</strong>. נלמד גם לעבוד עם <strong>GitHub</strong>, האתר שבו שומרים את הקוד בענן. בסוף החלק הדף שלכם יהיה שמור, מגובה ומפורסם באינטרנט.</p>
+      <p>אם אף פעם לא פתחתם טרמינל, זה בסדר גמור. נתחיל מהבסיס ממש, ונסביר כל פקודה וכל הודעה שהמחשב מחזיר.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>להסביר מה זה ניהול גרסאות, ומה ההבדל בין Git ל-GitHub</li>
+          <li>לעבוד בטרמינל: לנווט בין תיקיות, ליצור תיקיות ולהריץ פקודות</li>
+          <li>ליצור מאגר Git, לשמור שינויים (commit) ולראות את ההיסטוריה</li>
+          <li>לבטל טעויות ולהשתמש בקובץ <code>.gitignore</code></li>
+          <li>להעלות פרויקט ל-GitHub, ולהוריד ממנו פרויקטים</li>
+          <li>לפרסם אתר ב-Netlify, כך שכל <code>push</code> יעדכן אותו</li>
+          <li>לזהות את התקלות הנפוצות ולפתור אותן לבד</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>בכיתה (25 דק׳):</strong> מסבירים בקצרה למה צריך Git, שלושת האזורים והמושגים (5 דק׳). אחר כך מדגימים מול הכיתה את כל התהליך, מ-<code>git init</code> ועד <code>git push</code> (10 דק׳). בעשר הדקות האחרונות כל הסטודנטים עושים push ראשון. <strong>המטרה היחידה שחייבת להתממש בכיתה היא push ראשון מוצלח אצל כולם.</strong> כל השאר (ביטולים, ענפים, ‏clone, תקלות) מיועד ללמידה עצמית.</p>
+        <p>מומלץ לשמור את העמוד הזה פתוח על מסך נוסף בזמן ההדגמה, ולהפנות לסעיף "תקלות נפוצות" כשמשהו נתקע.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="why">למה צריך ניהול גרסאות?</h2>
+      <p>נניח שאתם כותבים עבודה סמינריונית. אחרי כמה שבועות, התיקייה נראית כך:</p>
+      <pre class="terminal"><code class="nohighlight">עבודה.docx
+עבודה_מתוקן.docx
+עבודה_מתוקן_2.docx
+עבודה_סופית.docx
+עבודה_סופית_v3_באמת_סופי.docx
+עבודה_סופית_v3_באמת_סופי_אחרי_הערות_המנחה.docx</code></pre>
+      <p>מוכר? עכשיו תחשבו על פרויקט תוכנה עם מאות קבצים ועם כמה אנשים שעובדים עליו בו זמנית. אי אפשר לנהל אותו ככה. כאן נכנס <strong>Git</strong>, מערכת לניהול גרסאות (Version Control System). היא פותרת ארבע בעיות:</p>
+      <table>
+        <tr><th>בעיה</th><th>איך Git פותר אותה</th></tr>
+        <tr><td>🕰️ <strong>היסטוריה</strong>: "מה השתנה, ומתי?"</td><td>כל שמירה (commit) נרשמת עם תאריך, מי עשה אותה והסבר קצר. אפשר לראות בדיוק אילו שורות השתנו.</td></tr>
+        <tr><td>↩️ <strong>ביטול</strong>: "שברתי משהו, ואתמול זה עבד!"</td><td>אפשר לחזור לכל גרסה קודמת, של קובץ אחד או של כל הפרויקט.</td></tr>
+        <tr><td>👥 <strong>עבודת צוות</strong>: "שנינו שינינו את אותו קובץ"</td><td>‏Git יודע לשלב שינויים של כמה אנשים, ומתריע כשיש התנגשות.</td></tr>
+        <tr><td>☁️ <strong>גיבוי</strong>: "המחשב נפל ונשבר"</td><td>מעלים עותק של כל ההיסטוריה ל-GitHub. אפשר להוריד אותו לכל מחשב, בכל רגע.</td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>למה זה חשוב לכם כבר עכשיו?</strong> ‏Git הוא כלי חובה בכל משרת פיתוח. בנוסף, פרופיל GitHub עם פרויקטים מסודרים הוא חלק מקורות החיים של כל מפתח: מעסיקים נכנסים אליו. כל פרויקט בקורס יישמר שם.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="git-vs-github">Git לעומת GitHub</h2>
+      <p>השמות דומים, וקל להתבלבל. אבל אלה שני דברים שונים:</p>
+      <table>
+        <tr><th></th><th>Git</th><th>GitHub</th></tr>
+        <tr><td><strong>מה זה?</strong></td><td>תוכנה שמותקנת אצלכם במחשב</td><td>אתר אינטרנט (שירות ענן)</td></tr>
+        <tr><td><strong>מה הוא עושה?</strong></td><td>שומר את ההיסטוריה של הפרויקט, בתיקייה אצלכם</td><td>מאחסן עותק של הפרויקט וההיסטוריה שלו בענן, ומאפשר לשתף ולעבוד בצוות</td></tr>
+        <tr><td><strong>צריך אינטרנט?</strong></td><td>לא. עובד גם בטיסה</td><td>כן</td></tr>
+        <tr><td><strong>משתמשים בו דרך</strong></td><td>הטרמינל (או VS Code)</td><td>הדפדפן, ו-Git עצמו (פקודות push ו-pull)</td></tr>
+      </table>
+      <p><strong>אנלוגיה:</strong> ‏Git הוא כמו מצלמה, ו-GitHub הוא כמו אלבום תמונות בענן (Google Photos). אפשר לצלם בלי להעלות לענן, אבל ההעלאה שומרת על התמונות ומאפשרת לשתף אותן.</p>
+      <p>ל-GitHub יש מתחרים שעובדים באותה צורה בדיוק, למשל <strong>GitLab</strong> ו-<strong>Bitbucket</strong>. מה שתלמדו כאן מתאים לכולם.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">איזה מהמשפטים הבאים נכון?</p>
+        <ul>
+          <li>אי אפשר להשתמש ב-Git בלי חשבון GitHub</li>
+          <li data-correct>‏Git עובד במחשב שלכם גם בלי אינטרנט, ו-GitHub הוא אתר שמאחסן עותק בענן</li>
+          <li>‏Git ו-GitHub הם שני שמות לאותה תוכנה</li>
+        </ul>
+        <p class="quiz-explain">‏Git הוא תוכנה מקומית, ואפשר להשתמש בו לבד לגמרי. ‏GitHub הוא שירות שמתחבר ל-Git ושומר עותק בענן.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="concepts">מילון מושגים</h2>
+      <p>לפני שמקלידים פקודה ראשונה, נכיר את המילים. אל דאגה, נחזור על כל אחת מהן בהמשך עם דוגמאות.</p>
+      <table>
+        <tr><th>מושג</th><th>מה זה</th><th>אנלוגיה</th></tr>
+        <tr><td><strong>Repository</strong> (ריפו, מאגר)</td><td>תיקיית פרויקט ש-Git עוקב אחריה, כולל כל ההיסטוריה שלה</td><td>אלבום התמונות של הפרויקט</td></tr>
+        <tr><td><strong>Commit</strong></td><td>"תמונת מצב" של הפרויקט ברגע מסוים, עם הודעה שמסבירה מה השתנה</td><td>נקודת שמירה במשחק מחשב: אפשר תמיד לחזור אליה</td></tr>
+        <tr><td><strong>Staging area</strong> (אזור ההכנה)</td><td>המקום שבו מסמנים אילו שינויים ייכנסו ל-commit הבא</td><td>ארגז לפני משלוח: מכניסים מה ששולחים, ורק אז סוגרים ושולחים</td></tr>
+        <tr><td><strong>Branch</strong> (ענף)</td><td>קו פיתוח נפרד, שמאפשר לנסות משהו בלי לגעת בגרסה הראשית</td><td>טיוטה נפרדת של העבודה</td></tr>
+        <tr><td><strong>Remote</strong></td><td>עותק של הריפו שנמצא במקום אחר, בדרך כלל ב-GitHub. השם המקובל שלו הוא <code>origin</code></td><td>האלבום בענן</td></tr>
+        <tr><td><strong>Push</strong></td><td>העלאת commits מהמחשב ל-remote</td><td>העלאת תמונות לענן</td></tr>
+        <tr><td><strong>Pull</strong></td><td>הורדת commits חדשים מה-remote למחשב</td><td>סנכרון תמונות חדשות מהענן לטלפון</td></tr>
+        <tr><td><strong>Clone</strong></td><td>הורדה ראשונה של ריפו שלם מ-GitHub למחשב</td><td>הורדת אלבום שלם בפעם הראשונה</td></tr>
+        <tr><td><strong>HEAD</strong></td><td>מצביע ל-commit שאתם "נמצאים" בו עכשיו (בדרך כלל האחרון)</td><td>"אתם נמצאים כאן" במפה</td></tr>
+      </table>
+
+      <!-- ===================================================== -->
+      <h2 id="terminal">הטרמינל למתחילים</h2>
+      <p><strong>הטרמינל</strong> (נקרא גם שורת הפקודה, Command Line או Shell) הוא חלון שבו נותנים למחשב הוראות בטקסט, במקום ללחוץ עם העכבר. בהתחלה הוא נראה מפחיד, אבל מספיקות כ-10 פקודות כדי להסתדר מצוין.</p>
+
+      <h3>איך פותחים טרמינל?</h3>
+      <table>
+        <tr><th>מערכת</th><th>איך פותחים</th></tr>
+        <tr><td><strong>Windows</strong></td><td>אחרי התקנת Git יש תוכנה בשם <strong>Git Bash</strong> (מחפשים אותה בתפריט התחל). אפשר גם <strong>PowerShell</strong>. בקורס נעבוד עם Git Bash, כי הפקודות בו זהות לפקודות ב-Mac.</td></tr>
+        <tr><td><strong>Mac</strong></td><td>לוחצים Cmd+רווח, מקלידים <code>Terminal</code> ולוחצים Enter.</td></tr>
+        <tr><td><strong>VS Code</strong> (מומלץ!)</td><td>בתוך VS Code לוחצים <code>Ctrl + `</code> (המקש שמתחת ל-Esc), או בוחרים בתפריט <strong>Terminal ← New Terminal</strong>. הטרמינל נפתח ישר בתיקיית הפרויקט.</td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>Windows + VS Code:</strong> כדי שהטרמינל ב-VS Code יהיה Git Bash, לוחצים על החץ הקטן ליד הסימן <code>+</code> בחלון הטרמינל, ובוחרים <strong>Select Default Profile ← Git Bash</strong>.</p>
+      </div>
+
+      <h3>האנטומיה של פקודה</h3>
+      <p>כל פקודה בנויה מאותם חלקים:</p>
+      <pre class="terminal"><code class="nohighlight">$ git commit -m "Add navbar"
+# git       ← הפקודה (התוכנה שמריצים)
+# commit    ← תת-פקודה: מה רוצים ש-git יעשה
+# -m        ← דגל (flag): אפשרות שמשנה את ההתנהגות. m = message
+# "Add navbar" ← ארגומנט: הערך של הדגל. יש מרכאות כי יש רווח</code></pre>
+      <p>הסימן <code>$</code> בתחילת השורה נקרא <strong>prompt</strong>. הוא מסמן שהטרמינל מחכה לפקודה. <strong>לא מקלידים אותו.</strong> באתר הזה, שורה שמתחילה ב-<code>$</code> היא פקודה, ושורה בלי <code>$</code> היא מה שהמחשב מחזיר.</p>
+
+      <h3>הפקודות הבסיסיות</h3>
+      <table>
+        <tr><th>פקודה</th><th>מה היא עושה</th><th>מקור השם</th></tr>
+        <tr><td><code>pwd</code></td><td>מציגה באיזו תיקייה אתם נמצאים עכשיו</td><td>print working directory</td></tr>
+        <tr><td><code>ls</code></td><td>מציגה את הקבצים והתיקיות בתיקייה הנוכחית</td><td>list</td></tr>
+        <tr><td><code>ls -a</code></td><td>כמו <code>ls</code>, כולל קבצים מוסתרים (שמתחילים בנקודה)</td><td>all</td></tr>
+        <tr><td><code>cd שם-תיקייה</code></td><td>נכנסת לתיקייה</td><td>change directory</td></tr>
+        <tr><td><code>cd ..</code></td><td>עולה תיקייה אחת למעלה</td><td><code>..</code> = תיקיית האב</td></tr>
+        <tr><td><code>cd ~</code></td><td>חוזרת לתיקיית הבית שלכם</td><td><code>~</code> = בית</td></tr>
+        <tr><td><code>mkdir שם</code></td><td>יוצרת תיקייה חדשה</td><td>make directory</td></tr>
+        <tr><td><code>touch שם.html</code></td><td>יוצרת קובץ ריק (ב-Git Bash וב-Mac)</td><td></td></tr>
+        <tr><td><code>clear</code></td><td>מנקה את המסך</td><td></td></tr>
+      </table>
+
+      <p>כך נראה סיור קצר בטרמינל של Mac (ב-Windows הנתיבים נראים כמו <code>/c/Users/dana</code>):</p>
+      <pre class="terminal"><code class="nohighlight">$ pwd
+/Users/dana
+$ ls
+Desktop    Documents    Downloads
+$ cd Documents
+$ mkdir web-course
+$ cd web-course
+$ pwd
+/Users/dana/Documents/web-course
+$ cd ..
+$ pwd
+/Users/dana/Documents</code></pre>
+
+      <h3>נתיב מוחלט ונתיב יחסי</h3>
+      <ul>
+        <li><strong>נתיב מוחלט</strong> מתחיל מהשורש של המחשב, למשל <code>/Users/dana/Documents</code>. הוא עובד מכל מקום.</li>
+        <li><strong>נתיב יחסי</strong> מתחיל מהמקום שבו אתם נמצאים, למשל <code>web-course</code> או <code>../Downloads</code>. בדיוק כמו נתיבים יחסיים בקישורים ב-HTML (חלק א׳).</li>
+      </ul>
+
+      <h3>טריקים שחוסכים זמן</h3>
+      <ul>
+        <li><strong>Tab</strong>: מקלידים את תחילת השם של תיקייה או קובץ ולוחצים Tab, והטרמינל משלים לבד. חוסך טעויות הקלדה.</li>
+        <li><strong>חץ למעלה ↑</strong>: מחזיר את הפקודה הקודמת. לחיצות נוספות מחזירות פקודות ישנות יותר.</li>
+        <li><strong>Ctrl+C</strong>: עוצר פקודה שרצה או "תקועה". (בטרמינל זה <em>לא</em> העתקה!)</li>
+        <li><strong>העתקה והדבקה:</strong> ב-Mac: ‏Cmd+C ו-Cmd+V. ב-Git Bash: לחיצה ימנית ← Copy או Paste, או Ctrl+Insert ו-Shift+Insert. בטרמינל של VS Code: ‏Ctrl+C ו-Ctrl+V עובדים כשיש טקסט מסומן.</li>
+        <li><strong>שמות עם רווחים</strong> צריך לעטוף במרכאות: <code>cd "My Projects"</code>. לכן עדיף לתת לתיקיות שמות בלי רווחים, למשל <code>my-projects</code>.</li>
+      </ul>
+
+      <div class="exercise">
+        <h3>תרגיל קצר: סיור בטרמינל <span class="level easy">קל</span></h3>
+        <ol>
+          <li>פתחו טרמינל והציגו באיזו תיקייה אתם נמצאים.</li>
+          <li>היכנסו לתיקיית <code>Documents</code> (או <code>Desktop</code>).</li>
+          <li>צרו תיקייה בשם <code>web-course</code> והיכנסו אליה.</li>
+          <li>צרו בתוכה תיקייה בשם <code>lesson-01</code>, היכנסו אליה, וצרו קובץ ריק בשם <code>index.html</code>.</li>
+          <li>הציגו את תוכן התיקייה, ואז חזרו שתי תיקיות למעלה.</li>
+        </ol>
+        <details class="solution">
+          <summary>הצגת פתרון</summary>
+          <pre class="terminal"><code class="nohighlight">$ pwd
+$ cd Documents
+$ mkdir web-course
+$ cd web-course
+$ mkdir lesson-01
+$ cd lesson-01
+$ touch index.html
+$ ls
+index.html
+$ cd ../..
+$ pwd
+/Users/dana/Documents</code></pre>
+          <p>‏<code>cd ../..</code> עולה שתי רמות בפקודה אחת. אפשר גם להריץ <code>cd ..</code> פעמיים.</p>
+        </details>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>הרבה סטודנטים לא פתחו טרמינל אף פעם. כדאי להראות על המסך ש-<code>ls</code> מציג בדיוק את מה שרואים ב-Finder או בסייר הקבצים: "זה אותו דבר, רק בטקסט". טעות נפוצה היא להקליד גם את ה-<code>$</code>. טעות נוספת היא לעבוד בתיקייה הלא נכונה. כדאי להרגיל את הכיתה להריץ <code>pwd</code> כשלא בטוחים איפה הם נמצאים.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="install">התקנת Git</h2>
+
+      <h3>Windows</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>מורידים את המתקין</h4>
+          <p>נכנסים ל-<a href="https://git-scm.com/downloads/win" target="_blank" rel="noopener">git-scm.com/downloads/win</a> ומורידים את <strong>64-bit Git for Windows Setup</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>מריצים את ההתקנה</h4>
+          <p>ההתקנה מציגה הרבה מסכים. ברוב המסכים מספיק ללחוץ <strong>Next</strong> ולהשאיר את ברירת המחדל. בשני מסכים כדאי לשנות:</p>
+          <ul>
+            <li><strong>Choosing the default editor used by Git</strong>: בוחרים <strong>Use Visual Studio Code as Git's default editor</strong>, ולא Vim. ככה לא תיתקעו בעורך לא מוכר.</li>
+            <li><strong>Adjusting the name of the initial branch</strong>: בוחרים <strong>Override the default branch name</strong> ומשאירים <code>main</code>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>בודקים שההתקנה הצליחה</h4>
+          <p>פותחים <strong>Git Bash</strong> (או טרמינל חדש ב-VS Code. אם VS Code היה פתוח בזמן ההתקנה, סוגרים ופותחים אותו מחדש):</p>
+          <pre class="terminal"><code class="nohighlight">$ git --version
+git version 2.47.0.windows.1</code></pre>
+          <p>מספר הגרסה אצלכם יכול להיות שונה, וזה בסדר. אם מופיעה ההודעה <code>git: command not found</code> או <code>'git' is not recognized</code>, סגרו את כל חלונות הטרמינל ו-VS Code ופתחו מחדש.</p>
+        </div>
+      </div>
+
+      <h3>Mac</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>פותחים Terminal ומקלידים</h4>
+          <pre class="terminal"><code class="nohighlight">$ git --version</code></pre>
+          <p>אם Git כבר מותקן, יופיע מספר גרסה, ואפשר לדלג הלאה. אם לא, macOS יציע להתקין את <strong>Command Line Developer Tools</strong>. לוחצים <strong>Install</strong> ומחכים כמה דקות.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>(לא חובה) דרך Homebrew</h4>
+          <p>מי שמשתמשים ב-<a href="https://brew.sh/" target="_blank" rel="noopener">Homebrew</a> יכולים להתקין כך:</p>
+          <pre class="terminal"><code class="nohighlight">$ brew install git</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>בודקים שוב</h4>
+          <pre class="terminal"><code class="nohighlight">$ git --version
+git version 2.39.5 (Apple Git-154)</code></pre>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="config">הגדרה ראשונית: מי אתם?</h2>
+      <p>כל commit שומר את השם והמייל של מי שיצר אותו. לכן, לפני ה-commit הראשון, צריך לספר ל-Git מי אתם. עושים את זה <strong>פעם אחת בלבד בכל מחשב</strong>:</p>
+      <pre class="terminal"><code class="nohighlight">$ git config --global user.name "Dana Cohen"
+$ git config --global user.email "dana@example.com"
+$ git config --global init.defaultBranch main</code></pre>
+      <table>
+        <tr><th>שורה</th><th>מה היא עושה</th></tr>
+        <tr><td><code>user.name</code></td><td>השם שיופיע ליד כל commit. כדאי באנגלית.</td></tr>
+        <tr><td><code>user.email</code></td><td>המייל. <strong>השתמשו באותו מייל שאיתו נרשמתם ל-GitHub</strong>, כדי ש-GitHub יקשר את ה-commits לפרופיל שלכם.</td></tr>
+        <tr><td><code>init.defaultBranch main</code></td><td>הענף הראשי בכל ריפו חדש ייקרא <code>main</code> (זה השם המקובל היום, וגם GitHub משתמש בו).</td></tr>
+        <tr><td><code>--global</code></td><td>ההגדרה חלה על כל הפרויקטים במחשב, ולא רק על התיקייה הנוכחית.</td></tr>
+      </table>
+      <p>אפשר לבדוק מה הוגדר:</p>
+      <pre class="terminal"><code class="nohighlight">$ git config --global --list
+user.name=Dana Cohen
+user.email=dana@example.com
+init.defaultbranch=main</code></pre>
+      <div class="box tip">
+        <p>הפקודות האלה לא מחזירות שום הודעה כשהן מצליחות. זה נורמלי! בטרמינל, <strong>שקט = הצלחה</strong>. הודעה מופיעה בדרך כלל רק כשמשהו השתבש.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="three-areas">שלושת האזורים של Git</h2>
+      <p>זה הרעיון הכי חשוב בחלק הזה. מי שמבינים אותו, מבינים את Git. כל קובץ בפרויקט נמצא באחד משלושה "אזורים":</p>
+      <table>
+        <tr><th>אזור</th><th>מה יש בו</th><th>איך מגיעים אליו</th></tr>
+        <tr><td>📝 <strong>Working Directory</strong> (תיקיית העבודה)</td><td>הקבצים כמו שהם עכשיו בתיקייה, כולל שינויים שעוד לא נשמרו ב-Git</td><td>עורכים קובץ ב-VS Code ושומרים (Ctrl+S)</td></tr>
+        <tr><td>📦 <strong>Staging Area</strong> (אזור ההכנה)</td><td>השינויים שבחרתם להכניס ל-commit הבא</td><td><code>git add</code></td></tr>
+        <tr><td>🗄️ <strong>Repository</strong> (המאגר)</td><td>כל ה-commits, כלומר ההיסטוריה השמורה</td><td><code>git commit</code></td></tr>
+      </table>
+      <pre class="terminal"><code class="nohighlight">  עריכה ושמירה            git add              git commit
+  ───────────────►  📝  ───────────────►  📦  ───────────────►  🗄️
+                  עבודה                 הכנה                 מאגר</code></pre>
+      <p><strong>אנלוגיה של צילום משפחתי:</strong> תיקיית העבודה היא כל האנשים בחדר. ‏<code>git add</code> הוא לקרוא לאנשים שייכנסו לתמונה. ‏<code>git commit</code> הוא ללחוץ על הכפתור ולצלם. אפשר לבחור לצלם רק חלק מהאנשים.</p>
+      <p><strong>למה צריך שלב הכנה?</strong> כי לפעמים שיניתם חמישה קבצים, אבל רק שלושה מהם שייכים לאותו שינוי. אזור ההכנה מאפשר ליצור commit מסודר שעוסק בדבר אחד. בהתחלה, ברוב המקרים תוסיפו פשוט הכול.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">ערכתם את <code>style.css</code>, שמרתם ב-VS Code והרצתם <code>git add style.css</code>. איפה השינוי נמצא עכשיו?</p>
+        <ul>
+          <li>רק בתיקיית העבודה</li>
+          <li data-correct>באזור ההכנה (staging). הוא ייכנס להיסטוריה רק אחרי <code>git commit</code></li>
+          <li>ב-GitHub</li>
+        </ul>
+        <p class="quiz-explain">‏<code>git add</code> רק מכין את השינוי. ‏commit שומר אותו בהיסטוריה המקומית, ורק <code>git push</code> מעלה אותו ל-GitHub.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="first-repo">הריפו הראשון שלכם, צעד אחר צעד</h2>
+      <p>עכשיו נעבור על כל התהליך בפועל. פתחו טרמינל ועבדו יחד עם העמוד. נשתמש בתיקייה מהתרגיל הקודם (<code>web-course/lesson-01</code>). אם תרצו, אפשר לעבוד ישר על תיקיית הפרויקט מעמוד הפרויקט.</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>נכנסים לתיקיית הפרויקט</h4>
+          <pre class="terminal"><code class="nohighlight">$ cd ~/Documents/web-course/lesson-01
+$ ls
+index.html</code></pre>
+          <p>ב-VS Code אפשר פשוט לפתוח את התיקייה (File ← Open Folder) ולפתוח טרמינל עם <code>Ctrl + `</code>. הטרמינל כבר יהיה בתיקייה הנכונה.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>יוצרים ריפו: <code>git init</code></h4>
+          <pre class="terminal"><code class="nohighlight">$ git init
+Initialized empty Git repository in /Users/dana/Documents/web-course/lesson-01/.git/</code></pre>
+          <p>‏Git יצר תיקייה מוסתרת בשם <code>.git</code>. בה הוא שומר את כל ההיסטוריה. אפשר לראות אותה עם <code>ls -a</code>. <strong>לא נוגעים בה ולא מוחקים אותה</strong>: מחיקה שלה מוחקת את כל ההיסטוריה.</p>
+          <div class="box warn">
+            <p>מריצים <code>git init</code> <strong>פעם אחת בלבד לכל פרויקט</strong>, ובתיקיית הפרויקט עצמה. לעולם לא בתיקיית הבית (<code>~</code>) ולא ב-Desktop כולו. אחרת Git ינסה לעקוב אחרי כל הקבצים במחשב.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>בודקים מצב: <code>git status</code></h4>
+          <pre class="terminal"><code class="nohighlight">$ git status
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+	index.html
+
+nothing added to commit but untracked files present (use "git add" to track)</code></pre>
+          <p>מה Git אומר כאן?</p>
+          <ul>
+            <li><code>On branch main</code>: אתם על הענף הראשי.</li>
+            <li><code>No commits yet</code>: עוד אין היסטוריה.</li>
+            <li><code>Untracked files</code>: קבצים ש-Git רואה אבל עוד לא עוקב אחריהם. בטרמינל הם מופיעים <span style="color:#dc2626">באדום</span>.</li>
+          </ul>
+          <p><strong>‏<code>git status</code> היא הפקודה הכי חשובה.</strong> הריצו אותה כל הזמן: לפני כל פקודה ואחריה. היא אף פעם לא משנה כלום, רק מראה מה המצב, ובדרך כלל גם מציעה מה לעשות הלאה.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>מוסיפים לאזור ההכנה: <code>git add</code></h4>
+          <pre class="terminal"><code class="nohighlight">$ git add index.html
+$ git status
+On branch main
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached &lt;file&gt;..." to unstage)
+	new file:   index.html</code></pre>
+          <p>עכשיו הקובץ מופיע תחת <code>Changes to be committed</code>, <span style="color:#16a34a">בירוק</span>. הוא מוכן ל-commit.</p>
+          <p>אפשרויות נפוצות:</p>
+          <table>
+            <tr><th>פקודה</th><th>מה מוסיפה</th></tr>
+            <tr><td><code>git add index.html</code></td><td>קובץ אחד</td></tr>
+            <tr><td><code>git add index.html style.css</code></td><td>כמה קבצים</td></tr>
+            <tr><td><code>git add .</code></td><td><strong>כל</strong> השינויים בתיקייה הנוכחית ובתיקיות שבתוכה. הנקודה פירושה "התיקייה הזאת". זו הפקודה שתשתמשו בה הכי הרבה.</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>שומרים בהיסטוריה: <code>git commit</code></h4>
+          <pre class="terminal"><code class="nohighlight">$ git commit -m "Add first HTML page"
+[main (root-commit) 3f2a9c1] Add first HTML page
+ 1 file changed, 12 insertions(+)
+ create mode 100644 index.html</code></pre>
+          <p>פענוח ההודעה:</p>
+          <ul>
+            <li><code>main</code>: ה-commit נוצר על הענף <code>main</code>. ‏<code>root-commit</code> פירושו שזה ה-commit הראשון.</li>
+            <li><code>3f2a9c1</code>: <strong>המזהה (hash)</strong> של ה-commit. לכל commit יש מזהה ייחודי. אפשר להשתמש בו כדי לחזור לגרסה הזאת.</li>
+            <li><code>1 file changed, 12 insertions(+)</code>: קובץ אחד השתנה, ונוספו לו 12 שורות.</li>
+          </ul>
+          <div class="box warn">
+            <p><strong>שכחתם את <code>-m</code>?</strong> ‏Git יפתח עורך כדי שתכתבו הודעה. אם הגדרתם VS Code כעורך, ייפתח קובץ: כתבו בשורה הראשונה את ההודעה, שמרו וסגרו את הלשונית. אם נפתח <strong>Vim</strong> (מסך שחור עם <code>~</code> בכל שורה), לחצו <code>Esc</code>, הקלידו <code>:q!</code> ולחצו Enter, ואז הריצו שוב את הפקודה עם <code>-m</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h4>עוד שינוי, עוד commit</h4>
+          <p>עכשיו עובדים כרגיל: ערכו את <code>index.html</code> (למשל הוסיפו פסקה), צרו קובץ <code>style.css</code> ושמרו. ואז:</p>
+          <pre class="terminal"><code class="nohighlight">$ git status
+On branch main
+Changes not staged for commit:
+	modified:   index.html
+
+Untracked files:
+	style.css
+
+$ git add .
+$ git commit -m "Add stylesheet and about paragraph"
+[main 8b41d07] Add stylesheet and about paragraph
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+ create mode 100644 style.css</code></pre>
+          <p>שימו לב להבדל: <code>modified</code> הוא קובץ ש-Git כבר מכיר ושהשתנה. ‏<code>Untracked</code> הוא קובץ חדש לגמרי. ‏<code>git add .</code> מטפל בשניהם.</p>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <p><strong>המעגל היומיומי</strong> (תשננו אותו):</p>
+        <pre class="terminal"><code class="nohighlight"># 1. עובדים: עורכים קבצים ושומרים
+$ git status
+$ git add .
+$ git commit -m "Describe what you did"
+# 2. חוזרים לעבוד... וחוזר חלילה</code></pre>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>בהדגמה בכיתה כדאי להריץ <code>git status</code> אחרי <strong>כל</strong> פקודה ולהקריא את הפלט בקול. ככה הסטודנטים מתרגלים לקרוא את מה ש-Git אומר במקום לפחד ממנו. כדאי גם להראות בכוונה את המצב שבו שוכחים <code>git add</code> ומקבלים <code>nothing added to commit</code>.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="status-diff">לראות מה השתנה: git diff</h2>
+      <p>‏<code>git status</code> אומר <em>אילו</em> קבצים השתנו. ‏<code>git diff</code> מראה <em>מה בדיוק</em> השתנה בהם, שורה אחרי שורה:</p>
+      <pre class="terminal"><code class="nohighlight">$ git diff
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@ -8,7 +8,7 @@
+   &lt;body&gt;
+-    &lt;h1&gt;שלום עולם&lt;/h1&gt;
++    &lt;h1&gt;דנה כהן: מפתחת ווב&lt;/h1&gt;
+     &lt;p&gt;ברוכים הבאים לדף שלי&lt;/p&gt;</code></pre>
+      <ul>
+        <li>שורה שמתחילה ב-<code>-</code> (באדום) נמחקה.</li>
+        <li>שורה שמתחילה ב-<code>+</code> (בירוק) נוספה.</li>
+        <li>שינוי של שורה מופיע כמחיקה של הישנה והוספה של החדשה.</li>
+        <li><code>@@ -8,7 +8,7 @@</code> אומר באיזה מקום בקובץ נמצא השינוי (שורה 8).</li>
+      </ul>
+      <table>
+        <tr><th>פקודה</th><th>מה מראה</th></tr>
+        <tr><td><code>git diff</code></td><td>שינויים שעוד <strong>לא</strong> הוספתם עם <code>git add</code></td></tr>
+        <tr><td><code>git diff --staged</code></td><td>שינויים שכבר נמצאים באזור ההכנה, ושייכנסו ל-commit הבא</td></tr>
+      </table>
+      <div class="box tip">
+        <p>אם הפלט ארוך, הטרמינל מציג אותו בעמודים. החצים גוללים, ו-<code>q</code> יוצא. (זה נכון גם ל-<code>git log</code>.)</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="messages">איך כותבים הודעת commit טובה</h2>
+      <p>בעוד חודש, ההודעות יהיו הדרך היחידה שלכם להבין מה עשיתם. גם מעסיקים שמסתכלים ב-GitHub שלכם קוראים אותן.</p>
+      <table>
+        <tr><th>❌ לא טוב</th><th>✅ טוב</th></tr>
+        <tr><td><code>update</code></td><td><code>Add contact section with email link</code></td></tr>
+        <tr><td><code>fix</code></td><td><code>Fix navbar overflow on mobile</code></td></tr>
+        <tr><td><code>asdfgh</code></td><td><code>Change hero background to gradient</code></td></tr>
+        <tr><td><code>lots of changes</code></td><td>כמה commits קטנים, כל אחד על דבר אחד</td></tr>
+      </table>
+      <p>כללי אצבע:</p>
+      <ul>
+        <li>כותבים <strong>באנגלית</strong>, בציווי ("Add", "Fix", "Remove"), כאילו משלימים את המשפט: "If applied, this commit will…"</li>
+        <li>שורה אחת קצרה, עד כ-50 תווים.</li>
+        <li><strong>commit אחד = שינוי הגיוני אחד.</strong> עדיף הרבה commits קטנים מאשר אחד ענק בסוף היום.</li>
+        <li>מתי לעשות commit? בכל פעם שמשהו עובד: סיימתם את ה-navbar? ‏commit. הוספתם כרטיס? ‏commit.</li>
+      </ul>
+
+      <!-- ===================================================== -->
+      <h2 id="log">היסטוריה: git log</h2>
+      <pre class="terminal"><code class="nohighlight">$ git log
+commit 8b41d07e5a1c9f3b2d6e4a8c7f1b0e9d3a2c5f61 (HEAD -> main)
+Author: Dana Cohen &lt;dana@example.com&gt;
+Date:   Mon Nov 3 18:42:10 2026 +0200
+
+    Add stylesheet and about paragraph
+
+commit 3f2a9c1b7d4e8a6f0c2b5d9e1a3f7c4b8d6e0a29
+Author: Dana Cohen &lt;dana@example.com&gt;
+Date:   Mon Nov 3 18:30:55 2026 +0200
+
+    Add first HTML page</code></pre>
+      <p>ה-commit החדש ביותר מופיע למעלה. ‏<code>HEAD -> main</code> אומר שאתם נמצאים ב-commit הזה, בענף <code>main</code>. יוצאים עם <code>q</code>.</p>
+      <p>גרסה מקוצרת ונוחה יותר:</p>
+      <pre class="terminal"><code class="nohighlight">$ git log --oneline
+8b41d07 (HEAD -> main) Add stylesheet and about paragraph
+3f2a9c1 Add first HTML page</code></pre>
+      <p>המספרים הקצרים (<code>8b41d07</code>) הם תחילת ה-hash. ‏Git מסתפק בהם כדי לזהות commit.</p>
+      <p>רוצים לראות מה השתנה ב-commit מסוים?</p>
+      <pre class="terminal"><code class="nohighlight">$ git show 3f2a9c1</code></pre>
+
+      <div class="exercise">
+        <h3>תרגיל: שלושה commits <span class="level easy">קל</span></h3>
+        <ol>
+          <li>בתיקייה <code>lesson-01</code> (שכבר יש בה ריפו), הוסיפו ל-<code>index.html</code> כותרת <code>h2</code> ושמרו.</li>
+          <li>בדקו את המצב, ראו את השינוי עם <code>git diff</code>, וצרו commit עם הודעה טובה.</li>
+          <li>צרו קובץ <code>about.html</code> עם פסקה אחת, וצרו commit.</li>
+          <li>הציגו את ההיסטוריה בשורה אחת לכל commit. כמה commits יש?</li>
+        </ol>
+        <details class="solution">
+          <summary>הצגת פתרון</summary>
+          <pre class="terminal"><code class="nohighlight">$ git status
+$ git diff
+$ git add .
+$ git commit -m "Add skills heading"
+$ touch about.html
+# עורכים את about.html ב-VS Code ושומרים
+$ git add .
+$ git commit -m "Add about page"
+$ git log --oneline
+d91c2e4 (HEAD -> main) Add about page
+a7f03b8 Add skills heading
+8b41d07 Add stylesheet and about paragraph
+3f2a9c1 Add first HTML page</code></pre>
+          <p>אם עבדתם לפי הסעיף הקודם, יש ארבעה commits. ה-hash אצלכם יהיה שונה, וזה תקין.</p>
+        </details>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="undo">ביטול טעויות</h2>
+      <p>הסיבה העיקרית להשתמש ב-Git: אפשר לבטל כמעט כל דבר. הנה המצבים הנפוצים, מהקל לכבד:</p>
+
+      <h3>1. "הרסתי קובץ ועוד לא עשיתי add": חזרה לגרסה האחרונה</h3>
+      <pre class="terminal"><code class="nohighlight">$ git restore index.html</code></pre>
+      <p>הקובץ חוזר למצב שלו ב-commit האחרון. <strong>זהירות: השינויים שלא נשמרו ב-commit יימחקו לתמיד.</strong></p>
+
+      <h3>2. "עשיתי add לקובץ שלא רציתי": הוצאה מאזור ההכנה</h3>
+      <pre class="terminal"><code class="nohighlight">$ git restore --staged notes.txt</code></pre>
+      <p>הקובץ יוצא מאזור ההכנה, אבל השינויים בו נשארים. כלום לא נמחק.</p>
+
+      <h3>3. "טעות בהודעה של ה-commit האחרון" או "שכחתי קובץ"</h3>
+      <pre class="terminal"><code class="nohighlight">$ git add forgotten-file.css
+$ git commit --amend -m "Add navbar with styles"</code></pre>
+      <p>‏<code>--amend</code> מחליף את ה-commit האחרון בגרסה מתוקנת. משתמשים בזה <strong>רק לפני push</strong>.</p>
+
+      <h3>4. "commit ישן שבר משהו": ביטול בטוח עם revert</h3>
+      <pre class="terminal"><code class="nohighlight">$ git log --oneline
+d91c2e4 (HEAD -> main) Add about page
+a7f03b8 Add skills heading
+$ git revert a7f03b8</code></pre>
+      <p>‏<code>git revert</code> יוצר commit <strong>חדש</strong> שמבטל את השינויים של commit ישן. ההיסטוריה לא נמחקת, ולכן זה בטוח גם אחרי push. ‏Git יפתח עורך עם הודעה מוכנה: שומרים וסוגרים.</p>
+
+      <h3>5. רק להציץ בגרסה ישנה</h3>
+      <pre class="terminal"><code class="nohighlight">$ git restore --source=3f2a9c1 index.html
+# index.html חוזר לגרסה מאותו commit. אם זה מה שרציתם: add ו-commit
+# אם לא: git restore index.html מחזיר למצב האחרון</code></pre>
+
+      <table>
+        <tr><th>מצב</th><th>פקודה</th><th>מוחק עבודה?</th></tr>
+        <tr><td>שינוי בקובץ שלא נוסף עם add</td><td><code>git restore קובץ</code></td><td>⚠️ כן, את השינויים שלא נשמרו</td></tr>
+        <tr><td>קובץ נוסף עם add בטעות</td><td><code>git restore --staged קובץ</code></td><td>✅ לא</td></tr>
+        <tr><td>תיקון ה-commit האחרון (לפני push)</td><td><code>git commit --amend</code></td><td>✅ לא</td></tr>
+        <tr><td>ביטול commit ישן</td><td><code>git revert hash</code></td><td>✅ לא, נוצר commit חדש</td></tr>
+      </table>
+      <div class="box warn">
+        <p>באינטרנט תמצאו גם את <code>git reset --hard</code>. היא חזקה ו<strong>מוחקת עבודה בלי אפשרות לשחזר</strong>. בשלב הזה של הקורס, אל תשתמשו בה.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">כבר עשיתם push ל-GitHub, ואז גיליתם ש-commit מלפני שלושה ימים שבר את העיצוב. מה הדרך הבטוחה לבטל אותו?</p>
+        <ul>
+          <li>למחוק את תיקיית <code>.git</code> ולהתחיל מחדש</li>
+          <li><code>git commit --amend</code></li>
+          <li data-correct><code>git revert</code> עם ה-hash של אותו commit</li>
+        </ul>
+        <p class="quiz-explain">‏<code>revert</code> מוסיף commit חדש שמבטל את הישן, בלי לשכתב היסטוריה שכבר נמצאת ב-GitHub. ‏<code>--amend</code> משנה רק את ה-commit האחרון, ומחיקת <code>.git</code> מוחקת את כל ההיסטוריה.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="gitignore">קבצים ש-Git צריך להתעלם מהם: .gitignore</h2>
+      <p>יש קבצים שלא רוצים לשמור בריפו: קבצי מערכת (כמו <code>.DS_Store</code> ב-Mac), הגדרות אישיות של העורך, ובהמשך הקורס גם תיקיית <code>node_modules</code> הענקית וקבצי <code>.env</code> עם סיסמאות.</p>
+      <p>יוצרים בתיקייה הראשית של הפרויקט קובץ בשם <code>.gitignore</code> (עם נקודה בהתחלה, ובלי סיומת), וכותבים בו מה להתעלם ממנו, שורה לכל דבר:</p>
+      <pre><code class="language-plaintext"># קבצי מערכת
+.DS_Store
+Thumbs.db
+
+# הגדרות עורך
+.vscode/
+
+# נצטרך את אלה מהשיעור הרביעי
+node_modules/
+.env</code></pre>
+      <ul>
+        <li>שורה שמתחילה ב-<code>#</code> היא הערה.</li>
+        <li><code>/</code> בסוף השם פירושו תיקייה.</li>
+        <li><code>*.log</code> פירושו כל הקבצים שמסתיימים ב-<code>.log</code>.</li>
+      </ul>
+      <p>אחרי שיוצרים את הקובץ, ‏<code>git status</code> כבר לא יציג את הקבצים האלה. את ה-<code>.gitignore</code> עצמו כן מוסיפים ל-commit:</p>
+      <pre class="terminal"><code class="nohighlight">$ git add .gitignore
+$ git commit -m "Add gitignore"</code></pre>
+      <div class="box warn">
+        <p><strong>סיסמאות ומפתחות לעולם לא נכנסים ל-Git.</strong> גם אם מוחקים אותם ב-commit מאוחר יותר, הם נשארים בהיסטוריה, וב-GitHub ציבורי כל אחד יכול למצוא אותם. נלמד לעבוד נכון עם סודות בשיעור 9.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="vscode">Git בתוך VS Code</h2>
+      <p>כל מה שעשינו בטרמינל אפשר לעשות גם בלחיצות ב-VS Code. חשוב להכיר את שתי הדרכים: הטרמינל עוזר להבין מה קורה, והממשק נוח לעבודה יומיומית.</p>
+      <ul>
+        <li><strong>צבעים בסייר הקבצים:</strong> קובץ חדש מסומן ב-<strong style="color:#16a34a">U</strong> (Untracked, ירוק), וקובץ שהשתנה מסומן ב-<strong style="color:#ca8a04">M</strong> (Modified, צהוב-כתום).</li>
+        <li><strong>לשונית Source Control</strong> (האייקון של הענף בסרגל הצד, או <code>Ctrl+Shift+G</code>): מציגה את כל הקבצים שהשתנו. לחיצה על קובץ מציגה diff, הישן מול החדש.</li>
+        <li><strong>הסימן <code>+</code></strong> ליד קובץ = <code>git add</code> לאותו קובץ.</li>
+        <li><strong>תיבת ההודעה + הכפתור ✓ Commit</strong> = <code>git commit -m</code>.</li>
+        <li><strong>הכפתור Sync Changes</strong> (או החצים בפינה השמאלית התחתונה) = <code>git pull</code> ואז <code>git push</code>.</li>
+        <li><strong>פסים צבעוניים ליד מספרי השורות</strong> בעורך: ירוק = שורה חדשה, כחול = שורה שהשתנתה, משולש אדום = שורה נמחקה.</li>
+      </ul>
+      <div class="box tip">
+        <p>אם לוחצים Commit בלי לסמן קבצים עם <code>+</code>, ‏VS Code שואל אם להוסיף את כל השינויים. אפשר לענות <strong>Yes</strong>, או <strong>Always</strong> כדי שלא ישאל שוב.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="github">GitHub: מעלים את הפרויקט לענן</h2>
+      <p>עד עכשיו כל ההיסטוריה נמצאת רק במחשב שלכם. עכשיו נעלה אותה ל-GitHub.</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>פותחים חשבון</h4>
+          <p>נרשמים ב-<a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a> עם אותו מייל שהגדרתם ב-<code>git config</code>. בחרו שם משתמש מקצועי, למשל <code>dana-cohen</code> ולא <code>dana_the_queen99</code>. הוא יופיע בכתובות של כל הפרויקטים שלכם.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>יוצרים ריפו חדש באתר</h4>
+          <ol>
+            <li>לוחצים על <strong>+</strong> בפינה העליונה ← <strong>New repository</strong>.</li>
+            <li><strong>Repository name</strong>: שם קצר באנגלית, בלי רווחים, למשל <code>profile-page</code>.</li>
+            <li><strong>Public</strong>: כדי שאחרים (ומעסיקים) יוכלו לראות.</li>
+            <li><strong>חשוב:</strong> <em>לא</em> מסמנים "Add a README file", ‏.gitignore או license. כבר יש לנו ריפו מקומי, וריפו ריק ב-GitHub מונע התנגשויות.</li>
+            <li>לוחצים <strong>Create repository</strong>.</li>
+          </ol>
+          <p>‏GitHub יציג עמוד עם הוראות. מעניין אותנו החלק <strong>"…or push an existing repository from the command line"</strong>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>מחברים את הריפו המקומי ל-GitHub</h4>
+          <pre class="terminal"><code class="nohighlight">$ git remote add origin https://github.com/dana-cohen/profile-page.git
+$ git branch -M main
+$ git push -u origin main</code></pre>
+          <table>
+            <tr><th>פקודה</th><th>מה היא עושה</th></tr>
+            <tr><td><code>git remote add origin URL</code></td><td>שומרת את הכתובת של הריפו ב-GitHub תחת הכינוי <code>origin</code>. פעם אחת לכל פרויקט.</td></tr>
+            <tr><td><code>git branch -M main</code></td><td>מוודאת שהענף נקרא <code>main</code>. אם כבר הגדרתם <code>init.defaultBranch</code>, הפקודה לא משנה כלום, אבל לא מזיקה.</td></tr>
+            <tr><td><code>git push -u origin main</code></td><td>מעלה את הענף <code>main</code> ל-<code>origin</code>. ‏<code>-u</code> זוכר את החיבור, כך שבפעמים הבאות מספיק לכתוב <code>git push</code>.</td></tr>
+          </table>
+          <p>העתיקו את הכתובת מהעמוד של GitHub. בכתובת צריך להופיע שם המשתמש <em>שלכם</em>. אפשר לוודא שהחיבור נשמר:</p>
+          <pre class="terminal"><code class="nohighlight">$ git remote -v
+origin  https://github.com/dana-cohen/profile-page.git (fetch)
+origin  https://github.com/dana-cohen/profile-page.git (push)</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>התחברות (פעם ראשונה בלבד)</h4>
+          <p>ב-push הראשון, ‏Git צריך לדעת שאתם באמת הבעלים של החשבון:</p>
+          <ul>
+            <li><strong>Windows:</strong> נפתח חלון של <em>Git Credential Manager</em>. בוחרים <strong>Sign in with your browser</strong>, מאשרים בדפדפן, וזהו. החיבור נשמר.</li>
+            <li><strong>Mac / VS Code:</strong> בדרך כלל VS Code מציע "Sign in with GitHub" ופותח את הדפדפן. מאשרים, וזהו.</li>
+            <li>אם הטרמינל מבקש <code>Username</code> ו-<code>Password</code>: הסיסמה הרגילה של GitHub <strong>לא תעבוד</strong> (‏GitHub הפסיק לתמוך בזה). במקומה צריך <strong>Personal Access Token</strong>: ב-GitHub נכנסים ל-<strong>Settings ← Developer settings ← Personal access tokens ← Tokens (classic) ← Generate new token</strong>, מסמנים את <code>repo</code>, מעתיקים את הטוקן ומדביקים אותו בתור הסיסמה. (בזמן ההדבקה לא יופיעו תווים על המסך. זה תקין.)</li>
+          </ul>
+          <p>כשה-push מצליח, רואים משהו כזה:</p>
+          <pre class="terminal"><code class="nohighlight">Enumerating objects: 9, done.
+Counting objects: 100% (9/9), done.
+Writing objects: 100% (9/9), 1.24 KiB | 1.24 MiB/s, done.
+Total 9 (delta 1), reused 0 (delta 0)
+To https://github.com/dana-cohen/profile-page.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.</code></pre>
+          <p>רעננו את העמוד ב-GitHub: הקבצים וה-commits שלכם שם! לחצו על "commits" כדי לראות את ההיסטוריה.</p>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <p><strong>README.md:</strong> כדאי להוסיף לכל פרויקט קובץ <code>README.md</code> שמסביר מה הפרויקט. ‏GitHub מציג אותו בעמוד הראשי של הריפו. הוא כתוב ב-Markdown, שפה פשוטה לעיצוב טקסט: <code># כותרת</code>, ‏<code>**מודגש**</code>, ‏<code>- פריט ברשימה</code>.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>ההתחברות היא המקום שבו רוב הכיתה נתקעת. כדאי לבקש מהסטודנטים לפתוח חשבון GitHub לפני השיעור, ולהקדיש לזה זמן בכיתה. אם מישהו נתקע על הסיסמה, להפנות ישר לפסקה על Personal Access Token. אפשרות חלופית ומהירה: <code>git push</code> מתוך VS Code, שמטפל בהתחברות דרך הדפדפן.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="daily">העבודה השוטפת: push ו-pull</h2>
+      <p>אחרי החיבור הראשון, המעגל היומיומי גדל בשלב אחד:</p>
+      <pre class="terminal"><code class="nohighlight"># עורכים ושומרים...
+$ git add .
+$ git commit -m "Add skills cards"
+$ git push</code></pre>
+      <p>ומה אם עבדתם על הפרויקט במחשב אחר (למשל במעבדה), או ששיניתם משהו ישירות באתר של GitHub? לפני שמתחילים לעבוד, מושכים את השינויים:</p>
+      <pre class="terminal"><code class="nohighlight">$ git pull
+Updating 8b41d07..c3e9a12
+Fast-forward
+ index.html | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)</code></pre>
+      <table>
+        <tr><th>פקודה</th><th>כיוון</th><th>מתי</th></tr>
+        <tr><td><code>git push</code></td><td>מחשב ← GitHub</td><td>אחרי commits, בסוף כל סשן עבודה</td></tr>
+        <tr><td><code>git pull</code></td><td>GitHub ← מחשב</td><td>בתחילת כל סשן עבודה</td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>הרגל טוב:</strong> מתחילים לעבוד עם <code>git pull</code>, ומסיימים עם <code>git push</code>. ככה GitHub תמיד מעודכן, ואתם אף פעם לא עובדים על גרסה ישנה.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">עשיתם <code>git commit</code> אבל לא <code>git push</code>. מה רואים ב-GitHub?</p>
+        <ul>
+          <li>את ה-commit החדש</li>
+          <li data-correct>את המצב שהיה לפני ה-commit: הוא קיים רק במחשב שלכם</li>
+          <li>הודעת שגיאה</li>
+        </ul>
+        <p class="quiz-explain">‏commit שומר רק בריפו המקומי. ‏GitHub מתעדכן רק כשעושים <code>git push</code>.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="clone">להוריד פרויקט קיים: git clone</h2>
+      <p>‏<code>clone</code> מוריד ריפו שלם מ-GitHub, כולל כל ההיסטוריה, ויוצר לו תיקייה. משתמשים בזה כשרוצים להמשיך לעבוד על הפרויקט שלכם במחשב חדש, או כשרוצים להוריד פרויקט של מישהו אחר (למשל קוד לדוגמה מהקורס).</p>
+      <p>ב-GitHub לוחצים על הכפתור הירוק <strong>&lt;&gt; Code</strong> ומעתיקים את כתובת ה-HTTPS. ואז:</p>
+      <pre class="terminal"><code class="nohighlight">$ cd ~/Documents
+$ git clone https://github.com/dana-cohen/profile-page.git
+Cloning into 'profile-page'...
+remote: Enumerating objects: 9, done.
+Receiving objects: 100% (9/9), done.
+$ cd profile-page
+$ git log --oneline</code></pre>
+      <ul>
+        <li><strong>לא</strong> מריצים <code>git init</code> אחרי clone. הריפו כבר קיים, וגם ה-remote (<code>origin</code>) כבר מוגדר.</li>
+        <li>אם זה הריפו שלכם, אפשר מיד לעבוד, לעשות commit ו-push.</li>
+        <li>אם זה ריפו של מישהו אחר, ‏push לא יעבוד (אין לכם הרשאה), אבל אפשר לקרוא ולשנות מקומית.</li>
+      </ul>
+      <table>
+        <tr><th></th><th><code>git init</code></th><th><code>git clone</code></th></tr>
+        <tr><td><strong>מתי</strong></td><td>פרויקט חדש שמתחיל אצלכם במחשב</td><td>פרויקט שכבר קיים ב-GitHub</td></tr>
+        <tr><td><strong>remote</strong></td><td>צריך להוסיף עם <code>git remote add</code></td><td>מוגדר אוטומטית</td></tr>
+        <tr><td><strong>היסטוריה</strong></td><td>ריקה</td><td>כל ההיסטוריה של הפרויקט</td></tr>
+      </table>
+
+      <!-- ===================================================== -->
+      <h2 id="branches">ענפים (branches): היכרות ראשונה</h2>
+      <p>ענף הוא קו פיתוח נפרד. נניח שאתם רוצים לנסות עיצוב חדש לגמרי לדף, אבל לא לשבור את הגרסה שעובדת. יוצרים ענף, מנסים בו, ואם זה מוצלח ממזגים אותו חזרה ל-<code>main</code>.</p>
+      <pre class="terminal"><code class="nohighlight">  main:        A ── B ── C ─────────── F   (מיזוג)
+                          \           /
+  dark-theme:              D ──── E ─</code></pre>
+      <pre class="terminal"><code class="nohighlight"># יוצרים ענף חדש ועוברים אליו
+$ git switch -c dark-theme
+Switched to a new branch 'dark-theme'
+# עובדים ועושים commits כרגיל...
+$ git add .
+$ git commit -m "Try dark theme"
+# חוזרים ל-main: הקבצים בתיקייה חוזרים למצב של main!
+$ git switch main
+# ממזגים את הענף לתוך main
+$ git merge dark-theme
+# רואים את כל הענפים (הכוכבית מסמנת איפה אתם)
+$ git branch
+  dark-theme
+* main</code></pre>
+      <p>בשיעור הזה מספיק להכיר את הרעיון. בפרויקטים עצמם נעבוד בעיקר על <code>main</code>. בעבודת צוות (בפרויקט הסיום) ענפים הם הכלי המרכזי: כל אחד עובד בענף משלו, ובסוף פותחים <strong>Pull Request</strong> ב-GitHub כדי למזג.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="netlify">פרסום האתר ב-Netlify</h2>
+      <p>‏<a href="https://www.netlify.com/" target="_blank" rel="noopener">Netlify</a> הוא שירות חינמי לאחסון אתרים. הוא מתחבר לריפו ב-GitHub, וכל <code>git push</code> מעדכן את האתר אוטומטית תוך כמה שניות. ככה גם האתר הזה מפורסם.</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>נרשמים</h4>
+          <p>נכנסים ל-<a href="https://app.netlify.com/signup" target="_blank" rel="noopener">app.netlify.com/signup</a> ובוחרים <strong>Sign up with GitHub</strong>. ככה Netlify יוכל לראות את הריפואים שלכם.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>מייבאים את הפרויקט</h4>
+          <ol>
+            <li>בלוח הבקרה: <strong>Add new site ← Import an existing project</strong> (בגרסאות חדשות: <strong>Add new project</strong>).</li>
+            <li>בוחרים <strong>GitHub</strong>, ומאשרים ל-Netlify גישה (אפשר רק לריפו הספציפי).</li>
+            <li>בוחרים את הריפו <code>profile-page</code>.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>הגדרות בנייה</h4>
+          <p>לאתר HTML ו-CSS פשוט אין צורך בבנייה:</p>
+          <table>
+            <tr><th>שדה</th><th>מה כותבים</th></tr>
+            <tr><td>Branch to deploy</td><td><code>main</code></td></tr>
+            <tr><td>Build command</td><td>משאירים <strong>ריק</strong></td></tr>
+            <tr><td>Publish directory</td><td>משאירים ריק, או <code>.</code> (אם <code>index.html</code> נמצא בתיקייה הראשית של הריפו)</td></tr>
+          </table>
+          <p>לוחצים <strong>Deploy</strong>. אחרי כמה שניות מופיעה כתובת כמו <code>https://random-name-123.netlify.app</code>. זה האתר שלכם, באוויר!</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>שם יפה ועדכונים</h4>
+          <ul>
+            <li><strong>Site configuration ← Change site name</strong>: משנים לשם כמו <code>dana-cohen</code>, והכתובת תהיה <code>dana-cohen.netlify.app</code>.</li>
+            <li>מעכשיו כל <code>git push</code> ל-<code>main</code> מפעיל פרסום חדש. אפשר לראות אותו בלשונית <strong>Deploys</strong>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box warn">
+        <p><strong>הדף הראשי חייב להיקרא <code>index.html</code></strong> (באותיות קטנות) ולהיות בתיקייה הראשית של הריפו. אחרת Netlify יציג "Page not found". שימו לב גם שבשרת יש הבדל בין אותיות גדולות לקטנות: <code>Images/Me.JPG</code> ו-<code>images/me.jpg</code> הם שני קבצים שונים, גם אם במחשב שלכם זה עבד.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="troubleshooting">תקלות נפוצות ואיך פותרים אותן</h2>
+      <p>כולם נתקלים בהודעות האלה. הנה מה הן אומרות ומה עושים:</p>
+      <table>
+        <tr><th>ההודעה</th><th>מה קרה</th><th>מה עושים</th></tr>
+        <tr><td><code>fatal: not a git repository</code></td><td>אתם לא בתיקייה של ריפו (או שעוד לא הרצתם <code>git init</code>)</td><td><code>pwd</code> כדי לראות איפה אתם, ואז <code>cd</code> לתיקיית הפרויקט</td></tr>
+        <tr><td><code>git: command not found</code></td><td>‏Git לא מותקן, או שהטרמינל נפתח לפני ההתקנה</td><td>סוגרים ופותחים מחדש את הטרמינל ואת VS Code. אם זה לא עוזר, מתקינים שוב</td></tr>
+        <tr><td><code>nothing to commit, working tree clean</code></td><td>אין שינויים חדשים</td><td>זו לא שגיאה! בדקו ששמרתם את הקובץ ב-VS Code (נקודה לבנה בלשונית = לא נשמר)</td></tr>
+        <tr><td><code>nothing added to commit but untracked files present</code></td><td>שכחתם <code>git add</code></td><td><code>git add .</code> ואז שוב commit</td></tr>
+        <tr><td><code>Author identity unknown</code></td><td>לא הגדרתם שם ומייל</td><td>מריצים את פקודות <code>git config</code> מהסעיף "הגדרה ראשונית"</td></tr>
+        <tr><td><code>error: remote origin already exists</code></td><td>כבר חיברתם remote</td><td>אם הכתובת שגויה: <code>git remote set-url origin URL</code> עם הכתובת הנכונה</td></tr>
+        <tr><td><code>error: src refspec main does not match any</code></td><td>אין עדיין אף commit, או שהענף נקרא אחרת (למשל <code>master</code>)</td><td>עושים commit קודם. בודקים את שם הענף עם <code>git branch</code>, ומשנים עם <code>git branch -M main</code></td></tr>
+        <tr><td><code>Support for password authentication was removed</code></td><td>הקלדתם את סיסמת GitHub הרגילה</td><td>משתמשים ב-Personal Access Token (ראו סעיף GitHub שלב 4), או ב-push מתוך VS Code</td></tr>
+        <tr><td><code>! [rejected] main -> main (fetch first)</code></td><td>ב-GitHub יש commits שאין אצלכם (למשל יצרתם README באתר)</td><td><code>git pull</code> ואז שוב <code>git push</code></td></tr>
+        <tr><td><code>fatal: refusing to merge unrelated histories</code></td><td>יצרתם ריפו ב-GitHub עם README, וגם ריפו מקומי עם <code>git init</code></td><td><code>git pull origin main --allow-unrelated-histories</code>, ואז <code>git push</code></td></tr>
+        <tr><td><code>CONFLICT (content): Merge conflict in index.html</code></td><td>אותה שורה השתנתה בשני מקומות</td><td>ראו הסבר מתחת לטבלה</td></tr>
+        <tr><td>מסך שחור עם <code>~</code> בכל שורה (Vim)</td><td>‏Git פתח עורך כי לא נתתם <code>-m</code></td><td><code>Esc</code>, ואז <code>:wq</code> ו-Enter (שמירה ויציאה) או <code>:q!</code> (יציאה בלי לשמור)</td></tr>
+        <tr><td>הטרמינל "תקוע" עם <code>:</code> בתחתית</td><td>אתם בתוך תצוגה בעמודים (של <code>git log</code> או <code>git diff</code>)</td><td>לוחצים <code>q</code></td></tr>
+      </table>
+
+      <h3>פתרון התנגשות (merge conflict)</h3>
+      <p>כשאותה שורה השתנתה גם אצלכם וגם ב-GitHub, ‏Git לא יודע איזו גרסה לבחור, ולכן משאיר את ההחלטה לכם. בקובץ יופיע:</p>
+      <pre><code class="language-plaintext">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+    &lt;h1&gt;דנה כהן: מפתחת Full-Stack&lt;/h1&gt;
+=======
+    &lt;h1&gt;דנה כהן: מפתחת ווב&lt;/h1&gt;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/main</code></pre>
+      <ol>
+        <li>החלק שבין <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> ל-<code>=======</code> הוא הגרסה שלכם. החלק שבין <code>=======</code> ל-<code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> הוא הגרסה מ-GitHub.</li>
+        <li>עורכים את הקובץ כך שיישאר רק מה שרוצים, ו<strong>מוחקים את שלוש שורות הסימון</strong>. ‏VS Code מציע כפתורים נוחים: <em>Accept Current</em>, ‏<em>Accept Incoming</em> או <em>Accept Both</em>.</li>
+        <li>שומרים, ואז:</li>
+      </ol>
+      <pre class="terminal"><code class="nohighlight">$ git add index.html
+$ git commit -m "Resolve title conflict"
+$ git push</code></pre>
+      <div class="box tip">
+        <p><strong>כשמשהו לא ברור:</strong> מריצים <code>git status</code>. בדרך כלל Git כותב בדיוק מה המצב ואיזו פקודה להריץ. ואם עדיין תקועים, מעתיקים את הודעת השגיאה המדויקת לחיפוש בגוגל. כמעט תמיד מישהו כבר נתקל בה.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="cheatsheet">דף עזר: כל הפקודות</h2>
+      <table>
+        <tr><th>פקודה</th><th>מה עושה</th><th>כמה פעמים</th></tr>
+        <tr><td><code>git config --global user.name "…"</code></td><td>הגדרת שם (וגם <code>user.email</code>)</td><td>פעם אחת למחשב</td></tr>
+        <tr><td><code>git init</code></td><td>יצירת ריפו בתיקייה הנוכחית</td><td>פעם אחת לפרויקט</td></tr>
+        <tr><td><code>git clone URL</code></td><td>הורדת ריפו קיים מ-GitHub</td><td>פעם אחת לפרויקט, לכל מחשב</td></tr>
+        <tr><td><code>git remote add origin URL</code></td><td>חיבור הריפו ל-GitHub</td><td>פעם אחת לפרויקט</td></tr>
+        <tr><td><code>git status</code></td><td>מה המצב עכשיו?</td><td>כל הזמן</td></tr>
+        <tr><td><code>git add .</code></td><td>הוספת כל השינויים לאזור ההכנה</td><td>לפני כל commit</td></tr>
+        <tr><td><code>git commit -m "…"</code></td><td>שמירת תמונת מצב בהיסטוריה</td><td>בכל פעם שמשהו עובד</td></tr>
+        <tr><td><code>git push</code></td><td>העלאה ל-GitHub</td><td>בסוף כל סשן עבודה</td></tr>
+        <tr><td><code>git pull</code></td><td>הורדת שינויים מ-GitHub</td><td>בתחילת כל סשן עבודה</td></tr>
+        <tr><td><code>git diff</code></td><td>מה השתנה בקבצים</td><td>לפני add</td></tr>
+        <tr><td><code>git log --oneline</code></td><td>היסטוריה מקוצרת</td><td>לפי הצורך</td></tr>
+        <tr><td><code>git restore קובץ</code></td><td>ביטול שינויים שלא נשמרו ב-commit</td><td>לפי הצורך</td></tr>
+        <tr><td><code>git revert hash</code></td><td>ביטול בטוח של commit ישן</td><td>לפי הצורך</td></tr>
+        <tr><td><code>git switch -c שם</code></td><td>יצירת ענף ומעבר אליו</td><td>לפי הצורך</td></tr>
+      </table>
+
+      <!-- ===================================================== -->
+      <h2 id="practice">תרגול מסכם</h2>
+
+      <div class="exercise">
+        <h3>תרגיל 1: מאפס ל-GitHub <span class="level medium">בינוני</span></h3>
+        <ol>
+          <li>צרו בטרמינל תיקייה חדשה בשם <code>git-practice</code> והיכנסו אליה.</li>
+          <li>צרו ריפו, וקובץ <code>index.html</code> עם מבנה HTML בסיסי וכותרת עם השם שלכם.</li>
+          <li>צרו קובץ <code>.gitignore</code> שמתעלם מ-<code>.DS_Store</code>.</li>
+          <li>עשו commit ראשון.</li>
+          <li>צרו ריפו ריק ב-GitHub בשם <code>git-practice</code>, חברו אותו ועשו push.</li>
+          <li>הוסיפו פסקה ל-<code>index.html</code>, ועשו commit ו-push נוספים. ודאו ב-GitHub שיש 2 commits.</li>
+        </ol>
+        <details class="solution">
+          <summary>הצגת פתרון</summary>
+          <pre class="terminal"><code class="nohighlight">$ cd ~/Documents/web-course
+$ mkdir git-practice
+$ cd git-practice
+$ git init
+$ touch index.html .gitignore
+# ב-VS Code: כותבים את ה-HTML ב-index.html, ומוסיפים ל-.gitignore את השורה .DS_Store
+$ git add .
+$ git commit -m "Add basic page and gitignore"
+$ git remote add origin https://github.com/YOUR-USERNAME/git-practice.git
+$ git push -u origin main
+# מוסיפים פסקה ושומרים
+$ git add .
+$ git commit -m "Add intro paragraph"
+$ git push</code></pre>
+        </details>
+      </div>
+
+      <div class="exercise">
+        <h3>תרגיל 2: ביטולים <span class="level medium">בינוני</span></h3>
+        <ol>
+          <li>בריפו מתרגיל 1, מחקו את כל התוכן של <code>index.html</code> ושמרו. (אופס!) החזירו אותו עם פקודת Git אחת.</li>
+          <li>צרו קובץ <code>secret.txt</code>, הריצו <code>git add .</code>, ואז הוציאו רק אותו מאזור ההכנה. לבסוף הוסיפו אותו ל-<code>.gitignore</code>.</li>
+          <li>עשו commit עם הודעה עם שגיאת כתיב, ואז תקנו את ההודעה.</li>
+        </ol>
+        <details class="solution">
+          <summary>הצגת פתרון</summary>
+          <pre class="terminal"><code class="nohighlight">$ git restore index.html
+$ touch secret.txt
+$ git add .
+$ git restore --staged secret.txt
+# מוסיפים את השורה secret.txt לקובץ .gitignore ושומרים
+$ git status
+# secret.txt לא מופיע יותר. ‏.gitignore מופיע כ-modified
+$ git add .
+$ git commit -m "Ignroe secret file"
+$ git commit --amend -m "Ignore secret file"
+$ git log --oneline</code></pre>
+        </details>
+      </div>
+
+      <div class="exercise">
+        <h3>תרגיל 3: מחשב שני <span class="level hard">מאתגר</span></h3>
+        <p>נדמה עבודה משני מחשבים, בעזרת שתי תיקיות:</p>
+        <ol>
+          <li>בתיקייה אחרת (למשל <code>~/Desktop</code>), עשו <code>clone</code> לריפו <code>git-practice</code>. זה "המחשב השני".</li>
+          <li>ב"מחשב השני", שנו את הכותרת, ועשו commit ו-push.</li>
+          <li>חזרו לתיקייה המקורית, ומשכו את השינוי. ודאו שהכותרת התעדכנה.</li>
+          <li><strong>בונוס:</strong> צרו התנגשות בכוונה: שנו את <em>אותה</em> שורה בשתי התיקיות, ‏commit בשתיהן, ‏push מאחת, ו-pull בשנייה. פתרו את ההתנגשות.</li>
+        </ol>
+        <details class="solution">
+          <summary>הצגת פתרון</summary>
+          <pre class="terminal"><code class="nohighlight">$ cd ~/Desktop
+$ git clone https://github.com/YOUR-USERNAME/git-practice.git
+$ cd git-practice
+# משנים את ה-h1 ושומרים
+$ git commit -am "Change title"
+$ git push
+$ cd ~/Documents/web-course/git-practice
+$ git pull</code></pre>
+          <p>‏<code>git commit -am</code> הוא קיצור של add ו-commit יחד, אבל הוא עובד רק לקבצים ש-Git כבר מכיר (לא לקבצים חדשים).</p>
+          <p><strong>בונוס:</strong> אחרי ה-pull יופיע <code>CONFLICT</code>. פותחים את הקובץ ב-VS Code, בוחרים גרסה (או משלבים), מוחקים את הסימונים, ואז <code>git add .</code>, ‏<code>git commit -m "Resolve conflict"</code> ו-<code>git push</code>.</p>
+        </details>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>תרגיל 1 הוא החובה של השיעור, ומבוצע ממילא כחלק מהפרויקט. תרגילים 2 ו-3 לבית. תרגיל 3 מכין לעבודת צוות. כדאי לבקש מהסטודנטים להגיש קישור לריפו ב-GitHub ולאתר ב-Netlify, ולבדוק שיש כמה commits עם הודעות משמעותיות ולא commit אחד ענק.</p>
+      </aside>
+
+      <h2 id="summary">סיכום</h2>
+      <ul>
+        <li>‏<strong>Git</strong> שומר היסטוריה במחשב. <strong>GitHub</strong> שומר עותק בענן ומאפשר לשתף.</li>
+        <li>שלושה אזורים: עבודה ← (<code>add</code>) ← הכנה ← (<code>commit</code>) ← מאגר. ומשם (<code>push</code>) ל-GitHub.</li>
+        <li>המעגל היומיומי: <code>pull</code> ← עבודה ← <code>status</code> ← <code>add .</code> ← <code>commit -m</code> ← <code>push</code>.</li>
+        <li>אפשר לבטל כמעט הכול: <code>restore</code>, ‏<code>--amend</code>, ‏<code>revert</code>.</li>
+        <li>‏<code>.gitignore</code> מונע שמירה של קבצים מיותרים ושל סודות.</li>
+        <li>‏Netlify מחובר ל-GitHub: כל push מעדכן את האתר.</li>
+        <li>תקועים? <code>git status</code>, ואז טבלת התקלות.</li>
+      </ul>
+      <p>עכשיו אתם מוכנים לפרויקט: בונים דף פרופיל אישי, ומעלים אותו לאוויר ←</p>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>
