@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 2 · חלק ג׳: פונקציות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="2" data-part="functions" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 2 · חלק ג׳</span>
+      <h1>פונקציות</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 40 דק׳ בכיתה</span>
+        <span class="chip">📚 3–4 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: חלקים א׳ ו-ב׳ (משתנים, תנאים ולולאות)</span>
+      </div>
+
+      <p>עד עכשיו כתבנו קוד שרץ שורה אחרי שורה, מלמעלה למטה, פעם אחת. אבל בתוכנה אמיתית אותה פעולה צריכה לקרות שוב ושוב: לחשב מחיר עם מע״מ לכל מוצר בחנות, לבדוק אם סיסמה תקינה בכל פעם שמישהו נרשם, להציג ברכה לכל משתמש שנכנס. <strong>פונקציה</strong> היא הדרך לתת שם לקטע קוד, ולהפעיל אותו מתי שרוצים, כמה פעמים שרוצים, עם נתונים שונים בכל פעם.</p>
+      <p>פונקציות הן <strong>הנושא החשוב ביותר בשיעור הזה</strong>, ואולי בכל הקורס: ב-React כל חלק במסך הוא פונקציה. מה שתלמדו כאן ילווה אתכם בכל שיעור מעכשיו.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>להסביר מה זו פונקציה ולמה משתמשים בה</li>
+          <li>להגדיר פונקציה ולקרוא לה, עם פרמטרים ובלי</li>
+          <li>להבין את ההבדל בין <code>return</code> ל-<code>console.log</code> (הבלבול הנפוץ ביותר אצל מתחילים)</li>
+          <li>להשתמש בערכי ברירת מחדל לפרמטרים</li>
+          <li>להבין מה זה scope: איפה משתנה "חי" ואיפה לא רואים אותו</li>
+          <li>לכתוב arrow functions, הצורה המודרנית שבה נשתמש כל הזמן ב-React</li>
+          <li>להעביר פונקציה לפונקציה אחרת (callback)</li>
+          <li>לתכנן, לכתוב ולבדוק פונקציה בעצמכם, צעד אחר צעד</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בכל דוגמה יש עורך JavaScript חי. הקוד מימין, והפלט (מה ש-<code>console.log</code> מדפיס) משמאל. לוחצים <strong>▶ הרצה</strong> (או Ctrl+Enter) כדי להריץ. אם יש שגיאה, תופיע בפלט הודעה אדומה עם מספר השורה והסבר בעברית.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>תוכנית ל-40 דקות:</strong> 5 דק׳ למה פונקציות (להראות את הקוד החוזר ואת התיקון), 10 דק׳ הגדרה, קריאה ופרמטרים, 10 דק׳ ‏return מול console.log (לא לדלג!), 10 דק׳ arrow functions, 5 דק׳ אתגר 1 או 2 בכיתה. ‏scope, ‏callbacks וההמשך לבית, או לתחילת שיעור 3 אם נשאר זמן.</p>
+      </aside>
+
+      <h2 id="why">למה צריך פונקציות? <span class="time">5 דק׳</span></h2>
+      <p>נניח שאנחנו בונים חנות אונליין, וצריך להציג את המחיר של שלושה מוצרים <strong>כולל מע״מ</strong> (18%). בלי פונקציות, הקוד ייראה כך:</p>
+
+      <div class="playground" id="pg-why-repeat" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const shirtPrice = 100;
+          const shirtTotal = shirtPrice * 1.18;
+          console.log('חולצה: ' + shirtTotal + ' ₪');
+
+          const pantsPrice = 200;
+          const pantsTotal = pantsPrice * 1.18;
+          console.log('מכנסיים: ' + pantsTotal + ' ₪');
+
+          const hatPrice = 50;
+          const hatTotal = hatPrice * 1.18;
+          console.log('כובע: ' + hatTotal + ' ₪');
+        </script>
+      </div>
+
+      <p>הקוד עובד, אבל יש בו שלוש בעיות:</p>
+      <ol>
+        <li><strong>חזרה:</strong> אותו חישוב כתוב שלוש פעמים. עם 100 מוצרים זה 100 פעמים.</li>
+        <li><strong>קשה לשנות:</strong> אם המע״מ משתנה ל-17%, צריך למצוא ולתקן כל מקום. מספיק לשכוח אחד, וכבר יש באג.</li>
+        <li><strong>קשה להבין:</strong> מי שקורא את <code>price * 1.18</code> צריך לנחש מה זה 1.18. אין לחישוב הזה שם.</li>
+      </ol>
+
+      <p>עכשיו אותו דבר, עם פונקציה:</p>
+
+      <div class="playground" id="pg-why-function" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function addVat(price) {
+            return price * 1.18;
+          }
+
+          console.log('חולצה: ' + addVat(100) + ' ₪');
+          console.log('מכנסיים: ' + addVat(200) + ' ₪');
+          console.log('כובע: ' + addVat(50) + ' ₪');
+        </script>
+      </div>
+
+      <p>החישוב כתוב <strong>פעם אחת</strong>, יש לו <strong>שם</strong> שמסביר מה הוא עושה (<code>addVat</code>, "הוסף מע״מ"), ואם המע״מ ישתנה, מתקנים שורה אחת. נסו: שנו את <code>1.18</code> ל-<code>1.17</code> והריצו. כל שלושת המחירים התעדכנו.</p>
+
+      <div class="box tip">
+        <p><strong>עיקרון DRY:</strong> מתכנתים אומרים <em>Don't Repeat Yourself</em>, "אל תחזרו על עצמכם". כשאתם מוצאים את עצמכם מעתיקים ומדביקים קוד ומשנים בו רק מספר, זה סימן שצריך פונקציה.</p>
+      </div>
+
+      <h3>פונקציה היא כמו מכונה</h3>
+      <p>הדרך הכי טובה לחשוב על פונקציה: <strong>מכונה</strong>. מכניסים לה משהו (קלט), היא עושה עבודה, ומוציאה משהו (פלט). מכונת מיץ מקבלת תפוזים ומוציאה מיץ. הפונקציה <code>addVat</code> מקבלת מחיר ומוציאה מחיר כולל מע״מ.</p>
+      <div class="flow">
+        <span class="node">📥 קלט<small>100</small></span><span class="arrow">←</span><span class="node">⚙️ הפונקציה addVat<small>price * 1.18</small></span><span class="arrow">←</span><span class="node">📤 פלט<small>118</small></span>
+      </div>
+      <p>אפשר גם לחשוב עליה כמו <strong>מתכון</strong>: כותבים את המתכון לעוגה פעם אחת במחברת, ומכינים לפיו עוגה כל פעם שרוצים. כתיבת המתכון היא <strong>הגדרת</strong> הפונקציה, והכנת העוגה היא <strong>קריאה</strong> לפונקציה. כתיבת מתכון לא מכינה עוגה, וגם הגדרת פונקציה לא מריצה אותה. זה חשוב, ונחזור לזה מיד.</p>
+
+      <div class="box tip">
+        <p><strong>בעצם כבר השתמשתם בפונקציות!</strong> <code>console.log(...)</code> היא פונקציה שמישהו אחר כתב. גם <code>Math.round(...)</code>, ‏<code>Number(...)</code> ו-<code>'abc'.toUpperCase()</code>. כל פעם שכתבתם שם ואחריו סוגריים, קראתם לפונקציה. עכשיו תלמדו לכתוב פונקציות משלכם.</p>
+      </div>
+
+      <h2 id="anatomy">איך כותבים פונקציה <span class="time">10 דק׳</span></h2>
+      <p>כך נראית פונקציה פשוטה, עם הסבר לכל חלק:</p>
+<pre><code class="language-js">function sayHello(name) {
+  console.log('שלום ' + name);
+}
+
+sayHello('דנה');</code></pre>
+
+      <table>
+        <tr><th>חלק</th><th>בקוד</th><th>מה זה</th></tr>
+        <tr><td>מילת המפתח</td><td><code>function</code></td><td>אומרת ל-JavaScript: "עכשיו אני מגדיר פונקציה".</td></tr>
+        <tr><td>השם</td><td><code>sayHello</code></td><td>השם שבו נקרא לפונקציה. אותם חוקים כמו לשמות משתנים: אותיות באנגלית, בלי רווחים, ‏camelCase. כדאי שיתחיל בפועל: <code>say</code>, ‏<code>get</code>, ‏<code>calculate</code>.</td></tr>
+        <tr><td>הפרמטרים</td><td><code>(name)</code></td><td>"החורים" שדרכם הפונקציה מקבלת קלט. בתוך הפונקציה <code>name</code> מתנהג כמו משתנה רגיל. אפשר כמה פרמטרים, מופרדים בפסיק, או אף אחד: <code>()</code>.</td></tr>
+        <tr><td>הגוף</td><td><code>{ ... }</code></td><td>הקוד שרץ בכל פעם שקוראים לפונקציה. נמצא בין הסוגריים המסולסלים.</td></tr>
+        <tr><td>הקריאה</td><td><code>sayHello('דנה')</code></td><td>מפעילה את הפונקציה. השם, ואחריו סוגריים עגולים עם הערכים שרוצים להכניס.</td></tr>
+      </table>
+
+      <div class="box warn">
+        <p><strong>הגדרה לבד לא עושה כלום!</strong> אם כותבים רק את <code>function sayHello(...) { ... }</code> ולא קוראים לה, שום דבר לא יודפס. זה כמו מתכון שכתוב במחברת: הוא לא מכין עוגה עד שמישהו מכין לפיו. נסו בעורך: מחקו את השורה האחרונה והריצו.</p>
+      </div>
+
+      <div class="playground" id="pg-anatomy" data-height="200">
+        <script type="text/plain" data-lang="js">
+          function sayHello(name) {
+            console.log('שלום ' + name);
+          }
+
+          sayHello('דנה');
+        </script>
+      </div>
+
+      <h3>קוראים לפונקציה כמה פעמים שרוצים</h3>
+      <p>זה כל הרעיון: מגדירים פעם אחת, משתמשים הרבה. בכל קריאה אפשר להכניס ערך אחר:</p>
+      <div class="playground" id="pg-call-many" data-height="220">
+        <script type="text/plain" data-lang="js">
+          function sayHello(name) {
+            console.log('שלום ' + name + '! ברוכים הבאים לקורס 👋');
+          }
+
+          sayHello('דנה');
+          sayHello('יוסי');
+          sayHello('מוחמד');
+          // נסו להוסיף כאן קריאה עם השם שלכם
+        </script>
+      </div>
+
+      <h3>פונקציה בלי פרמטרים</h3>
+      <p>לא כל פונקציה צריכה קלט. לפעמים היא פשוט עושה אותו דבר בכל פעם. שימו לב שגם בלי פרמטרים <strong>חייבים</strong> סוגריים, גם בהגדרה וגם בקריאה:</p>
+      <div class="playground" id="pg-no-params" data-height="200">
+        <script type="text/plain" data-lang="js">
+          function printLine() {
+            console.log('--------------------');
+          }
+
+          printLine();
+          console.log('תפריט היום');
+          printLine();
+          console.log('פיצה · סלט · מרק');
+          printLine();
+        </script>
+      </div>
+
+      <h3>מה קורה כשקוראים לפונקציה? הקוד "קופץ"</h3>
+      <p>כשהמחשב פוגש קריאה לפונקציה, הוא <strong>קופץ</strong> לגוף הפונקציה, מריץ אותו, ואז <strong>חוזר</strong> לשורה שאחרי הקריאה וממשיך משם. הריצו ועקבו אחרי סדר ההדפסות:</p>
+      <div class="playground" id="pg-flow" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function makeCoffee() {
+            console.log('  2. טוחנים פולים');
+            console.log('  3. מוזגים מים חמים');
+          }
+
+          console.log('1. נכנסים למטבח');
+          makeCoffee();
+          console.log('4. שותים 😌');
+        </script>
+      </div>
+      <p>הסדר הוא 1, 2, 3, 4, אף על פי ששורות 2 ו-3 כתובות <strong>למעלה</strong> בקובץ. ההגדרה רק "מלמדת" את המחשב מה זה <code>makeCoffee</code>. היא רצה רק ברגע הקריאה.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה יודפס כשמריצים את הקוד הזה?<br><code>function greet() { console.log('היי'); }</code></p>
+        <ul>
+          <li>היי</li>
+          <li data-correct>שום דבר</li>
+          <li>שגיאה</li>
+          <li>greet</li>
+        </ul>
+        <p class="quiz-explain">נכון! הפונקציה רק הוגדרה, ואף אחד לא קרא לה. כדי שיודפס "היי" צריך להוסיף שורה <code>greet();</code>.</p>
+      </div>
+
+      <h2 id="params">פרמטרים וארגומנטים</h2>
+      <p>שתי מילים שמבלבלות בהתחלה, אבל ההבדל פשוט:</p>
+      <ul>
+        <li><strong>פרמטר</strong> הוא השם שכותבים <strong>בהגדרה</strong>: <code>function addVat(<u>price</u>)</code>. זה משתנה ריק שמחכה לערך.</li>
+        <li><strong>ארגומנט</strong> הוא הערך האמיתי שמכניסים <strong>בקריאה</strong>: <code>addVat(<u>100</u>)</code>. ברגע הקריאה <code>price</code> מקבל את הערך <code>100</code>.</li>
+      </ul>
+      <p>אם נחזור למכונת המיץ: הפרמטר הוא הפתח שכתוב עליו "כאן מכניסים פרי", והארגומנט הוא התפוז שהכנסתם הבוקר.</p>
+
+      <h3>כמה פרמטרים</h3>
+      <p>מפרידים בפסיק. <strong>הסדר קובע:</strong> הארגומנט הראשון נכנס לפרמטר הראשון, השני לשני, וכן הלאה.</p>
+      <div class="playground" id="pg-multi-params" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function introduce(name, age, city) {
+            console.log('קוראים לי ' + name + ', אני בן/בת ' + age + ' וגר/ה ב' + city);
+          }
+
+          introduce('דנה', 25, 'חיפה');
+          introduce('יוסי', 31, 'באר שבע');
+
+          // מה קורה אם מחליפים את הסדר? נסו:
+          introduce(25, 'חיפה', 'דנה');
+        </script>
+      </div>
+      <p>בקריאה האחרונה JavaScript לא "מבין" שהתבלבלנו. היא פשוט שמה את <code>25</code> ב-<code>name</code>, כי הוא הראשון. המחשב לא יודע מה התכוונתם, רק מה כתבתם.</p>
+
+      <h3>מה אם שוכחים ארגומנט?</h3>
+      <p>ב-JavaScript אין שגיאה. הפרמטר שלא קיבל ערך יהיה <code>undefined</code> ("לא מוגדר"). זה מקור נפוץ לבאגים, ולכן חשוב להכיר:</p>
+      <div class="playground" id="pg-missing-arg" data-height="200">
+        <script type="text/plain" data-lang="js">
+          function introduce(name, city) {
+            console.log(name + ' גר/ה ב' + city);
+          }
+
+          introduce('דנה', 'חיפה');
+          introduce('יוסי');          // שכחנו את העיר
+          introduce();                // שכחנו הכול
+        </script>
+      </div>
+      <p>כשרואים <code>undefined</code> בפלט במקום שציפיתם לערך, השאלה הראשונה שכדאי לשאול: "האם העברתי את כל הארגומנטים, ובסדר הנכון?". בהמשך העמוד נלמד <a href="#defaults">ערכי ברירת מחדל</a>, שפותרים את הבעיה הזו.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בקוד <code>function area(width, height) {...}</code> ובקריאה <code>area(5, 3)</code>, מה הם <code>5</code> ו-<code>3</code>?</p>
+        <ul>
+          <li>פרמטרים</li>
+          <li data-correct>ארגומנטים</li>
+          <li>שמות של פונקציות</li>
+          <li>ערכי החזרה</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>width</code> ו-<code>height</code> (בהגדרה) הם הפרמטרים. ‏<code>5</code> ו-<code>3</code> (בקריאה) הם הארגומנטים, הערכים האמיתיים שנכנסים לפרמטרים.</p>
+      </div>
+
+      <h2 id="return">‏return: הפונקציה מחזירה תשובה <span class="time">10 דק׳</span></h2>
+      <p>זה <strong>החלק הכי חשוב בעמוד</strong>, ולכן נעבור עליו לאט. עד עכשיו הפונקציות שלנו <em>הדפיסו</em> דברים. אבל ברוב המקרים אנחנו לא רוצים שהפונקציה תדפיס, אלא שהיא <strong>תחזיר לנו את התוצאה</strong>, כדי שנוכל להמשיך לעבוד איתה: לשמור במשתנה, לחבר למספר אחר, להשוות, להציג במסך.</p>
+      <p>המילה <code>return</code> ("החזר") אומרת: "זו התשובה של הפונקציה". הערך שאחרי <code>return</code> חוזר <strong>למקום שבו קראו לפונקציה</strong>, ו"מחליף" את הקריאה.</p>
+
+      <div class="playground" id="pg-return-basic" data-height="220">
+        <script type="text/plain" data-lang="js">
+          function addVat(price) {
+            return price * 1.18;
+          }
+
+          const total = addVat(100);   // addVat(100) "הופך" ל-118
+          console.log(total);
+
+          const double = addVat(100) * 2;  // אפשר להמשיך לחשב עם התשובה
+          console.log(double);
+        </script>
+      </div>
+      <p>אפשר לחשוב על זה כך: כשהמחשב מגיע ל-<code>addVat(100)</code>, הוא מריץ את הפונקציה, מקבל <code>118</code>, ו"מדביק" את <code>118</code> במקום הקריאה. השורה הופכת ל-<code>const total = 118;</code>.</p>
+
+      <h3>‏return מול console.log: ההבדל הקריטי</h3>
+      <p>הנה שתי פונקציות שנראות כמעט זהות. הראשונה <strong>מדפיסה</strong>, השנייה <strong>מחזירה</strong>:</p>
+<pre><code class="language-js">function printDouble(n) {
+  console.log(n * 2);   // מדפיס למסך, ולא מחזיר כלום
+}
+
+function getDouble(n) {
+  return n * 2;         // מחזיר את התשובה, ולא מדפיס כלום
+}</code></pre>
+      <p>כשקוראים להן לבד, נראה שהן עושות אותו דבר. אבל ברגע שמנסים <strong>להשתמש בתשובה</strong>, ההבדל מתגלה. הריצו ותראו:</p>
+
+      <div class="playground wide" id="pg-return-vs-log" data-height="320">
+        <script type="text/plain" data-lang="js">
+          function printDouble(n) {
+            console.log(n * 2);
+          }
+
+          function getDouble(n) {
+            return n * 2;
+          }
+
+          console.log('--- גרסה 1: מדפיסה ---');
+          const a = printDouble(5);   // מדפיס 10...
+          console.log('a =', a);       // ...אבל a הוא undefined!
+          console.log('a + 1 =', a + 1);
+
+          console.log('--- גרסה 2: מחזירה ---');
+          const b = getDouble(5);      // לא מדפיס כלום...
+          console.log('b =', b);       // ...אבל b הוא 10
+          console.log('b + 1 =', b + 1);
+        </script>
+      </div>
+
+      <table>
+        <tr><th></th><th><code>console.log(...)</code></th><th><code>return ...</code></th></tr>
+        <tr><td>מה זה עושה</td><td>מציג טקסט בחלון הפלט, <strong>לבני אדם</strong></td><td>מוסר ערך <strong>לקוד</strong> שקרא לפונקציה</td></tr>
+        <tr><td>אפשר לשמור את התוצאה במשתנה?</td><td>לא. מה שהודפס "הלך" למסך</td><td>כן: <code>const x = f()</code></td></tr>
+        <tr><td>מה הפונקציה מחזירה?</td><td><code>undefined</code></td><td>את הערך שאחרי <code>return</code></td></tr>
+        <tr><td>מתי משתמשים</td><td>כדי לבדוק מה קורה (דיבאג), או להציג הודעה</td><td>כמעט תמיד, כשהפונקציה מחשבת משהו</td></tr>
+      </table>
+
+      <div class="box tip">
+        <p><strong>אנלוגיה:</strong> שולחים חבר לבדוק כמה עולה חלב בסופר. <code>console.log</code> זה החבר שצועק את המחיר בתוך הסופר: הוא "אמר" את התשובה, אבל אתם בבית ולא שמעתם. <code>return</code> זה החבר שחוזר הביתה ואומר לכם את המחיר, ועכשיו אתם יכולים להשתמש בו, למשל לחשב אם יש מספיק כסף.</p>
+      </div>
+
+      <div class="box warn">
+        <p><strong>כלל אצבע:</strong> פונקציה שמחשבת משהו צריכה <code>return</code>. את ה-<code>console.log</code> כותבים <strong>מחוץ</strong> לפונקציה, ברגע שרוצים לראות את התשובה: <code>console.log(getDouble(5))</code>. כך הפונקציה שימושית בכל מקום: גם להדפסה, גם לחישובים, וגם (בהמשך הקורס) להצגה במסך ב-React.</p>
+      </div>
+
+      <h3>‏return עוצר את הפונקציה</h3>
+      <p>ברגע ש-JavaScript מגיעה ל-<code>return</code>, הפונקציה <strong>נגמרת מיד</strong>. כל מה שכתוב אחריו בגוף הפונקציה לא ירוץ:</p>
+      <div class="playground" id="pg-return-stops" data-height="200">
+        <script type="text/plain" data-lang="js">
+          function test() {
+            console.log('לפני ה-return');
+            return 42;
+            console.log('את השורה הזו לא תראו לעולם');
+          }
+
+          console.log(test());
+        </script>
+      </div>
+
+      <h3>‏return מוקדם (early return)</h3>
+      <p>התכונה הזו שימושית מאוד יחד עם <code>if</code>: בודקים מקרה מיוחד בתחילת הפונקציה, ואם הוא קורה, מחזירים תשובה ויוצאים. כך אין צורך ב-<code>else</code> מקונן:</p>
+      <div class="playground" id="pg-early-return" data-height="280">
+        <script type="text/plain" data-lang="js">
+          function getTicketPrice(age) {
+            if (age < 3) {
+              return 0;          // תינוקות בחינם, והפונקציה נגמרת כאן
+            }
+            if (age < 18) {
+              return 25;         // ילדים ונוער
+            }
+            if (age >= 67) {
+              return 20;         // גמלאים
+            }
+            return 40;           // כל השאר. לכאן מגיעים רק אם אף if לא התקיים
+          }
+
+          console.log('גיל 2:', getTicketPrice(2));
+          console.log('גיל 10:', getTicketPrice(10));
+          console.log('גיל 30:', getTicketPrice(30));
+          console.log('גיל 70:', getTicketPrice(70));
+        </script>
+      </div>
+      <p>נסו להוסיף מקרה: חיילים (נניח גיל 18–21) משלמים 15. איפה צריך להוסיף את ה-<code>if</code> כדי שזה יעבוד? (רמז: הסדר חשוב.)</p>
+
+      <h3>פונקציה שמחזירה true או false</h3>
+      <p>פונקציה יכולה להחזיר כל סוג של ערך: מספר, מחרוזת, או בוליאני. פונקציות שמחזירות <code>true</code>/<code>false</code> נקראות בדרך כלל בשם שמתחיל ב-<code>is</code> ("האם"), והן שימושיות מאוד בתוך <code>if</code>:</p>
+      <div class="playground" id="pg-return-bool" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function isAdult(age) {
+            return age >= 18;    // הביטוי עצמו כבר true או false
+          }
+
+          console.log(isAdult(20));
+          console.log(isAdult(15));
+
+          const userAge = 16;
+          if (isAdult(userAge)) {
+            console.log('אפשר להירשם');
+          } else {
+            console.log('צריך אישור הורים');
+          }
+        </script>
+      </div>
+      <p>שימו לב: לא צריך לכתוב <code>if (age &gt;= 18) { return true; } else { return false; }</code>. הביטוי <code>age &gt;= 18</code> הוא כבר <code>true</code> או <code>false</code>, אז פשוט מחזירים אותו.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה יודפס?<br><code>function f(x) { console.log(x + 1); }</code><br><code>const result = f(4);</code><br><code>console.log(result);</code></p>
+        <ul>
+          <li>5 ואז 5</li>
+          <li data-correct>5 ואז undefined</li>
+          <li>undefined ואז 5</li>
+          <li>רק 5</li>
+        </ul>
+        <p class="quiz-explain">נכון! בתוך <code>f</code> יש <code>console.log</code>, לכן קודם מודפס 5. אבל אין <code>return</code>, כך ש-<code>f(4)</code> מחזירה <code>undefined</code>, ו-<code>result</code> הוא <code>undefined</code>. זה בדיוק ההבדל בין הדפסה להחזרה.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה תחזיר <code>check(5)</code>?<br><code>function check(n) { if (n &gt; 3) { return 'גדול'; } return 'קטן'; }</code></p>
+        <ul>
+          <li data-correct>'גדול'</li>
+          <li>'קטן'</li>
+          <li>את שניהם</li>
+          <li>undefined</li>
+        </ul>
+        <p class="quiz-explain">נכון! 5 גדול מ-3, אז מגיעים ל-<code>return 'גדול'</code>, והפונקציה נגמרת מיד. השורה <code>return 'קטן'</code> לא רצה בכלל.</p>
+      </div>
+
+      <h2 id="defaults">ערכי ברירת מחדל לפרמטרים</h2>
+      <p>ראינו שפרמטר שלא קיבל ערך הופך ל-<code>undefined</code>. אפשר לתת לו <strong>ערך ברירת מחדל</strong>: ערך שישמש אם לא העבירו ארגומנט. כותבים <code>=</code> והערך, ישר בהגדרה:</p>
+      <div class="playground" id="pg-defaults" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function greet(name = 'אורח') {
+            return 'שלום ' + name + '!';
+          }
+
+          console.log(greet('דנה'));   // העברנו שם, אז משתמשים בו
+          console.log(greet());        // לא העברנו, אז name = 'אורח'
+
+          function calculatePrice(price, vat = 0.18) {
+            return price + price * vat;
+          }
+
+          console.log(calculatePrice(100));        // מע״מ רגיל
+          console.log(calculatePrice(100, 0));     // בלי מע״מ (למשל באילת)
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>טיפ:</strong> שימו את הפרמטרים עם ברירת מחדל <strong>בסוף</strong> הרשימה. כך אפשר פשוט לא לכתוב אותם בקריאה. אם <code>vat</code> היה ראשון, לא הייתה דרך נוחה "לדלג" עליו.</p>
+      </div>
+
+      <h3>🎯 אתגר 1: ברכה <span class="level easy">קל</span></h3>
+      <p>כתבו פונקציה בשם <code>greet</code> שמקבלת שם ו<strong>מחזירה</strong> (לא מדפיסה!) את המחרוזת <code>'שלום NAME!'</code>. למשל <code>greet('דנה')</code> מחזירה <code>'שלום דנה!'</code>. אם לא מעבירים שם, היא מחזירה <code>'שלום אורח!'</code>.</p>
+      <p>כתבו את הפונקציה, הריצו כדי לראות את התוצאה, ואז לחצו "✓ בדיקה".</p>
+      <div class="playground challenge" id="ch-greet" data-check="ch-greet" data-height="220">
+        <script type="text/plain" data-lang="js">
+          // כתבו כאן את הפונקציה greet
+
+
+          console.log(greet('דנה'));
+          console.log(greet());
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function greet(name = 'אורח') {
+            return 'שלום ' + name + '!';
+          }
+
+          console.log(greet('דנה'));
+          console.log(greet());
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-greet': (out, win) => {
+            const fn = win.eval('typeof greet === "function" ? greet : null');
+            return [
+              [fn, 'לא מצאתי פונקציה בשם greet. בדקו את השם (אותיות קטנות) ושהגדרתם אותה.'],
+              [fn && fn('דנה') === 'שלום דנה!', "greet('דנה') צריכה להחזיר בדיוק 'שלום דנה!' (עם רווח אחרי שלום וסימן קריאה בסוף). אולי הדפסתם במקום להחזיר?"],
+              [fn && fn('יוסי') === 'שלום יוסי!', "greet('יוסי') צריכה להחזיר 'שלום יוסי!'"],
+              [fn && fn() === 'שלום אורח!', "greet() בלי ארגומנט צריכה להחזיר 'שלום אורח!'. רמז: ערך ברירת מחדל."],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="scope">‏Scope: איפה משתנה "חי"?</h2>
+      <p><strong>Scope</strong> (בעברית: "טווח הכרה") הוא האזור בקוד שבו משתנה קיים ואפשר להשתמש בו. הכלל הבסיסי: <strong>משתנה שהוגדר בתוך פונקציה קיים רק בתוך הפונקציה.</strong></p>
+
+      <h3>משתנה מקומי (local)</h3>
+      <div class="playground" id="pg-scope-local" data-height="220">
+        <script type="text/plain" data-lang="js">
+          function calculate() {
+            const secret = 42;        // משתנה מקומי: קיים רק בתוך calculate
+            console.log('בפנים:', secret);
+          }
+
+          calculate();
+          console.log('בחוץ:', secret);   // שגיאה! בחוץ לא מכירים את secret
+        </script>
+      </div>
+      <p>הריצו וקראו את השגיאה: <code>secret is not defined</code>. מבחוץ פשוט אין משתנה כזה. גם הפרמטרים של פונקציה הם משתנים מקומיים: <code>price</code> של <code>addVat</code> קיים רק בזמן שהיא רצה.</p>
+      <p>אנלוגיה: פונקציה היא כמו חדר עם דלת סגורה. מה שמניחים על השולחן בחדר נשאר בחדר. מי שעומד במסדרון לא רואה אותו.</p>
+
+      <h3>משתנה גלובלי (global)</h3>
+      <p>משתנה שהוגדר <strong>מחוץ</strong> לכל פונקציה נקרא גלובלי, ואפשר לראות אותו מכל מקום, גם מתוך פונקציות. מהחדר אפשר לראות את מה שנמצא במסדרון:</p>
+      <div class="playground" id="pg-scope-global" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const storeName = 'חנות הספרים';   // גלובלי
+
+          function printHeader() {
+            console.log('ברוכים הבאים ל' + storeName);  // רואים אותו מבפנים
+          }
+
+          printHeader();
+        </script>
+      </div>
+
+      <h3>גם בלוקים של if ו-for הם "חדרים"</h3>
+      <p>משתנים שהוגדרו עם <code>let</code> או <code>const</code> בתוך סוגריים מסולסלים <code>{ }</code> של <code>if</code> או של לולאה קיימים רק שם. זה נקרא <strong>block scope</strong>:</p>
+      <div class="playground" id="pg-scope-block" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const age = 20;
+
+          if (age >= 18) {
+            const message = 'מבוגר';
+            console.log('בתוך ה-if:', message);
+          }
+
+          for (let i = 0; i < 3; i++) {
+            console.log('בתוך הלולאה, i =', i);
+          }
+
+          console.log(i);   // שגיאה: i קיים רק בתוך הלולאה
+        </script>
+      </div>
+      <p>אם צריך את הערך גם אחרי הבלוק, מגדירים את המשתנה <strong>לפני</strong> הבלוק, ומשנים אותו בפנים:</p>
+      <div class="playground" id="pg-scope-fix" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const age = 20;
+          let message;            // מוגדר בחוץ
+
+          if (age >= 18) {
+            message = 'מבוגר';    // משנים בפנים (בלי let!)
+          } else {
+            message = 'קטין';
+          }
+
+          console.log(message);   // עובד
+        </script>
+      </div>
+
+      <h3>למה לא לשים הכול בגלובלי?</h3>
+      <p>זה מפתה: אם כל המשתנים גלובליים, רואים אותם מכל מקום ואין שגיאות "not defined". אבל בתוכנה גדולה זה מתכון לבלגן:</p>
+      <ul>
+        <li>כל פונקציה יכולה לשנות את המשתנה, וקשה לדעת <strong>מי</strong> שינה אותו כשמשהו נשבר.</li>
+        <li>שתי פונקציות שבמקרה משתמשות באותו שם (למשל <code>total</code>) ידרסו אחת את השנייה.</li>
+        <li>פונקציה שתלויה במשתנה גלובלי קשה להעתיק לפרויקט אחר ולבדוק לבד.</li>
+      </ul>
+      <p>ראו בדוגמה הזו איך פונקציה אחת "מקלקלת" לשנייה בלי שהתכוונו:</p>
+      <div class="playground" id="pg-scope-bad" data-height="260">
+        <script type="text/plain" data-lang="js">
+          let total = 0;   // גלובלי, משותף לכולם
+
+          function addToCart(price) {
+            total = total + price;
+            return total;
+          }
+
+          function calculateTip(bill) {
+            total = bill * 0.1;    // אופס, השתמשו באותו שם
+            return total;
+          }
+
+          addToCart(100);
+          addToCart(50);
+          calculateTip(200);
+          console.log('סכום העגלה:', total);   // ציפינו ל-150...
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>הכלל:</strong> משתנה צריך לחיות ב-scope הקטן ביותר שאפשר. פונקציה טובה מקבלת את מה שהיא צריכה דרך <strong>פרמטרים</strong>, ומוסרת את התוצאה דרך <strong>return</strong>, בלי לגעת במשתנים מבחוץ.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה יקרה כאן?<br><code>function f() { let x = 5; }</code><br><code>f();</code><br><code>console.log(x);</code></p>
+        <ul>
+          <li>יודפס 5</li>
+          <li>יודפס undefined</li>
+          <li data-correct>תהיה שגיאה: x is not defined</li>
+          <li>יודפס x</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>x</code> הוגדר בתוך <code>f</code>, ולכן הוא מקומי. מחוץ לפונקציה הוא לא קיים בכלל, ולכן מקבלים שגיאה (ולא <code>undefined</code>).</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏scope אפשר להציג ב-5 דקות עם האנלוגיה של החדר והמסדרון, ולהשאיר את הדוגמה של <code>total</code> לבית. מה שחשוב שיישאר: "משתנה שהוגדר בפנים לא קיים בחוץ". הנושא יחזור בשיעור 5 עם state ב-React.</p>
+      </aside>
+
+      <h2 id="expressions">פונקציה בתוך משתנה (function expression)</h2>
+      <p>ב-JavaScript פונקציה היא <strong>ערך</strong>, בדיוק כמו מספר או מחרוזת. לכן אפשר לשמור אותה במשתנה. זו דרך שנייה לכתוב את אותה פונקציה:</p>
+<pre><code class="language-js">// דרך 1: הצהרה (function declaration), מה שראינו עד עכשיו
+function addVat(price) {
+  return price * 1.18;
+}
+
+// דרך 2: ביטוי (function expression): פונקציה בלי שם, שנשמרת במשתנה
+const addVat2 = function (price) {
+  return price * 1.18;
+};</code></pre>
+      <p>קוראים לשתיהן בדיוק באותה צורה: <code>addVat(100)</code> או <code>addVat2(100)</code>. שימו לב לנקודה-פסיק בסוף דרך 2: זו השמה למשתנה, כמו <code>const x = 5;</code>.</p>
+      <div class="playground" id="pg-expression" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const addVat = function (price) {
+            return price * 1.18;
+          };
+
+          console.log(addVat(100));
+          console.log(addVat);   // מה מודפס כשמדפיסים את הפונקציה עצמה, בלי ()?
+        </script>
+      </div>
+      <p>שימו לב להבדל בין <code>addVat</code> ל-<code>addVat(100)</code>. בלי סוגריים זו <strong>הפונקציה עצמה</strong> (המכונה). עם סוגריים זו <strong>קריאה</strong> לפונקציה, והתוצאה היא מה שהיא מחזירה (המיץ). ההבחנה הזו תהיה חשובה מאוד בהמשך העמוד, וב-React.</p>
+
+      <h2 id="arrow">‏Arrow functions: הצורה המודרנית <span class="time">10 דק׳</span></h2>
+      <p>ב-2015 נוספה ל-JavaScript צורה קצרה יותר לכתוב פונקציות, עם חץ <code>=&gt;</code>. קוראים לה <strong>arrow function</strong> ("פונקציית חץ"). בקוד מודרני, ובמיוחד ב-React, תראו אותה בכל מקום, אז כדאי להתרגל אליה כבר עכשיו.</p>
+
+      <h3>מהצורה הרגילה לצורת החץ, צעד אחר צעד</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>מתחילים מ-function expression</h4>
+<pre><code class="language-js">const addVat = function (price) {
+  return price * 1.18;
+};</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>מוחקים את המילה function, ומוסיפים חץ אחרי הסוגריים</h4>
+<pre><code class="language-js">const addVat = (price) =&gt; {
+  return price * 1.18;
+};</code></pre>
+          <p>זו כבר arrow function מלאה ותקינה. קוראים את זה: "‏addVat היא פונקציה שמקבלת price, <em>והולכת אל</em>...".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>אם כל הגוף הוא רק return, אפשר לקצר לשורה אחת</h4>
+<pre><code class="language-js">const addVat = (price) =&gt; price * 1.18;</code></pre>
+          <p>מוחקים את <code>{ }</code> ואת המילה <code>return</code>. מה שבא אחרי החץ <strong>מוחזר אוטומטית</strong>. זה נקרא <strong>implicit return</strong> ("החזרה מרומזת").</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>עם פרמטר אחד בדיוק, אפשר גם בלי הסוגריים העגולים</h4>
+<pre><code class="language-js">const addVat = price =&gt; price * 1.18;</code></pre>
+          <p>זה לא חובה. הרבה צוותים (וגם כלי העיצוב Prettier) מעדיפים להשאיר את הסוגריים תמיד, כי זה אחיד יותר. בקורס נשאיר אותם.</p>
+        </div>
+      </div>
+
+      <p>כל ארבע הגרסאות עושות בדיוק אותו דבר. נסו:</p>
+      <div class="playground" id="pg-arrow-forms" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const v1 = function (price) { return price * 1.18; };
+          const v2 = (price) => { return price * 1.18; };
+          const v3 = (price) => price * 1.18;
+          const v4 = price => price * 1.18;
+
+          console.log(v1(100), v2(100), v3(100), v4(100));
+
+          // עם כמה פרמטרים, הסוגריים חובה:
+          const add = (a, b) => a + b;
+          console.log(add(2, 3));
+
+          // בלי פרמטרים בכלל, סוגריים ריקים:
+          const sayHi = () => console.log('היי!');
+          sayHi();
+        </script>
+      </div>
+
+      <h3>מלכודת: סוגריים מסולסלים בלי return</h3>
+      <p>זו הטעות הכי נפוצה עם arrow functions. ברגע שכותבים <code>{ }</code> אחרי החץ, ההחזרה האוטומטית <strong>נעלמת</strong>, וצריך לכתוב <code>return</code> בעצמכם:</p>
+      <div class="playground" id="pg-arrow-trap" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const good = (n) => n * 2;             // בלי { } : מחזיר אוטומטית
+          const alsoGood = (n) => { return n * 2; };  // עם { } ועם return
+          const broken = (n) => { n * 2; };      // עם { } ובלי return!
+
+          console.log(good(5));
+          console.log(alsoGood(5));
+          console.log(broken(5));   // undefined. החישוב קרה, אבל אף אחד לא החזיר אותו
+        </script>
+      </div>
+      <p>כשהגוף ארוך יותר משורה אחת (יש בו <code>if</code>, משתנים, כמה צעדים), חייבים <code>{ }</code>, ולכן גם <code>return</code>:</p>
+      <div class="playground" id="pg-arrow-multiline" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const getGrade = (score) => {
+            if (score >= 90) {
+              return 'מצוין';
+            }
+            if (score >= 60) {
+              return 'עובר';
+            }
+            return 'נכשל';
+          };
+
+          console.log(getGrade(95), getGrade(70), getGrade(40));
+        </script>
+      </div>
+
+      <h3>אז באיזו צורה להשתמש?</h3>
+      <table>
+        <tr><th>צורה</th><th>מתי מתאים</th></tr>
+        <tr><td><code>function name() {}</code></td><td>פונקציות "ראשיות" בקובץ, עם שם ברור. קל לקרוא, ואפשר לקרוא לה גם לפני השורה שבה היא מוגדרת (ראו מיד).</td></tr>
+        <tr><td><code>const name = () =&gt; ...</code></td><td>פונקציות קצרות, ובמיוחד פונקציות שמעבירים לפונקציה אחרת (callbacks, בהמשך העמוד). זה הסגנון הנפוץ ב-React.</td></tr>
+      </table>
+      <p>שתיהן נכונות. מה שחשוב הוא לקרוא את שתיהן בלי להתבלבל, כי בקוד אמיתי תפגשו את שתיהן.</p>
+
+      <h3>הבדל קטן: מתי אפשר לקרוא לפונקציה (hoisting)</h3>
+      <p>פונקציה שהוגדרה עם <code>function name()</code> "מורמת" (hoisted) לראש הקובץ, ולכן אפשר לקרוא לה <strong>לפני</strong> השורה שבה היא כתובה. פונקציה שנשמרה ב-<code>const</code> קיימת רק <strong>מהשורה שבה הוגדרה ואילך</strong>, כמו כל משתנה:</p>
+      <div class="playground" id="pg-hoisting" data-height="220">
+        <script type="text/plain" data-lang="js">
+          console.log(double(4));    // עובד, למרות שההגדרה למטה
+
+          function double(n) {
+            return n * 2;
+          }
+
+          console.log(triple(4));    // שגיאה! triple עוד לא הוגדרה
+
+          const triple = (n) => n * 3;
+        </script>
+      </div>
+      <p>הפתרון פשוט: מגדירים פונקציות <strong>לפני</strong> שמשתמשים בהן. ככה הקוד גם קריא יותר.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 מה תחזיר <code>f(3)</code> אם <code>const f = (x) =&gt; { x + 10; };</code>?</p>
+        <ul>
+          <li>13</li>
+          <li data-correct>undefined</li>
+          <li>שגיאה</li>
+          <li>x + 10</li>
+        </ul>
+        <p class="quiz-explain">נכון! ברגע שיש <code>{ }</code> אחרי החץ, אין החזרה אוטומטית. החישוב <code>x + 10</code> קורה, אבל בלי <code>return</code> הפונקציה מחזירה <code>undefined</code>. התיקון: <code>(x) =&gt; x + 10</code> או <code>(x) =&gt; { return x + 10; }</code>.</p>
+      </div>
+
+      <h3>🎯 אתגר 2: המרה לפונקציות חץ <span class="level easy">קל</span></h3>
+      <p>שלוש הפונקציות למטה כתובות בצורה הישנה. המירו כל אחת ל-<strong>arrow function</strong> שנשמרת ב-<code>const</code>, עם אותו שם. נסו לכתוב את <code>square</code> ו-<code>isPositive</code> בשורה אחת, עם החזרה מרומזת.</p>
+      <div class="playground challenge" id="ch-arrows" data-check="ch-arrows" data-height="300">
+        <script type="text/plain" data-lang="js">
+          function square(n) {
+            return n * n;
+          }
+
+          function isPositive(n) {
+            return n > 0;
+          }
+
+          function fullName(first, last) {
+            return first + ' ' + last;
+          }
+
+          console.log(square(4), isPositive(-2), fullName('דנה', 'כהן'));
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const square = (n) => n * n;
+
+          const isPositive = (n) => n > 0;
+
+          const fullName = (first, last) => first + ' ' + last;
+
+          console.log(square(4), isPositive(-2), fullName('דנה', 'כהן'));
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-arrows': (out, win) => {
+            const get = (name) => win.eval(`typeof ${name} === "function" ? ${name} : null`);
+            const isArrow = (name) => new RegExp(`const\\s+${name}\\s*=\\s*\\(?[\\w\\s,]*\\)?\\s*=>`).test(out.code);
+            const square = get('square');
+            const isPositive = get('isPositive');
+            const fullName = get('fullName');
+            return [
+              [!/\bfunction\b/.test(out.code), 'עדיין יש בקוד את המילה function. בפונקציית חץ היא לא מופיעה.'],
+              [isArrow('square'), 'הגדירו את square כך: const square = (n) => ...'],
+              [isArrow('isPositive'), 'הגדירו את isPositive כך: const isPositive = (n) => ...'],
+              [isArrow('fullName'), 'הגדירו את fullName כך: const fullName = (first, last) => ...'],
+              [square && square(4) === 16 && square(-3) === 9, 'square(4) צריכה להחזיר 16. אולי שכחתם return אחרי { }?'],
+              [isPositive && isPositive(5) === true && isPositive(-1) === false && isPositive(0) === false, 'isPositive צריכה להחזיר true למספר חיובי ו-false לאפס ולשלילי'],
+              [fullName && fullName('דנה', 'כהן') === 'דנה כהן', "fullName('דנה', 'כהן') צריכה להחזיר 'דנה כהן'"],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="callbacks">פונקציה כערך: להעביר פונקציה לפונקציה (callback)</h2>
+      <p>ראינו שפונקציה היא ערך שאפשר לשמור במשתנה. אם היא ערך, אפשר גם <strong>להעביר אותה כארגומנט</strong> לפונקציה אחרת. פונקציה שמעבירים כך נקראת <strong>callback</strong> ("פונקציה שקוראים לה בחזרה"): אנחנו לא קוראים לה בעצמנו, אלא נותנים אותה למישהו אחר, והוא יקרא לה מתי שצריך.</p>
+      <p>זה נשמע מופשט, אז נתחיל בדוגמה. הפונקציה <code>repeat</code> מקבלת מספר ו<strong>פונקציה</strong>, וקוראת לפונקציה הזו כמה פעמים:</p>
+      <div class="playground" id="pg-callback-repeat" data-height="260">
+        <script type="text/plain" data-lang="js">
+          function repeat(times, action) {
+            for (let i = 1; i <= times; i++) {
+              action();          // קוראים לפונקציה שקיבלנו
+            }
+          }
+
+          function sayHi() {
+            console.log('היי! 👋');
+          }
+
+          repeat(3, sayHi);      // שימו לב: sayHi בלי סוגריים!
+        </script>
+      </div>
+      <div class="box warn">
+        <p><strong>למה <code>sayHi</code> ולא <code>sayHi()</code>?</strong> אנחנו רוצים לתת ל-<code>repeat</code> את <strong>הפונקציה עצמה</strong>, כדי שהיא תפעיל אותה. אם נכתוב <code>repeat(3, sayHi())</code>, ‏<code>sayHi</code> תרוץ <strong>מיד</strong>, פעם אחת, ול-<code>repeat</code> יגיע מה שהיא מחזירה, כלומר <code>undefined</code>. נסו ותראו את השגיאה.</p>
+      </div>
+
+      <h3>callback עם ארגומנט</h3>
+      <p>הפונקציה שמקבלת callback יכולה גם להעביר לו ערכים. כאן <code>repeat</code> מעבירה לכל קריאה את מספר הסיבוב:</p>
+      <div class="playground" id="pg-callback-arg" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function repeat(times, action) {
+            for (let i = 1; i <= times; i++) {
+              action(i);
+            }
+          }
+
+          const printRound = (n) => console.log('סיבוב מספר ' + n);
+          repeat(3, printRound);
+
+          // אפשר גם לכתוב את ה-callback ישר בתוך הקריאה, בלי לתת לו שם:
+          repeat(4, (n) => console.log(n + ' בריבוע זה ' + n * n));
+        </script>
+      </div>
+      <p>הצורה האחרונה, arrow function שנכתבת ישר בתוך הקריאה, היא הנפוצה ביותר. בשיעור 3 תשתמשו בה כל הזמן עם <code>map</code> ו-<code>filter</code> על מערכים, וב-React עם אירועים כמו <code>onClick={() =&gt; ...}</code>.</p>
+
+      <h3>‏setTimeout: callback שרץ אחר כך</h3>
+      <p>הפונקציה המובנית <code>setTimeout</code> מקבלת callback ומספר מילי-שניות (1000 = שנייה אחת), ומריצה את ה-callback <strong>אחרי</strong> הזמן הזה. בינתיים שאר הקוד ממשיך לרוץ. הריצו ושימו לב לסדר:</p>
+      <div class="playground" id="pg-timeout" data-height="200">
+        <script type="text/plain" data-lang="js">
+          console.log('1. מזמינים פיצה');
+
+          setTimeout(() => {
+            console.log('3. 🍕 הפיצה הגיעה! (אחרי שנייה וחצי)');
+          }, 1500);
+
+          console.log('2. בינתיים עורכים את השולחן');
+        </script>
+      </div>
+      <p>‏JavaScript לא "מחכה" לפיצה. היא רושמת את ה-callback בצד, ממשיכה, וחוזרת להריץ אותו כשהזמן עובר. הרעיון הזה (קוד שרץ "אחר כך") יחזור בגדול בשיעור 3, כשנביא נתונים מהאינטרנט עם <code>fetch</code>.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 יש פונקציה <code>function beep() { console.log('ביפ'); }</code>. איזו קריאה תדפיס "ביפ" חמש פעמים?</p>
+        <ul>
+          <li><code>repeat(5, beep())</code></li>
+          <li data-correct><code>repeat(5, beep)</code></li>
+          <li><code>repeat(beep, 5)</code></li>
+          <li><code>beep(repeat(5))</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! מעבירים את הפונקציה עצמה, בלי סוגריים, ובסדר הפרמטרים של <code>repeat</code>: קודם מספר הפעמים, ואחר כך הפעולה.</p>
+      </div>
+
+      <h2 id="composition">פונקציות שקוראות לפונקציות</h2>
+      <p>הכוח האמיתי של פונקציות: בונים פונקציות קטנות ופשוטות, ומרכיבים מהן פונקציות גדולות. כמו קוביות לגו. כל פונקציה קטנה קלה להבין ולבדוק, והפונקציה הגדולה נקראת כמעט כמו משפט בעברית:</p>
+      <div class="playground wide" id="pg-composition" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const VAT = 0.18;
+
+          const addVat = (price) => price + price * VAT;
+          const applyDiscount = (price, percent) => price - price * (percent / 100);
+          const roundPrice = (price) => Math.round(price * 100) / 100;
+          const formatPrice = (price) => price + ' ₪';
+
+          function getFinalPrice(price, discountPercent) {
+            const discounted = applyDiscount(price, discountPercent);
+            const withVat = addVat(discounted);
+            return formatPrice(roundPrice(withVat));
+          }
+
+          console.log(getFinalPrice(100, 10));
+          console.log(getFinalPrice(59.9, 25));
+        </script>
+      </div>
+      <p>שימו לב לשורה <code>formatPrice(roundPrice(withVat))</code>: קריאה בתוך קריאה. קוראים אותה <strong>מבפנים החוצה</strong>: קודם <code>roundPrice(withVat)</code> רצה ומחזירה מספר מעוגל, והמספר הזה נכנס ל-<code>formatPrice</code>. בדיוק כמו בחשבון: קודם מה שבתוך הסוגריים.</p>
+
+      <h2 id="good-functions">איך נראית פונקציה טובה</h2>
+      <h3>פונקציה "טהורה" (pure function)</h3>
+      <p>פונקציה טהורה היא פונקציה ש:</p>
+      <ol>
+        <li>התשובה שלה תלויה <strong>רק</strong> בפרמטרים שלה. אותו קלט נותן תמיד אותו פלט.</li>
+        <li>היא <strong>לא משנה</strong> שום דבר מחוץ לה (לא משתנים גלובליים, לא הדפסות).</li>
+      </ol>
+      <p><code>addVat</code> ו-<code>square</code> הן טהורות. הפונקציה <code>addToCart</code> מהדוגמה של ה-scope, שמשנה את <code>total</code> הגלובלי, לא טהורה. פונקציות טהורות קלות לבדיקה, לא מפתיעות, ואפשר להשתמש בהן בכל מקום. לא כל פונקציה יכולה להיות טהורה (מישהו צריך להדפיס בסוף), אבל כדאי שרוב הפונקציות שמחשבות דברים יהיו כאלה. ב-React זה עיקרון מרכזי.</p>
+
+      <h3>שמות לפונקציות</h3>
+      <p>שם טוב חוסך הערה. מתחילים ב<strong>פועל</strong> שמתאר מה הפונקציה עושה:</p>
+      <table>
+        <tr><th>תחילית</th><th>משמעות</th><th>דוגמאות</th></tr>
+        <tr><td><code>get</code></td><td>מחזירה ערך</td><td><code>getFullName</code>, ‏<code>getTicketPrice</code></td></tr>
+        <tr><td><code>calculate</code></td><td>מחשבת</td><td><code>calculateTotal</code>, ‏<code>calculateAverage</code></td></tr>
+        <tr><td><code>is</code> / <code>has</code> / <code>can</code></td><td>מחזירה true/false</td><td><code>isEven</code>, ‏<code>hasDiscount</code>, ‏<code>canVote</code></td></tr>
+        <tr><td><code>format</code></td><td>הופכת ערך לטקסט יפה</td><td><code>formatPrice</code>, ‏<code>formatDate</code></td></tr>
+        <tr><td><code>print</code> / <code>show</code></td><td>מציגה משהו</td><td><code>printReceipt</code>, ‏<code>showError</code></td></tr>
+      </table>
+      <p>שמות כמו <code>f</code>, ‏<code>doStuff</code> או <code>func1</code> לא אומרים כלום. בעוד חודש גם אתם לא תזכרו מה הם עושים.</p>
+      <div class="box tip">
+        <p><strong>פונקציה אחת, תפקיד אחד.</strong> אם קשה לתת לפונקציה שם בלי המילה "ו" (<code>calculateAndPrintAndSave</code>), כנראה שהיא עושה יותר מדי. פצלו אותה לכמה פונקציות קטנות.</p>
+      </div>
+
+      <h2 id="worked-example">דוגמה פתורה: כותבים פונקציה מאפס <span class="time">5 דק׳</span></h2>
+      <p>איך ניגשים לכתוב פונקציה כשמקבלים משימה? לא מתחילים להקליד מיד. הנה התהליך, על דוגמה אמיתית.</p>
+      <div class="box goals">
+        <p><strong>המשימה:</strong> חנות אונליין רוצה לחשב דמי משלוח. משלוח רגיל עולה 30 ₪. הזמנה של 200 ₪ ומעלה מקבלת משלוח חינם. משלוח אקספרס עולה 20 ₪ נוספים, תמיד (גם כשהמשלוח הרגיל חינם).</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>מבינים את הקלט ואת הפלט</h4>
+          <p>שואלים: מה הפונקציה צריכה לדעת כדי לענות? (סכום ההזמנה, והאם זה אקספרס.) ומה היא מחזירה? (מספר: דמי המשלוח בשקלים.)</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>בוחרים שם וחתימה (signature)</h4>
+          <p>השם מתחיל בפועל ומסביר מה מחושב. ל-<code>isExpress</code> ניתן ברירת מחדל <code>false</code>, כי רוב ההזמנות רגילות:</p>
+<pre><code class="language-js">function calculateShipping(orderTotal, isExpress = false) {
+  // ...
+}</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>כותבים דוגמאות לפני הקוד</h4>
+          <p>מה התשובה הנכונה במקרים שונים? כותבים את זה לפני שכותבים את הפונקציה. ככה יודעים מה לבדוק:</p>
+          <table>
+            <tr><th>קריאה</th><th>תשובה צפויה</th><th>למה</th></tr>
+            <tr><td><code>calculateShipping(100)</code></td><td>30</td><td>מתחת ל-200, רגיל</td></tr>
+            <tr><td><code>calculateShipping(250)</code></td><td>0</td><td>מעל 200: חינם</td></tr>
+            <tr><td><code>calculateShipping(200)</code></td><td>0</td><td>"200 ומעלה", אז גם 200 בדיוק (מקרה גבול!)</td></tr>
+            <tr><td><code>calculateShipping(100, true)</code></td><td>50</td><td>30 + 20 אקספרס</td></tr>
+            <tr><td><code>calculateShipping(300, true)</code></td><td>20</td><td>חינם + 20 אקספרס</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>כותבים את הקוד, ובודקים את כל הדוגמאות</h4>
+          <p>בונים את התשובה בשלבים: קודם המשלוח הבסיסי, אחר כך התוספת. בסוף מדפיסים כל דוגמה ליד התשובה הצפויה, ובודקים שהן זהות:</p>
+        </div>
+      </div>
+
+      <div class="playground wide" id="pg-shipping" data-height="380">
+        <script type="text/plain" data-lang="js">
+          function calculateShipping(orderTotal, isExpress = false) {
+            let cost = 30;
+            if (orderTotal >= 200) {
+              cost = 0;
+            }
+            if (isExpress) {
+              cost = cost + 20;
+            }
+            return cost;
+          }
+
+          // בדיקות: מה קיבלנו, ומה ציפינו
+          console.log(calculateShipping(100), 'צפוי: 30');
+          console.log(calculateShipping(250), 'צפוי: 0');
+          console.log(calculateShipping(200), 'צפוי: 0');
+          console.log(calculateShipping(100, true), 'צפוי: 50');
+          console.log(calculateShipping(300, true), 'צפוי: 20');
+        </script>
+      </div>
+      <p>נסו "לשבור" את הפונקציה: החליפו את <code>&gt;=</code> ב-<code>&gt;</code>. איזו בדיקה נכשלת? בדיוק בשביל זה כותבים מראש דוגמאות, ובמיוחד <strong>מקרי גבול</strong>.</p>
+
+      <h3>בדיקה אוטומטית קטנה</h3>
+      <p>להשוות בעיניים זה מעייף. אפשר לכתוב פונקציה קטנה שבודקת בשבילנו, ומדפיסה ✅ או ❌. גם זו פונקציה שמשתמשת בפונקציה:</p>
+      <div class="playground wide" id="pg-test-helper" data-height="340">
+        <script type="text/plain" data-lang="js">
+          function check(actual, expected) {
+            if (actual === expected) {
+              console.log('✅ קיבלנו ' + actual);
+            } else {
+              console.log('❌ קיבלנו ' + actual + ' אבל ציפינו ל-' + expected);
+            }
+          }
+
+          const calculateShipping = (orderTotal, isExpress = false) => {
+            const base = orderTotal >= 200 ? 0 : 30;
+            return isExpress ? base + 20 : base;
+          };
+
+          check(calculateShipping(100), 30);
+          check(calculateShipping(250), 0);
+          check(calculateShipping(200), 0);
+          check(calculateShipping(100, true), 50);
+          check(calculateShipping(300, true), 20);
+        </script>
+      </div>
+      <p>זו גרסה קצרה יותר של אותה פונקציה, עם האופרטור המשולש (<code>? :</code>) שלמדתם בחלק ב׳. הבדיקות עוברות, אז אנחנו יודעים שהקיצור לא שבר כלום. ככה עובדים מפתחים אמיתיים: כותבים בדיקות, ואז אפשר לשפר את הקוד בביטחון. (כלי בדיקה מקצועיים כמו Vitest עובדים בדיוק על אותו רעיון.)</p>
+
+      <aside class="box lecturer-note">
+        <p>מומלץ לעשות את הדוגמה הזו בכיתה "בשידור חי": לבקש מהכיתה את הדוגמאות לטבלה לפני שכותבים קוד, ולשאול במיוחד "מה עם 200 בדיוק?". אחר כך לשבור את <code>&gt;=</code> בכוונה ולהראות איך הבדיקה תופסת את זה.</p>
+      </aside>
+
+      <h2 id="mistakes">טעויות נפוצות</h2>
+      <table>
+        <tr><th>מה כתבתם</th><th>מה קורה</th><th>התיקון</th></tr>
+        <tr><td><code>function f(n) { n * 2; }</code></td><td>הפונקציה מחזירה <code>undefined</code></td><td>שכחתם <code>return</code>: <code>return n * 2;</code></td></tr>
+        <tr><td><code>function f(n) { console.log(n * 2); }</code><br>ואז <code>const x = f(3);</code></td><td>מודפס 6, אבל <code>x</code> הוא <code>undefined</code></td><td>להחזיר עם <code>return</code>, ולהדפיס מבחוץ</td></tr>
+        <tr><td><code>sayHi;</code></td><td>שום דבר לא קורה</td><td>שכחתם סוגריים: <code>sayHi();</code></td></tr>
+        <tr><td><code>repeat(3, sayHi());</code></td><td>‏<code>sayHi</code> רצה פעם אחת מיד, ואז שגיאה</td><td>מעבירים בלי סוגריים: <code>repeat(3, sayHi)</code></td></tr>
+        <tr><td><code>(n) =&gt; { n * 2 }</code></td><td>מחזירה <code>undefined</code></td><td>בלי <code>{ }</code>: ‏<code>(n) =&gt; n * 2</code>, או להוסיף <code>return</code></td></tr>
+        <tr><td>קריאה ל-<code>const f = () =&gt; ...</code> לפני השורה שלה</td><td>שגיאה: <code>Cannot access 'f' before initialization</code></td><td>להזיז את ההגדרה למעלה</td></tr>
+        <tr><td><code>function area(w) { return w * h; }</code></td><td>שגיאה: <code>h is not defined</code></td><td>כל מה שהפונקציה צריכה צריך להגיע כפרמטר: <code>function area(w, h)</code></td></tr>
+        <tr><td>השתמשתם במשתנה שהוגדר בתוך פונקציה, מחוץ לה</td><td>שגיאה: <code>is not defined</code></td><td>להחזיר את הערך עם <code>return</code> ולשמור אותו בחוץ</td></tr>
+      </table>
+
+      <h3>תרגיל: מצאו את הבאגים <span class="level medium">בינוני</span></h3>
+      <p>בקוד הזה יש ארבעה באגים. הריצו, קראו את הפלט ואת הודעות השגיאה, ותקנו אחד אחד. בסוף כל הבדיקות צריכות להדפיס ✅.</p>
+      <div class="playground wide" id="pg-debug" data-height="360">
+        <script type="text/plain" data-lang="js">
+          function check(actual, expected) {
+            console.log(actual === expected ? '✅ ' + actual : '❌ קיבלנו ' + actual + ', ציפינו ל-' + expected);
+          }
+
+          check(rectangleArea(3, 4), 12);
+
+          const rectangleArea = (width, height) => {
+            width * height;
+          };
+
+          function isTeen(age) {
+            console.log(age >= 13 && age <= 19);
+          }
+          check(isTeen(15), true);
+
+          function average(a, b) {
+            return a + b / 2;
+          }
+          check(average(4, 8), 6);
+        </script>
+      </div>
+      <details class="solution">
+        <summary>הצגת הפתרון</summary>
+        <ol>
+          <li>קוראים ל-<code>rectangleArea</code> לפני שהיא מוגדרת עם <code>const</code>. מזיזים את הבדיקה אחרי ההגדרה.</li>
+          <li>ב-<code>rectangleArea</code> יש <code>{ }</code> בלי <code>return</code>. כותבים <code>(width, height) =&gt; width * height</code>.</li>
+          <li>‏<code>isTeen</code> מדפיסה במקום להחזיר. מחליפים את <code>console.log</code> ב-<code>return</code>.</li>
+          <li>ב-<code>average</code> סדר הפעולות שגוי: החילוק קורה לפני החיבור. כותבים <code>(a + b) / 2</code>.</li>
+        </ol>
+      </details>
+
+      <h2 id="practice">תרגול: אתגרים</h2>
+      <p>בכל אתגר כתבו את הפונקציה, הריצו כדי לראות מה היא מחזירה, ולחצו "✓ בדיקה". הבדיקה מריצה את הפונקציה שלכם על הרבה קלטים, גם כאלה שלא כתבתם, אז חשבו על מקרי גבול. כדאי לנסות לפחות 10 דקות לבד לפני שפותחים את הפתרון.</p>
+
+      <h3>🎯 אתגר 3: זוגי או אי-זוגי <span class="level easy">קל</span></h3>
+      <p>כתבו פונקציה <code>isEven(n)</code> שמחזירה <code>true</code> אם המספר זוגי, ו-<code>false</code> אם לא. רמז: האופרטור <code>%</code> מחזיר את השארית של חילוק. מספר זוגי מתחלק ב-2 בלי שארית.</p>
+      <div class="playground challenge" id="ch-even" data-check="ch-even" data-height="220">
+        <script type="text/plain" data-lang="js">
+          // כתבו כאן את isEven
+
+
+          console.log(isEven(4));   // true
+          console.log(isEven(7));   // false
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const isEven = (n) => n % 2 === 0;
+
+          console.log(isEven(4));   // true
+          console.log(isEven(7));   // false
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-even': (out, win) => {
+            const fn = win.eval('typeof isEven === "function" ? isEven : null');
+            const cases = [[4, true], [7, false], [0, true], [1, false], [100, true], [-3, false], [-8, true]];
+            const wrong = fn ? cases.filter(([n, expected]) => fn(n) !== expected) : cases;
+            return [
+              [fn, 'לא מצאתי פונקציה בשם isEven'],
+              [fn && fn(4) === true, 'isEven(4) צריכה להחזיר true (בוליאני, לא מחרוזת). אולי הדפסתם במקום להחזיר?'],
+              [!wrong.length, `התשובה לא נכונה עבור: ${wrong.map(([n]) => n).join(', ')}`],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 4: הגדול מבין שלושה <span class="level medium">בינוני</span></h3>
+      <p>כתבו פונקציה <code>maxOfThree(a, b, c)</code> שמחזירה את המספר הגדול ביותר מבין השלושה. <strong>בלי</strong> <code>Math.max</code>: השתמשו ב-<code>if</code>. חשבו מה קורה כשיש שני מספרים שווים, או כשכולם שליליים.</p>
+      <div class="playground challenge" id="ch-max" data-check="ch-max" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function maxOfThree(a, b, c) {
+            // כתבו כאן
+          }
+
+          console.log(maxOfThree(3, 9, 5));    // 9
+          console.log(maxOfThree(-1, -7, -3)); // -1
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function maxOfThree(a, b, c) {
+            let max = a;
+            if (b > max) {
+              max = b;
+            }
+            if (c > max) {
+              max = c;
+            }
+            return max;
+          }
+
+          console.log(maxOfThree(3, 9, 5));    // 9
+          console.log(maxOfThree(-1, -7, -3)); // -1
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-max': (out, win) => {
+            const fn = win.eval('typeof maxOfThree === "function" ? maxOfThree : null');
+            const cases = [[3, 9, 5], [9, 3, 5], [3, 5, 9], [-1, -7, -3], [4, 4, 2], [2, 7, 7], [0, 0, 0], [-5, 0, -2]];
+            const wrong = fn ? cases.filter(([a, b, c]) => fn(a, b, c) !== Math.max(a, b, c)) : cases;
+            return [
+              [fn, 'לא מצאתי פונקציה בשם maxOfThree'],
+              [!/Math\.max/.test(out.code), 'הפעם בלי Math.max. נסו עם if.'],
+              [fn && fn(3, 9, 5) !== undefined, 'הפונקציה מחזירה undefined. שכחתם return?'],
+              [!wrong.length, `התשובה לא נכונה עבור: ${wrong.map((c) => `(${c.join(', ')})`).join(' ')}`],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 5: כמה פעמים מופיעה אות? <span class="level medium">בינוני</span></h3>
+      <p>כתבו פונקציה <code>countChar(text, char)</code> שמחזירה כמה פעמים התו <code>char</code> מופיע במחרוזת <code>text</code>. למשל <code>countChar('banana', 'a')</code> מחזירה <code>3</code>. רמז: לולאת <code>for</code> על המחרוזת, ו-<code>text[i]</code> נותן את התו במקום <code>i</code>.</p>
+      <div class="playground challenge" id="ch-count" data-check="ch-count" data-height="240">
+        <script type="text/plain" data-lang="js">
+          function countChar(text, char) {
+            // כתבו כאן
+          }
+
+          console.log(countChar('banana', 'a'));     // 3
+          console.log(countChar('שלום עולם', 'ו'));  // 2
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function countChar(text, char) {
+            let count = 0;
+            for (let i = 0; i < text.length; i++) {
+              if (text[i] === char) {
+                count++;
+              }
+            }
+            return count;
+          }
+
+          console.log(countChar('banana', 'a'));     // 3
+          console.log(countChar('שלום עולם', 'ו'));  // 2
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-count': (out, win) => {
+            const fn = win.eval('typeof countChar === "function" ? countChar : null');
+            const cases = [['banana', 'a', 3], ['banana', 'b', 1], ['banana', 'z', 0], ['', 'a', 0], ['aaaa', 'a', 4], ['שלום עולם', 'ו', 2], ['Hello', 'h', 0]];
+            const wrong = fn ? cases.filter(([t, c, expected]) => fn(t, c) !== expected) : cases;
+            return [
+              [fn, 'לא מצאתי פונקציה בשם countChar'],
+              [fn && fn('banana', 'a') !== undefined, 'הפונקציה מחזירה undefined. שכחתם return?'],
+              [!wrong.length, `התשובה לא נכונה עבור: ${wrong.map(([t, c, e]) => `countChar('${t}', '${c}') צריך ${e}`).join(' · ')}`],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 6: פלינדרום <span class="level hard">מאתגר</span></h3>
+      <p>פלינדרום הוא מילה שנקראת אותו דבר מההתחלה ומהסוף: <code>'abba'</code>, ‏<code>'racecar'</code>, ‏<code>'אבא'</code>. כתבו פונקציה <code>isPalindrome(word)</code> שמחזירה <code>true</code> אם המילה פלינדרום. היא צריכה להתעלם מאותיות גדולות וקטנות: <code>'Abba'</code> הוא פלינדרום.</p>
+      <p>רמזים: <code>word.toLowerCase()</code> הופך הכול לאותיות קטנות. אפשר לבנות מחרוזת הפוכה בלולאה שרצה מהסוף להתחלה, או להשוות את התו הראשון לאחרון, השני לאחד-לפני-האחרון, וכן הלאה.</p>
+      <div class="playground challenge wide" id="ch-palindrome" data-check="ch-palindrome" data-height="300">
+        <script type="text/plain" data-lang="js">
+          function isPalindrome(word) {
+            // כתבו כאן
+          }
+
+          console.log(isPalindrome('abba'));     // true
+          console.log(isPalindrome('Racecar'));  // true
+          console.log(isPalindrome('hello'));    // false
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function reverse(text) {
+            let result = '';
+            for (let i = text.length - 1; i >= 0; i--) {
+              result = result + text[i];
+            }
+            return result;
+          }
+
+          function isPalindrome(word) {
+            const lower = word.toLowerCase();
+            return lower === reverse(lower);
+          }
+
+          console.log(isPalindrome('abba'));     // true
+          console.log(isPalindrome('Racecar'));  // true
+          console.log(isPalindrome('hello'));    // false
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-palindrome': (out, win) => {
+            const fn = win.eval('typeof isPalindrome === "function" ? isPalindrome : null');
+            const cases = [['abba', true], ['racecar', true], ['Racecar', true], ['hello', false], ['a', true], ['ab', false], ['אבא', true], ['abca', false], ['ABba', true]];
+            const wrong = fn ? cases.filter(([w, expected]) => fn(w) !== expected) : cases;
+            return [
+              [fn, 'לא מצאתי פונקציה בשם isPalindrome'],
+              [fn && typeof fn('abba') === 'boolean', 'הפונקציה צריכה להחזיר true או false (ולא להדפיס)'],
+              [!wrong.length, `התשובה לא נכונה עבור: ${wrong.map(([w]) => `'${w}'`).join(', ')}`],
+            ];
+          },
+        });
+      </script>
+
+      <div class="exercise">
+        <h3>תרגיל בונוס: מחשבון ציונים <span class="level medium">בינוני</span></h3>
+        <p>בלי בדיקה אוטומטית. בנו כמה פונקציות קטנות שעובדות יחד:</p>
+        <ol>
+          <li><code>average(a, b, c)</code> מחזירה את הממוצע של שלושה ציונים.</li>
+          <li><code>getLetter(score)</code> מחזירה <code>'A'</code> ל-90 ומעלה, ‏<code>'B'</code> ל-80–89, ‏<code>'C'</code> ל-70–79, ו-<code>'F'</code> מתחת ל-70.</li>
+          <li><code>getReport(name, a, b, c)</code> מחזירה מחרוזת כמו <code>'דנה: ממוצע 85, ציון B'</code>, ומשתמשת בשתי הפונקציות הקודמות.</li>
+          <li>בדקו עם הפונקציה <code>check</code> מהדוגמה הפתורה, כולל מקרי גבול (ממוצע של בדיוק 90, בדיוק 70).</li>
+        </ol>
+        <details class="solution">
+          <summary>הצגת הפתרון</summary>
+<pre><code class="language-js">const average = (a, b, c) =&gt; (a + b + c) / 3;
+
+function getLetter(score) {
+  if (score &gt;= 90) return 'A';
+  if (score &gt;= 80) return 'B';
+  if (score &gt;= 70) return 'C';
+  return 'F';
+}
+
+function getReport(name, a, b, c) {
+  const avg = Math.round(average(a, b, c));
+  return name + ': ממוצע ' + avg + ', ציון ' + getLetter(avg);
+}
+
+console.log(getReport('דנה', 80, 90, 85));  // דנה: ממוצע 85, ציון B</code></pre>
+          <p>שימו לב: כשבגוף ה-<code>if</code> יש שורה אחת, אפשר לכתוב אותה בלי <code>{ }</code>. זה מקובל עם <code>return</code> קצר, אבל אם יש ספק, עדיף עם סוגריים.</p>
+        </details>
+      </div>
+
+      <h2 id="cheatsheet">דף סיכום</h2>
+<pre><code class="language-js">// הצהרה: אפשר לקרוא לה גם לפני השורה הזו
+function add(a, b) {
+  return a + b;
+}
+
+// ביטוי: פונקציה במשתנה
+const add2 = function (a, b) {
+  return a + b;
+};
+
+// arrow function עם גוף
+const add3 = (a, b) =&gt; {
+  return a + b;
+};
+
+// arrow function קצרה: מחזירה אוטומטית
+const add4 = (a, b) =&gt; a + b;
+
+// ברירת מחדל
+const greet = (name = 'אורח') =&gt; 'שלום ' + name;
+
+// callback: מעבירים פונקציה בלי ()
+setTimeout(() =&gt; console.log('אחרי שנייה'), 1000);
+
+// קריאה ושמירת התשובה
+const sum = add(2, 3);   // 5</code></pre>
+
+      <h2 id="summary">סיכום</h2>
+      <ul>
+        <li><strong>פונקציה</strong> היא קטע קוד עם שם, שמגדירים פעם אחת וקוראים לו כמה פעמים שרוצים. הגדרה לבד לא מריצה כלום.</li>
+        <li><strong>פרמטרים</strong> הם השמות בהגדרה. <strong>ארגומנטים</strong> הם הערכים בקריאה. פרמטר שלא קיבל ערך הוא <code>undefined</code>, אלא אם נתתם לו ברירת מחדל.</li>
+        <li><strong><code>return</code></strong> מחזיר את התשובה למי שקרא לפונקציה, ועוצר אותה. ‏<code>console.log</code> רק מציג. פונקציה בלי <code>return</code> מחזירה <code>undefined</code>.</li>
+        <li><strong>Scope:</strong> משתנה שהוגדר בתוך פונקציה (או בלוק) קיים רק שם. עדיף לקבל נתונים בפרמטרים ולהחזיר ב-<code>return</code>, ולא לשנות משתנים גלובליים.</li>
+        <li><strong>Arrow functions</strong> (<code>(x) =&gt; ...</code>) הן הצורה המודרנית. בלי <code>{ }</code> הן מחזירות אוטומטית. עם <code>{ }</code> צריך <code>return</code>.</li>
+        <li>פונקציה היא <strong>ערך</strong>: אפשר להעביר אותה לפונקציה אחרת (callback). ‏<code>f</code> היא הפונקציה, ‏<code>f()</code> היא הקריאה.</li>
+        <li>כותבים פונקציה בשלבים: קלט ופלט, שם, דוגמאות עם תשובות צפויות (כולל מקרי גבול), קוד, בדיקה.</li>
+      </ul>
+
+      <div class="box goals">
+        <h3>מה הלאה?</h3>
+        <p>בשיעור 3 נלמד <strong>מערכים ואובייקטים</strong>, ונראה את הכוח של callbacks: ‏<code>map</code>, ‏<code>filter</code> ו-<code>reduce</code> הן פונקציות שמקבלות arrow function ומפעילות אותה על כל פריט ברשימה. לפני כן, נסו את <a href="project.html">הפרויקט המסכם</a> של השיעור.</p>
+      </div>
+
+      <h3>מקורות להעמקה</h3>
+      <ul>
+        <li><a href="https://developer.mozilla.org/he/docs/Web/JavaScript/Guide/Functions" target="_blank" rel="noopener">MDN: מדריך פונקציות</a> (בחלקו בעברית, אפשר לעבור לאנגלית)</li>
+        <li><a href="https://javascript.info/function-basics" target="_blank" rel="noopener">javascript.info: Functions</a> ו-<a href="https://javascript.info/arrow-functions-basics" target="_blank" rel="noopener">Arrow functions, the basics</a>: הסברים מצוינים עם תרגילים</li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions" target="_blank" rel="noopener">MDN: Arrow function expressions</a></li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p>לסיום החלק בכיתה כדאי לשאול שתי שאלות: "מה ההבדל בין return ל-console.log?" ו"מה ההבדל בין sayHi ל-sayHi()?". אם הכיתה עונה בביטחון, הבסיס לשיעור 3 קיים. אתגרים 1–3 מתאימים לסוף השיעור. אתגרים 4–6, תרגיל הבאגים והבונוס לבית.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

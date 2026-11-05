@@ -11,7 +11,16 @@ const LESSONS = [
       { slug: 'project', title: 'פרויקט ותרגול מסכם' },
     ],
   },
-  { n: 2, title: 'JavaScript מודרני א׳', topics: 'let/const, טיפוסים, תנאים, לולאות, פונקציות, arrow functions', ready: false },
+  {
+    n: 2, title: 'JavaScript מודרני א׳', topics: 'משתנים, טיפוסים, תנאים, לולאות, פונקציות, arrow functions', ready: true,
+    parts: [
+      { slug: 'index', title: 'סקירה ומטרות' },
+      { slug: 'basics', title: 'חלק א׳: משתנים וטיפוסים' },
+      { slug: 'logic', title: 'חלק ב׳: תנאים ולולאות' },
+      { slug: 'functions', title: 'חלק ג׳: פונקציות' },
+      { slug: 'project', title: 'פרויקט ותרגול מסכם' },
+    ],
+  },
   { n: 3, title: 'JavaScript מודרני ב׳', topics: 'מערכים ואובייקטים, map/filter/reduce, destructuring, spread, מודולים, async/await, fetch', ready: false },
   { n: 4, title: 'React: יסודות', topics: 'Node ו-npm, Vite, JSX, קומפוננטות, props', ready: false },
   { n: 5, title: 'State ואירועים', topics: 'useState, אירועים, רינדור מותנה, רשימות ו-key', ready: false },
@@ -131,37 +140,139 @@ function buildDoc(html, css) {
   return `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">${style}</head><body>${html}</body></html>`;
 }
 
+// רץ בתוך ה-iframe של עורך JavaScript: מעביר את console.log ואת השגיאות לעמוד
+function captureConsole(token) {
+  const fmt = (v, depth = 0) => {
+    if (typeof v === 'string') return depth ? `'${v}'` : v;
+    if (typeof v === 'function') return `ƒ ${v.name || 'anonymous'}()`;
+    if (v instanceof Error) return `${v.name}: ${v.message}`;
+    if (v instanceof Date) return v.toString();
+    if (Array.isArray(v)) return depth > 2 ? '[…]' : `[${v.map((x) => fmt(x, depth + 1)).join(', ')}]`;
+    if (v && typeof v === 'object') {
+      if (depth > 2) return '{…}';
+      const entries = Object.entries(v).map(([k, x]) => `${k}: ${fmt(x, depth + 1)}`);
+      return entries.length ? `{ ${entries.join(', ')} }` : '{}';
+    }
+    return String(v);
+  };
+  const send = (type, data) => parent.postMessage({ token, type, ...data }, '*');
+  ['log', 'info', 'warn', 'error', 'table'].forEach((m) => {
+    const type = m === 'warn' || m === 'error' ? m : 'log';
+    console[m] = (...args) => send(type, { text: args.map((a) => fmt(a)).join(' ') });
+  });
+  addEventListener('error', (e) => send('exception', { text: e.message.replace(/^Uncaught /, ''), line: e.lineno }));
+  addEventListener('unhandledrejection', (e) => send('exception', { text: String(e.reason?.message ?? e.reason) }));
+}
+
+// הסבר בעברית לשגיאות הנפוצות של מתחילים
+const ERROR_HINTS = [
+  [/is not defined/, 'השם הזה לא מוגדר. אולי יש שגיאת כתיב (אותיות גדולות וקטנות נחשבות שונות), או שהמשתנה מוגדר רק בהמשך?'],
+  [/before initialization/, 'השתמשתם במשתנה לפני השורה שבה הוא הוגדר. הזיזו את ההגדרה למעלה.'],
+  [/Assignment to constant/, 'אי אפשר לשנות משתנה שהוגדר עם const. אם הערך צריך להשתנות, הגדירו אותו עם let.'],
+  [/already been declared/, 'המשתנה הזה כבר הוגדר. מגדירים משתנה פעם אחת, ואחר כך משנים אותו בלי let.'],
+  [/is not a function/, 'ניסיתם לקרוא למשהו שהוא לא פונקציה. בדקו את השם ואת הסוגריים.'],
+  [/Cannot read properties of (undefined|null)/, 'ניסיתם לקרוא מאפיין מתוך ערך שהוא undefined או null.'],
+  [/Unexpected|missing|Invalid or unexpected|Unterminated/, 'שגיאת תחביר: בדקו שכל סוגריים ומרכאות נסגרו, ושאין פסיק או נקודה-פסיק חסרים.'],
+];
+
 function initPlayground(root, index) {
   const id = root.id || `pg-${index}`;
   const read = (lang) => {
     const s = root.querySelector(`script[data-lang="${lang}"]`);
     return s ? dedent(s.textContent) : null;
   };
-  const initial = { html: read('html') ?? '', css: read('css') };
-  const solution = { html: read('solution-html'), css: read('solution-css') };
-  const langs = ['html'];
-  if (initial.css !== null || solution.css !== null || root.dataset.tabs === 'html,css') langs.push('css');
-  initial.css ??= '';
+  const initial = { html: read('html'), css: read('css'), js: read('js') };
+  const solution = { html: read('solution-html'), css: read('solution-css'), js: read('solution-js') };
+  const isJs = initial.js !== null || solution.js !== null;
+  const langs = ['html', 'css', 'js'].filter((lang) => initial[lang] !== null || solution[lang] !== null);
+  if (!isJs && !langs.includes('html')) langs.unshift('html');
+  if (root.dataset.tabs === 'html,css' && !langs.includes('css')) langs.push('css');
+  langs.forEach((lang) => (initial[lang] ??= ''));
 
   const storeKey = (lang) => `pg:${location.pathname}:${id}:${lang}`;
   const code = {};
   langs.forEach((lang) => (code[lang] = localStorage.getItem(storeKey(lang)) ?? initial[lang]));
-  let active = 'html';
-  const height = `${root.dataset.height || 220}px`;
+  const hasSaved = langs.some((lang) => localStorage.getItem(storeKey(lang)) !== null);
+  let active = isJs ? 'js' : 'html';
+  const heightPx = Number(root.dataset.height || 220);
+  const height = `${heightPx}px`;
 
-  const editor = el('textarea', { className: 'pg-editor', spellcheck: false, value: code.html });
+  const editor = el('textarea', { className: 'pg-editor', spellcheck: false, value: code[active] });
   editor.setAttribute('dir', 'ltr');
+  editor.setAttribute('wrap', 'off');
   editor.setAttribute('aria-label', 'עורך קוד');
   editor.style.height = height;
 
-  const preview = el('iframe', { className: 'pg-preview', title: 'תוצאה' });
-  preview.setAttribute('sandbox', 'allow-same-origin'); // בלי סקריפטים: רק HTML ו-CSS
-  preview.style.height = height;
+  // מספרי שורות בעורך JavaScript, כי הודעות השגיאה מפנות למספר שורה
+  const gutter = isJs ? el('div', { className: 'pg-lines', ariaHidden: 'true' }) : null;
+  const updateGutter = () => {
+    if (!gutter) return;
+    gutter.textContent = editor.value.split('\n').map((_, i) => i + 1).join('\n');
+    gutter.scrollTop = editor.scrollTop;
+  };
+  editor.addEventListener('scroll', () => gutter && (gutter.scrollTop = editor.scrollTop));
 
-  const render = () => { preview.srcdoc = buildDoc(code.html, code.css || ''); };
+  const preview = el('iframe', { className: 'pg-preview', title: 'תוצאה' });
+  // עורך HTML/CSS רץ בלי סקריפטים. עורך JavaScript מריץ סקריפטים, ורק בלחיצה על "הרצה"
+  preview.setAttribute('sandbox', isJs ? 'allow-scripts allow-same-origin' : 'allow-same-origin');
+  const showPreview = !isJs || langs.includes('html');
+  preview.style.height = isJs ? `${Math.round(heightPx / 2)}px` : height;
+  preview.hidden = !showPreview;
+
+  const consoleOut = isJs ? el('div', { className: 'pg-console', role: 'log', dir: 'ltr' }) : null;
+  if (consoleOut) consoleOut.style.height = showPreview ? `${Math.round(heightPx / 2)}px` : height;
+  const logLine = (type, text) => {
+    consoleOut.append(el('div', { className: `pg-log ${type}`, dir: 'auto' }, text));
+    consoleOut.scrollTop = consoleOut.scrollHeight;
+  };
+
+  // הרצת JavaScript: בונים מסמך עם לוכד ה-console, הקוד של המשתמש, וסימן "סיימתי"
+  let runId = 0;
+  let finishRun = () => {};
+  const out = { logs: [], errors: [] };
+  let prefixLines = 0;
+  window.addEventListener('message', (e) => {
+    const m = e.data;
+    if (!isJs || !m || m.token !== `${id}:${runId}`) return;
+    if (m.type === 'done') return finishRun();
+    if (m.type === 'exception') {
+      out.errors.push(m.text);
+      const line = m.line ? m.line - prefixLines : 0;
+      logLine('error', `✖ ${m.text}${line > 0 ? ` (שורה ${line})` : ''}`);
+      const hint = ERROR_HINTS.find(([re]) => re.test(m.text));
+      if (hint) logLine('hint', `💡 ${hint[1]}`);
+      return;
+    }
+    (m.type === 'error' ? out.errors : out.logs).push(m.text);
+    logLine(m.type, m.text);
+  });
+
+  const run = () => new Promise((resolve) => {
+    const token = `${id}:${++runId}`;
+    out.logs = [];
+    out.errors = [];
+    consoleOut.replaceChildren();
+    let finished = false;
+    finishRun = () => {
+      if (finished) return;
+      finished = true;
+      if (!consoleOut.childElementCount) logLine('hint', 'אין פלט. כדי לראות משהו כאן, כתבו console.log(...)');
+      resolve();
+    };
+    setTimeout(finishRun, 3000);
+    const prefix = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">'
+      + `<style>${PREVIEW_BASE_CSS}\n${code.css || ''}</style>`
+      + `<script>(${captureConsole})(${JSON.stringify(token)})</script></head><body>${code.html || ''}\n<script>\n`;
+    prefixLines = (prefix.match(/\n/g) || []).length;
+    const done = `<script>parent.postMessage({ token: ${JSON.stringify(token)}, type: 'done' }, '*')</script>`;
+    preview.srcdoc = `${prefix}${code.js.replace(/<\/script/gi, '<\\/script')}\n</script>${done}</body></html>`;
+  });
+
+  const render = isJs ? run : () => { preview.srcdoc = buildDoc(code.html, code.css || ''); };
   let timer;
   const save = () => {
     localStorage.setItem(storeKey(active), code[active]);
+    if (isJs) return; // JavaScript רץ רק בלחיצה, כדי שלולאה אינסופית לא תתקע את העמוד בזמן ההקלדה
     clearTimeout(timer);
     timer = setTimeout(render, 250);
   };
@@ -171,14 +282,20 @@ function initPlayground(root, index) {
     b.addEventListener('click', () => {
       active = lang;
       editor.value = code[lang];
+      updateGutter();
       tabButtons.forEach((t) => t.classList.toggle('active', t === b));
       editor.focus();
     });
     return b;
   });
 
-  editor.addEventListener('input', () => { code[active] = editor.value; save(); });
+  editor.addEventListener('input', () => { code[active] = editor.value; updateGutter(); save(); });
   editor.addEventListener('keydown', (e) => {
+    if (isJs && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      run();
+      return;
+    }
     if (e.key !== 'Tab' || e.shiftKey) return;
     e.preventDefault();
     editor.setRangeText('  ', editor.selectionStart, editor.selectionEnd, 'end');
@@ -194,12 +311,18 @@ function initPlayground(root, index) {
       localStorage.setItem(storeKey(lang), code[lang]);
     });
     editor.value = code[active];
+    updateGutter();
     status.replaceChildren();
     status.className = 'pg-status';
     render();
   };
 
   const tools = [];
+  if (isJs) {
+    const runBtn = el('button', { type: 'button', className: 'pg-btn run', title: 'הרצה (Ctrl+Enter)' }, '▶ הרצה');
+    runBtn.addEventListener('click', run);
+    tools.push(runBtn);
+  }
   const resetBtn = el('button', { type: 'button', className: 'pg-btn', title: 'חזרה לקוד המקורי' }, '↺ איפוס');
   resetBtn.addEventListener('click', () => {
     langs.forEach((lang) => localStorage.removeItem(storeKey(lang)));
@@ -219,14 +342,22 @@ function initPlayground(root, index) {
       render();
     });
     const checkBtn = el('button', { type: 'button', className: 'pg-btn primary' }, '✓ בדיקה');
+    // בעורך JavaScript הבדיקה מקבלת את הפלט: { logs, errors, code }, ואת החלון שבו הקוד רץ.
+    // דרך win.eval('שם') אפשר לגשת גם למשתנים ולפונקציות שהוגדרו עם const ו-let.
+    const checkArgs = async () => {
+      if (!isJs) return [await freshDoc(), preview.contentWindow];
+      await run();
+      return [{ logs: [...out.logs], errors: [...out.errors], code: code.js }, preview.contentWindow];
+    };
     checkBtn.addEventListener('click', async () => {
-      const doc = await freshDoc();
+      const args = await checkArgs();
       let failed;
       try {
-        failed = window.PLAYGROUND_CHECKS[checkName](doc, preview.contentWindow).filter(([ok]) => !ok);
+        failed = window.PLAYGROUND_CHECKS[checkName](...args).filter(([ok]) => !ok);
       } catch {
-        failed = [[false, 'משהו בקוד עדיין לא תקין. בדקו שכל התגיות נסגרו.']];
+        failed = [[false, isJs ? 'משהו בקוד עדיין לא תקין. בדקו את חלון הפלט.' : 'משהו בקוד עדיין לא תקין. בדקו שכל התגיות נסגרו.']];
       }
+      if (isJs && out.errors.length) failed.unshift([false, 'הקוד נעצר בגלל שגיאה. ההסבר מופיע באדום בחלון הפלט.']);
       status.className = `pg-status ${failed.length ? 'fail' : 'ok'}`;
       status.replaceChildren(failed.length
         ? el('div', {}, el('strong', {}, 'כמעט! מה שעוד חסר:'), el('ul', {}, ...failed.map(([, msg]) => el('li', {}, msg))))
@@ -235,7 +366,7 @@ function initPlayground(root, index) {
     tools.push(checkBtn);
   }
 
-  if (solution.html !== null || solution.css !== null) {
+  if (Object.values(solution).some((s) => s !== null)) {
     const solBtn = el('button', { type: 'button', className: 'pg-btn' }, '💡 פתרון');
     solBtn.addEventListener('click', () => {
       if (confirm('להציג את הפתרון? הקוד שכתבתם יוחלף. כדאי לנסות קודם לבד 🙂')) setCode(solution);
@@ -246,12 +377,19 @@ function initPlayground(root, index) {
   const toolbar = el('div', { className: 'pg-toolbar' },
     el('div', { className: 'pg-tabs' }, ...tabButtons),
     el('div', { className: 'pg-tools' }, ...tools));
+  const codeArea = gutter ? el('div', { className: 'pg-code', dir: 'ltr' }, gutter, editor) : editor;
+  const resultPane = isJs
+    ? [preview, el('div', { className: 'pg-label' }, 'פלט (Console)'), consoleOut]
+    : [preview];
   const body = el('div', { className: 'pg-body' },
-    el('div', { className: 'pg-pane' }, el('div', { className: 'pg-label' }, 'הקוד'), editor),
-    el('div', { className: 'pg-pane' }, el('div', { className: 'pg-label' }, 'התוצאה'), preview));
+    el('div', { className: 'pg-pane' }, el('div', { className: 'pg-label' }, 'הקוד'), codeArea),
+    el('div', { className: 'pg-pane' }, showPreview ? el('div', { className: 'pg-label' }, 'התוצאה') : null, ...resultPane));
 
   root.append(toolbar, body, status);
-  render();
+  updateGutter();
+  // קוד ששמרתם לא רץ אוטומטית: אם יש בו לולאה אינסופית, רענון העמוד עדיין יעבוד
+  if (isJs && hasSaved) logLine('hint', 'הקוד ששמרתם נטען. לחצו ▶ הרצה כדי להריץ אותו.');
+  else render();
 }
 
 document.querySelectorAll('.playground').forEach(initPlayground);

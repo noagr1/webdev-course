@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 2 · חלק א׳: משתנים וטיפוסים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="2" data-part="basics" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 2 · חלק א׳</span>
+      <h1>משתנים וטיפוסים</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 40 דק׳ בכיתה</span>
+        <span class="chip">📚 2–3 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: שיעור 1 (HTML ו-CSS)</span>
+      </div>
+
+      <p>בשיעור הקודם בנינו דף שנראה טוב, אבל הוא <strong>לא עושה כלום</strong>: אי אפשר ללחוץ על כפתור ולקבל תשובה, אין חישובים, ואין שום דבר שמשתנה. כאן נכנסת <strong>JavaScript</strong>, שפת התכנות של הדפדפן. בחלק הזה נלמד את אבני הבניין הבסיסיות של כל תוכנית: איך מריצים קוד, איך שומרים מידע ב<strong>משתנים</strong>, ואילו <strong>סוגי מידע</strong> (טיפוסים) יש: טקסט, מספרים, אמת/שקר.</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>להסביר מה זה JavaScript ואיפה היא רצה</li>
+          <li>להריץ קוד בשלוש דרכים: בקונסול של הדפדפן, בקובץ שמחובר לדף, ובעורך של האתר</li>
+          <li>להדפיס ערכים עם <code>console.log</code> ולהשתמש בזה כדי להבין מה הקוד עושה</li>
+          <li>להגדיר משתנים עם <code>let</code> ו-<code>const</code>, ולדעת מתי להשתמש בכל אחד</li>
+          <li>לזהות את הטיפוסים הבסיסיים: מחרוזת, מספר, בוליאני, <code>null</code> ו-<code>undefined</code></li>
+          <li>לחשב עם אופרטורים, לעבוד עם מחרוזות ולהמיר בין טיפוסים</li>
+          <li>לקרוא הודעת שגיאה ולתקן אותה</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בעמוד הזה העורכים הם עורכי <strong>JavaScript</strong>. הקוד מימין, ומשמאל חלון <strong>פלט (Console)</strong> שמציג את מה שהקוד מדפיס. הקוד רץ כשלוחצים על <strong>▶ הרצה</strong> (או <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, ובמק <kbd>⌘</kbd>+<kbd>Enter</kbd>). אם יש שגיאה, היא תופיע באדום עם מספר השורה והסבר בעברית.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>חלוקת זמן מומלצת לחלק הזה (40 דק׳):</strong> 5 דק׳ מה זה JS ואיפה מריצים (הדגמה חיה בקונסול), 10 דק׳ משתנים ו-let/const, 10 דק׳ טיפוסים ואופרטורים, 10 דק׳ מחרוזות ו-template literals, 5 דק׳ קריאת שגיאות. המרות טיפוסים, ‏Math ושאר המתודות של מחרוזות נשארים ללימוד עצמי. כדאי לפתוח את הקונסול על המקרן ולהקליד יחד עם הסטודנטים, ולא רק להראות שקפים.</p>
+      </aside>
+
+      <h2 id="what">מה זה JavaScript? <span class="time">5 דק׳</span></h2>
+      <p>עד עכשיו פגשנו שתי שפות. לכל אחת מהן תפקיד אחר, וכדאי לחשוב עליהן כמו על בית:</p>
+      <table>
+        <tr><th>שפה</th><th>התפקיד</th><th>בבית</th></tr>
+        <tr><td><strong>HTML</strong></td><td>התוכן והמבנה: כותרות, פסקאות, כפתורים</td><td>הקירות, החדרים והדלתות</td></tr>
+        <tr><td><strong>CSS</strong></td><td>העיצוב: צבעים, גופנים, סידור</td><td>הצבע על הקירות והרהיטים</td></tr>
+        <tr><td><strong>JavaScript</strong></td><td>ההתנהגות: מה קורה כשלוחצים, חישובים, נתונים מהשרת</td><td>החשמל: האור נדלק כשלוחצים על המתג</td></tr>
+      </table>
+      <p>‏<strong>JavaScript</strong> (בקיצור <strong>JS</strong>) היא <strong>שפת תכנות</strong>. בניגוד ל-HTML ול-CSS, שמתארים איך דף צריך להיראות, ב-JavaScript כותבים <strong>הוראות</strong> שהמחשב מבצע אחת אחרי השנייה: "תחשב את זה", "אם המשתמש לחץ, תציג הודעה", "תביא נתונים מהשרת".</p>
+
+      <h3>איפה JavaScript רצה?</h3>
+      <ul>
+        <li><strong>בדפדפן</strong>: לכל דפדפן (Chrome, ‏Firefox, ‏Safari, ‏Edge) יש "מנוע" שמריץ JavaScript. זה המקום הראשון שבו השפה נולדה, ושם נעבוד בשיעורים הקרובים.</li>
+        <li><strong>במחשב או בשרת, בעזרת Node.js</strong>: אותה שפה בדיוק, רק מחוץ לדפדפן. נכיר את Node בשיעור 4 (כשנתחיל React) ונשתמש בו לכתיבת שרת בשיעור 9.</li>
+      </ul>
+      <p>כלומר, אם לומדים JavaScript פעם אחת, אפשר לכתוב איתה גם את מה שהמשתמש רואה (Frontend) וגם את השרת (Backend). זו אחת הסיבות שהיא השפה הפופולרית בעולם.</p>
+
+      <div class="box tip">
+        <p><strong>JavaScript ו-Java הן שתי שפות שונות לגמרי</strong>, למרות השם הדומה. השם נבחר בשנות ה-90 מסיבות שיווקיות, כי Java הייתה אז מאוד פופולרית. אין ביניהן קשר, כמו שאין קשר בין "מכונית" ל"מכונת כביסה".</p>
+      </div>
+
+      <h3>הטעימה הראשונה</h3>
+      <p>הנה תוכנית JavaScript קטנה. לחצו על <strong>▶ הרצה</strong> ותראו מה מופיע בחלון הפלט:</p>
+      <div class="playground" id="pg-first" data-height="200">
+        <script type="text/plain" data-lang="js">
+          console.log('שלום עולם!');
+          console.log('אני לומד/ת JavaScript');
+          console.log(2 + 3);
+        </script>
+      </div>
+      <p>כל שורה היא <strong>הוראה</strong>. המחשב מבצע אותן לפי הסדר, מלמעלה למטה. ‏<code>console.log(...)</code> פירושו "תדפיס את מה שבתוך הסוגריים". שימו לב: את <code>2 + 3</code> המחשב <strong>חישב</strong> והדפיס <code>5</code>.</p>
+      <p>✏️ <strong>נסו לשנות:</strong> כתבו את השם שלכם במקום "שלום עולם", ושנו את החישוב ל-<code>7 * 6</code>. לחצו שוב על הרצה.</p>
+
+      <h2 id="run">שלוש דרכים להריץ JavaScript <span class="time">5 דק׳</span></h2>
+      <p>את אותו קוד אפשר להריץ בשלושה מקומות. כל אחד מתאים למצב אחר:</p>
+
+      <h3>1. הקונסול של הדפדפן: לניסויים מהירים</h3>
+      <p>בכל דפדפן יש <strong>כלי מפתחים</strong> (DevTools), ובתוכם לשונית <strong>Console</strong>. זה מקום שבו מקלידים שורת JavaScript, לוחצים Enter, ומקבלים תשובה מיד.</p>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><p>פתחו את Chrome בכל דף שהוא (אפילו בדף הזה).</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>פתחו את כלי המפתחים:</p>
+          <ul>
+            <li><strong>Windows</strong>: ‏<kbd>F12</kbd>, או <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> (פותח ישר את הקונסול)</li>
+            <li><strong>Mac</strong>: ‏<kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>J</kbd> (Command+Option+J)</li>
+            <li>או: לחיצה ימנית על הדף ← <strong>Inspect</strong> (בדיקה) ← לשונית <strong>Console</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><p>הקליקו בשורה הריקה שליד הסימן <code>&gt;</code>, הקלידו <code>2 + 2</code> ולחצו Enter. הקונסול יענה <code>4</code>. נסו גם <code>'שלום'.length</code>.</p></div>
+      </div>
+      <div class="box warn">
+        <p><strong>אזהרת Chrome:</strong> בפעם הראשונה שמדביקים קוד לקונסול, Chrome עשוי לחסום את ההדבקה ולבקש להקליד <code>allow pasting</code>. זו הגנה מפני נוכלים שמבקשים מאנשים להדביק קוד זדוני. מותר להקליד את זה כשמדביקים קוד שאתם כתבתם או מבינים. <strong>לעולם אל תדביקו בקונסול קוד שמישהו זר שלח לכם.</strong></p>
+      </div>
+      <p>הקונסול מצוין לבדוק "מה יוצא אם...", אבל כל מה שמקלידים בו נמחק כשסוגרים את הלשונית. לתוכנית אמיתית צריך קובץ.</p>
+
+      <h3>2. קובץ JavaScript שמחובר לדף: הדרך האמיתית</h3>
+      <p>כמו שקובץ CSS מחברים לדף עם <code>&lt;link&gt;</code>, קובץ JavaScript מחברים עם התגית <code>&lt;script&gt;</code>. ככה בנויים כל האתרים. צרו ב-VS Code תיקייה חדשה בשם <code>js-basics</code>, ובתוכה שני קבצים:</p>
+      <pre><code class="nohighlight">js-basics/
+├── index.html
+└── app.js</code></pre>
+      <p class="file-name">index.html</p>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="he" dir="rtl"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;התרגול הראשון ב-JS&lt;/title&gt;
+  &lt;script src="app.js" defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;פתחו את הקונסול כדי לראות את הפלט&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <p class="file-name">app.js</p>
+      <pre><code class="language-javascript">console.log('הקובץ app.js נטען!');
+console.log(10 * 3);</code></pre>
+      <p>פתחו את <code>index.html</code> עם Live Server (כמו בשיעור 1), ופתחו את הקונסול (<kbd>F12</kbd>). תראו שם את שתי ההודעות. כל שינוי ב-<code>app.js</code> ושמירה (<kbd>Ctrl</kbd>+<kbd>S</kbd>) ירעננו את הדף ויריצו את הקוד מחדש.</p>
+      <p>כמה פרטים חשובים בשורה <code>&lt;script src="app.js" defer&gt;&lt;/script&gt;</code>:</p>
+      <ul>
+        <li><code>src</code> הוא הנתיב לקובץ, בדיוק כמו <code>href</code> ב-<code>&lt;link&gt;</code>.</li>
+        <li>התגית חייבת להיסגר ב-<code>&lt;/script&gt;</code>, גם כשאין בתוכה כלום. ‏<code>&lt;script src="app.js" /&gt;</code> <strong>לא עובד</strong>.</li>
+        <li><code>defer</code> אומר לדפדפן: "תוריד את הקובץ, אבל תריץ אותו רק אחרי שכל ה-HTML נקרא". בלי זה, הקוד ירוץ לפני שהדף קיים, ובהמשך, כשנרצה לגעת באלמנטים של הדף, זה יגרום לשגיאות. כלל אצבע: <strong>תמיד לשים <code>defer</code></strong>.</li>
+      </ul>
+      <div class="box tip">
+        <p>אפשר גם לכתוב קוד ישירות בתוך התגית: <code>&lt;script&gt;console.log('היי')&lt;/script&gt;</code>. זה בסדר לדוגמה קטנה, אבל כמו עם CSS, קובץ נפרד מסודר יותר ומאפשר להשתמש באותו קוד בכמה דפים.</p>
+      </div>
+
+      <h3>3. העורך באתר הזה: ללמידה</h3>
+      <p>העורכים בעמוד הזה עושים בדיוק את מה שהקובץ והקונסול עושים יחד: הקוד רץ בדף קטן ונסתר, וכל <code>console.log</code> מופיע בחלון הפלט. זה המקום הנוח ביותר לתרגל, אבל חשוב לדעת גם את שתי הדרכים האחרות, כי בפרויקטים אמיתיים עובדים עם קבצים.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מה הדרך הנכונה לחבר את <code>app.js</code> לדף?</p>
+        <ul>
+          <li><code>&lt;link rel="script" href="app.js"&gt;</code></li>
+          <li><code>&lt;script src="app.js" /&gt;</code></li>
+          <li data-correct><code>&lt;script src="app.js" defer&gt;&lt;/script&gt;</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>&lt;link&gt;</code> משמש ל-CSS, ותגית script חייבת תגית סוגרת. ‏<code>defer</code> דואג שהקוד ירוץ אחרי שהדף נטען.</p>
+      </div>
+
+      <h2 id="console-log">‏console.log: לראות מה קורה בתוך הקוד</h2>
+      <p>‏<code>console.log</code> היא הפקודה שתשתמשו בה יותר מכל פקודה אחרת. היא מדפיסה ערך לקונסול. למשתמש באתר היא לא מראה כלום (הוא לא פותח את הקונסול), אבל <strong>לכם</strong>, המפתחים, היא מאפשרת "להציץ" לתוך התוכנית.</p>
+      <p>אפשר להדפיס כמה ערכים בפקודה אחת, עם פסיק ביניהם. הם יודפסו באותה שורה, עם רווח:</p>
+      <div class="playground" id="pg-log" data-height="220">
+        <script type="text/plain" data-lang="js">
+          console.log('שלום');
+          console.log('התוצאה היא', 4 * 5);
+          console.log('גיל:', 25, 'עיר:', 'חיפה');
+          console.log();
+          console.log('השורה הקודמת הייתה ריקה');
+          console.warn('זו אזהרה: היא מופיעה בצהוב');
+          console.error('וזו שגיאה: היא מופיעה באדום');
+        </script>
+      </div>
+      <p>‏<code>console.warn</code> ו-<code>console.error</code> עובדים כמו <code>console.log</code>, רק בצבע אחר. נשתמש בהם פחות.</p>
+      <div class="box tip">
+        <p><strong>למה זה כלי הדיבאג החשוב ביותר?</strong> כשקוד לא עושה את מה שציפיתם, הדבר הראשון שעושים הוא להוסיף <code>console.log</code> ולבדוק: האם הקוד בכלל הגיע לשורה הזו? מה הערך של המשתנה ברגע הזה? מתכנתים מנוסים עושים את זה כל יום. אל תנחשו, תדפיסו.</p>
+      </div>
+
+      <h2 id="comments">הערות בקוד</h2>
+      <p><strong>הערה</strong> (comment) היא טקסט בקוד שהמחשב מתעלם ממנו. היא מיועדת לבני אדם: להסביר <strong>למה</strong> הקוד עושה משהו, או "לכבות" זמנית שורה בלי למחוק אותה.</p>
+      <div class="playground" id="pg-comments" data-height="220">
+        <script type="text/plain" data-lang="js">
+          // הערה של שורה אחת מתחילה בשני לוכסנים
+          console.log('השורה הזו רצה');
+
+          // console.log('השורה הזו לא רצה, כי היא בתוך הערה');
+
+          /*
+            הערה של כמה שורות
+            מתחילה בלוכסן וכוכבית
+            ונגמרת בכוכבית ולוכסן
+          */
+          console.log(10 + 5); // אפשר גם הערה בסוף שורה
+        </script>
+      </div>
+      <p>✏️ <strong>נסו:</strong> מחקו את <code>//</code> בתחילת השורה הרביעית והריצו. עכשיו גם היא מודפסת. ב-VS Code הקיצור <kbd>Ctrl</kbd>+<kbd>/</kbd> (במק <kbd>⌘</kbd>+<kbd>/</kbd>) הופך שורה להערה ובחזרה.</p>
+
+      <h2 id="statements">הוראות ונקודה-פסיק</h2>
+      <p>תוכנית היא רשימה של <strong>הוראות</strong> (statements). בדרך כלל כל הוראה בשורה משלה, ובסופה <strong>נקודה-פסיק</strong> <code>;</code>, כמו נקודה בסוף משפט.</p>
+      <ul>
+        <li>JavaScript מבצעת את ההוראות <strong>לפי הסדר</strong>, מלמעלה למטה.</li>
+        <li>הנקודה-פסיק היא ברוב המקרים לא חובה, כי JavaScript "מנחשת" איפה נגמרת הוראה. אבל יש מקרים נדירים שבהם הניחוש שגוי, ולכן בקורס הזה <strong>נשים <code>;</code> בסוף כל הוראה</strong>. ‏Prettier ב-VS Code מוסיף אותן אוטומטית.</li>
+        <li>רווחים ושורות ריקות לא משנים כלום למחשב. משתמשים בהם כדי שהקוד יהיה קריא.</li>
+        <li><strong>JavaScript מבחינה בין אותיות גדולות וקטנות</strong>: ‏<code>console.log</code> עובד, ‏<code>Console.Log</code> לא.</li>
+      </ul>
+
+      <h2 id="variables">משתנים: let ו-const <span class="time">10 דק׳</span></h2>
+      <p>תוכנית צריכה <strong>לזכור</strong> דברים: שם המשתמש, כמה מוצרים יש בעגלה, מה הניקוד במשחק. בשביל זה יש <strong>משתנים</strong>.</p>
+      <p>אפשר לחשוב על משתנה כמו על <strong>קופסה עם מדבקה</strong>. על המדבקה כתוב שם (למשל <code>age</code>), ובתוך הקופסה יש ערך (למשל <code>25</code>). כשרוצים את הערך, קוראים לקופסה בשם שלה.</p>
+      <div class="flow">
+        <div class="node">🏷️ השם<small>age</small></div>
+        <span class="arrow">←</span>
+        <div class="node">📦 הערך<small>25</small></div>
+      </div>
+
+      <h3>הגדרת משתנה עם let</h3>
+      <div class="playground" id="pg-let" data-height="230">
+        <script type="text/plain" data-lang="js">
+          let age = 25;
+          console.log(age);
+
+          // משנים את הערך: בלי let, כי המשתנה כבר קיים
+          age = 26;
+          console.log(age);
+
+          // אפשר לחשב ערך חדש מהערך הקודם
+          age = age + 1;
+          console.log('בשנה הבאה:', age);
+        </script>
+      </div>
+      <p>בואו נפרק את השורה <code>let age = 25;</code>:</p>
+      <table>
+        <tr><th>חלק</th><th>מה הוא אומר</th></tr>
+        <tr><td><code>let</code></td><td>"אני יוצר משתנה חדש" (מילה שמורה של השפה)</td></tr>
+        <tr><td><code>age</code></td><td>השם של המשתנה. אנחנו בוחרים אותו</td></tr>
+        <tr><td><code>=</code></td><td><strong>השמה</strong>: "שים בקופסה את הערך שמימין". זה <strong>לא</strong> "שווה" של מתמטיקה!</td></tr>
+        <tr><td><code>25</code></td><td>הערך שנכנס לקופסה</td></tr>
+        <tr><td><code>;</code></td><td>סוף ההוראה</td></tr>
+      </table>
+      <div class="box tip">
+        <p><strong>הסימן <code>=</code> הוא פקודה, לא שאלה.</strong> במתמטיקה <code>age = age + 1</code> הוא שטות (מספר לא יכול להיות שווה לעצמו ועוד 1). בתכנות זה אומר: "קח את הערך הנוכחי של age, הוסף 1, ושים את התוצאה בחזרה ב-age". קוראים את זה מ<strong>ימין לשמאל</strong>: קודם מחשבים את הצד הימני, ואז שמים בצד השמאלי.</p>
+      </div>
+
+      <h3>הגדרה בלי ערך</h3>
+      <p>אפשר ליצור משתנה ריק, ולתת לו ערך רק אחר כך. עד שנותנים לו ערך, יש בו <code>undefined</code> (מילה שאומרת "עדיין אין כאן ערך"):</p>
+      <div class="playground" id="pg-declare" data-height="170">
+        <script type="text/plain" data-lang="js">
+          let score;
+          console.log(score);
+
+          score = 100;
+          console.log(score);
+        </script>
+      </div>
+
+      <h3>const: משתנה שלא משתנה</h3>
+      <p>לפעמים ערך לא אמור להשתנות אף פעם: מספר הימים בשבוע, שם האתר, שיעור המע״מ. בשביל זה יש <code>const</code> (קיצור של constant, קבוע). אחרי שנותנים לו ערך, אי אפשר לשנות אותו. נסו להריץ:</p>
+      <div class="playground" id="pg-const" data-height="170">
+        <script type="text/plain" data-lang="js">
+          const daysInWeek = 7;
+          console.log(daysInWeek);
+
+          daysInWeek = 8; // שגיאה!
+          console.log(daysInWeek);
+        </script>
+      </div>
+      <p>קיבלתם שגיאה באדום: <code>TypeError: Assignment to constant variable</code>, כלומר "ניסיתם לשנות קבוע". שימו לב שהשורה האחרונה לא הודפסה: <strong>כששגיאה קורית, התוכנית נעצרת</strong>.</p>
+      <p>עוד הבדל: ‏<code>const</code> חייב לקבל ערך מיד. ‏<code>const x;</code> לבד היא שגיאה.</p>
+
+      <h3>אז מתי let ומתי const?</h3>
+      <div class="box goals">
+        <p><strong>הכלל שמתכנתים משתמשים בו:</strong> ברירת המחדל היא <code>const</code>. רק אם יודעים שהערך <strong>יצטרך להשתנות</strong> (מונה, ניקוד, סכום שמצטבר), משתמשים ב-<code>let</code>.</p>
+      </div>
+      <p>למה? כי כשקוראים קוד ורואים <code>const</code>, יודעים מיד שהערך הזה לא ישתנה בהמשך. זה מקל על ההבנה, ומונע באגים שבהם משנים משהו בטעות.</p>
+
+      <h3>ומה עם var?</h3>
+      <p>בקוד ישן ובהרבה מדריכים באינטרנט תראו <code>var age = 25;</code>. זו הדרך הישנה להגדיר משתנים, מלפני 2015. יש לה כמה התנהגויות מבלבלות, ולכן היום <strong>לא משתמשים בה</strong>. אם תראו <code>var</code> במדריך, אפשר בדרך כלל להחליף אותו ב-<code>let</code>.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: אחרי הקוד הזה, מה הערך של <code>points</code>?<br><code>let points = 10; points = points + 5; points = points * 2;</code></p>
+        <ul>
+          <li>10</li>
+          <li>15</li>
+          <li data-correct>30</li>
+          <li>20</li>
+        </ul>
+        <p class="quiz-explain">נכון! מתחילים ב-10, אחרי השורה השנייה 15, ואחרי השלישית 15 × 2 = 30. כל השמה מחליפה את הערך הקודם.</p>
+      </div>
+
+      <h2 id="naming">איך לתת שמות למשתנים</h2>
+      <h3>חוקים (אם לא שומרים עליהם, יש שגיאה)</h3>
+      <ul>
+        <li>מותר: אותיות באנגלית, ספרות, <code>_</code> ו-<code>$</code>.</li>
+        <li>אסור להתחיל בספרה: <code>2name</code> ❌, ‏<code>name2</code> ✅.</li>
+        <li>אסור רווחים או מקפים: <code>first name</code> ❌, ‏<code>first-name</code> ❌ (המחשב יחשוב שזה "first פחות name").</li>
+        <li>אסור להשתמש ב<strong>מילים שמורות</strong> של השפה: <code>let</code>, ‏<code>const</code>, ‏<code>if</code>, ‏<code>for</code>, ‏<code>function</code>, ‏<code>return</code>, ‏<code>class</code>, ‏<code>new</code> ועוד.</li>
+      </ul>
+      <h3>מוסכמות (הקוד יעבוד גם בלי, אבל כולם עושים ככה)</h3>
+      <ul>
+        <li><strong>camelCase</strong>: כשהשם מורכב מכמה מילים, המילה הראשונה באות קטנה וכל מילה אחריה מתחילה באות גדולה: <code>firstName</code>, ‏<code>totalPrice</code>, ‏<code>isLoggedIn</code>. קוראים לזה "גמל" בגלל ה"דבשות".</li>
+        <li><strong>שמות שמסבירים את עצמם</strong>: ‏<code>price</code> עדיף על <code>p</code>, ו-<code>studentCount</code> עדיף על <code>x</code>. בעוד חודש לא תזכרו מה זה <code>x</code>.</li>
+        <li>שמות באנגלית. טכנית JavaScript מרשה גם אותיות בעברית (<code>let גיל = 5</code> עובד!), אבל זה מתנגש עם כיוון הכתיבה ב-VS Code, אף ספרייה לא עובדת ככה, ואף צוות פיתוח לא יקבל את זה. <strong>טקסט בעברית שמים בתוך מרכאות, לא בשמות של משתנים.</strong></li>
+      </ul>
+      <div class="playground" id="pg-naming" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const firstName = 'דנה';
+          const lastName = 'כהן';
+          let itemsInCart = 3;
+          const isStudent = true;
+
+          console.log(firstName, lastName);
+          console.log('מוצרים בעגלה:', itemsInCart);
+          console.log('סטודנטית?', isStudent);
+        </script>
+      </div>
+      <p>✏️ <strong>נסו לשבור:</strong> שנו את <code>firstName</code> בשורה 1 ל-<code>first name</code> (עם רווח) והריצו. תקבלו <code>SyntaxError</code>. החזירו בעזרת ↺ איפוס.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: איזה שם משתנה גם חוקי וגם כתוב לפי המוסכמה?</p>
+        <ul>
+          <li><code>total-price</code></li>
+          <li><code>1stPlace</code></li>
+          <li data-correct><code>totalPrice</code></li>
+          <li><code>TOTAL PRICE</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>total-price</code> נקרא כ"total פחות price", ‏<code>1stPlace</code> מתחיל בספרה, ו-<code>TOTAL PRICE</code> מכיל רווח.</p>
+      </div>
+
+      <h2 id="types">טיפוסים: אילו סוגי מידע יש? <span class="time">10 דק׳</span></h2>
+      <p>לכל ערך ב-JavaScript יש <strong>טיפוס</strong> (type): הסוג שלו. הטיפוס קובע מה אפשר לעשות עם הערך. מספרים אפשר לחבר ולהכפיל, מטקסט אפשר לבקש את האורך או להפוך לאותיות גדולות. אלה חמשת הטיפוסים הבסיסיים:</p>
+      <table>
+        <tr><th>טיפוס</th><th>מה זה</th><th>דוגמאות</th></tr>
+        <tr><td><strong>string</strong> (מחרוזת)</td><td>טקסט. תמיד בתוך מרכאות</td><td><code>'שלום'</code>, ‏<code>"abc"</code>, ‏<code>'123'</code>, ‏<code>''</code></td></tr>
+        <tr><td><strong>number</strong> (מספר)</td><td>כל מספר: שלם, עשרוני, שלילי</td><td><code>42</code>, ‏<code>3.14</code>, ‏<code>-7</code>, ‏<code>0</code></td></tr>
+        <tr><td><strong>boolean</strong> (בוליאני)</td><td>רק שני ערכים: אמת או שקר</td><td><code>true</code>, ‏<code>false</code></td></tr>
+        <tr><td><strong>undefined</strong></td><td>"עוד לא נתנו כאן ערך"</td><td><code>let x;</code> ← ‏x הוא <code>undefined</code></td></tr>
+        <tr><td><strong>null</strong></td><td>"אין כאן ערך, ובכוונה"</td><td><code>let winner = null;</code> (עוד אין מנצח)</td></tr>
+      </table>
+      <p>ההבדל בין <code>undefined</code> ל-<code>null</code> עדין: ‏<code>undefined</code> הוא מה ש-JavaScript שמה כשלא נתתם ערך, ו-<code>null</code> הוא ערך ש<strong>אתם</strong> שמים כדי להגיד במפורש "ריק". בפועל, שניהם אומרים "אין כאן כלום".</p>
+      <p>יש עוד שני טיפוסים חשובים מאוד, <strong>מערך</strong> (array, רשימה של ערכים) ו<strong>אובייקט</strong> (object, אוסף של ערכים עם שמות). נלמד אותם לעומק בשיעור 3.</p>
+
+      <h3>typeof: לשאול "מה הטיפוס של זה?"</h3>
+      <div class="playground" id="pg-typeof" data-height="250">
+        <script type="text/plain" data-lang="js">
+          console.log(typeof 'שלום');     // string
+          console.log(typeof 42);         // number
+          console.log(typeof 3.5);        // number
+          console.log(typeof true);       // boolean
+          console.log(typeof undefined);  // undefined
+
+          // שימו לב: מספר בתוך מרכאות הוא מחרוזת!
+          console.log(typeof '42');
+
+          // באג היסטורי ידוע: typeof null מחזיר object
+          console.log(typeof null);
+        </script>
+      </div>
+      <div class="box warn">
+        <p><strong><code>'42'</code> ו-<code>42</code> הם לא אותו דבר.</strong> הראשון הוא טקסט שבמקרה כתובות בו ספרות, כמו מספר טלפון. השני הוא מספר שאפשר לחשב איתו. זה מקור לאחד הבאגים הנפוצים ביותר, ונחזור אליו בסעיף "המרות".</p>
+      </div>
+      <p>‏<code>typeof null</code> מחזיר <code>'object'</code> בגלל טעות מהגרסה הראשונה של השפה ב-1995. אי אפשר לתקן אותה בלי לשבור אתרים ישנים, אז היא נשארה. פשוט זכרו את זה.</p>
+
+      <h3>JavaScript היא שפה "דינמית"</h3>
+      <p>בשפות כמו Java או C צריך להצהיר מראש מה הטיפוס של כל משתנה. ב-JavaScript לא: המשתנה מקבל את הטיפוס של הערך שבתוכו, ואפילו יכול להחליף טיפוס:</p>
+      <div class="playground" id="pg-dynamic" data-height="150">
+        <script type="text/plain" data-lang="js">
+          let thing = 5;
+          console.log(thing, typeof thing);
+          thing = 'חמש';
+          console.log(thing, typeof thing);
+        </script>
+      </div>
+      <p>זה נוח, אבל גם מסוכן: קל לבלבל טיפוסים בטעות. הרגל טוב: משתנה אחד = סוג מידע אחד.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מה ידפיס <code>console.log(typeof '100')</code>?</p>
+        <ul>
+          <li><code>number</code></li>
+          <li data-correct><code>string</code></li>
+          <li><code>100</code></li>
+          <li>שגיאה</li>
+        </ul>
+        <p class="quiz-explain">נכון! המרכאות הופכות את זה למחרוזת, גם אם בפנים יש רק ספרות.</p>
+      </div>
+
+      <h2 id="operators">אופרטורים: לחשב עם מספרים</h2>
+      <p><strong>אופרטור</strong> הוא סימן שעושה פעולה על ערכים. אלה האופרטורים החשבוניים:</p>
+      <table>
+        <tr><th>אופרטור</th><th>פעולה</th><th>דוגמה</th><th>תוצאה</th></tr>
+        <tr><td><code>+</code></td><td>חיבור</td><td><code>7 + 2</code></td><td><code>9</code></td></tr>
+        <tr><td><code>-</code></td><td>חיסור</td><td><code>7 - 2</code></td><td><code>5</code></td></tr>
+        <tr><td><code>*</code></td><td>כפל</td><td><code>7 * 2</code></td><td><code>14</code></td></tr>
+        <tr><td><code>/</code></td><td>חילוק</td><td><code>7 / 2</code></td><td><code>3.5</code></td></tr>
+        <tr><td><code>%</code></td><td><strong>שארית</strong> החילוק</td><td><code>7 % 2</code></td><td><code>1</code></td></tr>
+        <tr><td><code>**</code></td><td>חזקה</td><td><code>2 ** 3</code></td><td><code>8</code></td></tr>
+      </table>
+      <div class="playground" id="pg-math-ops" data-height="250">
+        <script type="text/plain" data-lang="js">
+          const price = 40;
+          const quantity = 3;
+          const total = price * quantity;
+          console.log('סה״כ לתשלום:', total);
+
+          console.log('לכל אחד מ-4 חברים:', total / 4);
+
+          // שארית: כמה עוגיות נשארות אם מחלקים 17 ל-5 ילדים?
+          console.log('נשארו:', 17 % 5);
+
+          // 10 בחזקת 3
+          console.log(10 ** 3);
+        </script>
+      </div>
+
+      <h3>האופרטור % (שארית): למה הוא שימושי?</h3>
+      <p>‏<code>a % b</code> נותן את מה ש<strong>נשאר</strong> אחרי שמחלקים את a ל-b בלי שברים. ‏17 עוגיות ל-5 ילדים: כל ילד מקבל 3 (זה 15), ונשארות <strong>2</strong>. לכן <code>17 % 5</code> הוא 2. שימושים נפוצים:</p>
+      <ul>
+        <li><strong>זוגי או אי-זוגי</strong>: ‏<code>n % 2</code> הוא 0 למספר זוגי ו-1 לאי-זוגי.</li>
+        <li><strong>המרת זמנים</strong>: ‏<code>130 % 60</code> הוא 10, כלומר 130 דקות הן שעתיים ו<strong>10</strong> דקות.</li>
+        <li><strong>הספרה האחרונה</strong>: ‏<code>1234 % 10</code> הוא 4.</li>
+      </ul>
+
+      <h3>סדר פעולות</h3>
+      <p>בדיוק כמו במתמטיקה: קודם חזקה, אחר כך כפל, חילוק ושארית, ובסוף חיבור וחיסור. סוגריים קובעים סדר אחר:</p>
+      <div class="playground" id="pg-precedence" data-height="150">
+        <script type="text/plain" data-lang="js">
+          console.log(2 + 3 * 4);     // 14, כי הכפל קודם
+          console.log((2 + 3) * 4);   // 20
+          // ממוצע של שלושה ציונים: בלי סוגריים זה לא נכון!
+          console.log(80 + 90 + 100 / 3);
+          console.log((80 + 90 + 100) / 3);
+        </script>
+      </div>
+      <p>כשלא בטוחים, שמים סוגריים. זה לא מזיק, ועוזר למי שיקרא את הקוד.</p>
+
+      <h3>קיצורים: <code>+=</code>, <code>++</code> וחבריהם</h3>
+      <p>פעולה כמו "תוסיף 5 למשתנה" נפוצה כל כך, שיש לה קיצור:</p>
+      <table>
+        <tr><th>הקיצור</th><th>זהה ל-</th></tr>
+        <tr><td><code>score += 5</code></td><td><code>score = score + 5</code></td></tr>
+        <tr><td><code>score -= 2</code></td><td><code>score = score - 2</code></td></tr>
+        <tr><td><code>score *= 3</code></td><td><code>score = score * 3</code></td></tr>
+        <tr><td><code>score++</code></td><td><code>score = score + 1</code> (הוספת 1)</td></tr>
+        <tr><td><code>score--</code></td><td><code>score = score - 1</code> (הורדת 1)</td></tr>
+      </table>
+      <div class="playground" id="pg-shortcuts" data-height="210">
+        <script type="text/plain" data-lang="js">
+          let score = 0;
+          score += 10;   // ניצחתם בשלב
+          score += 10;   // ועוד שלב
+          score -= 5;    // נפגעתם
+          score++;       // מטבע בונוס
+          console.log('ניקוד:', score);
+
+          let lives = 3;
+          lives--;
+          console.log('חיים:', lives);
+        </script>
+      </div>
+      <p>✏️ <strong>נסו:</strong> לפני שאתם מריצים, חשבו בראש מה יהיה הניקוד. אחר כך הריצו ובדקו.</p>
+
+      <h3>🎯 אתגר 1: ממיר טמפרטורות <span class="level easy">קל</span></h3>
+      <p>הנוסחה להמרה ממעלות צלזיוס לפרנהייט: <strong>פרנהייט = צלזיוס × 1.8 + 32</strong>.</p>
+      <ol>
+        <li>צרו קבוע בשם <code>celsius</code> עם הערך <code>25</code>.</li>
+        <li>צרו קבוע בשם <code>fahrenheit</code> שמחושב <strong>מתוך</strong> <code>celsius</code> לפי הנוסחה (אל תכתבו את התוצאה ביד!).</li>
+        <li>הדפיסו את <code>fahrenheit</code> עם <code>console.log</code>. אמור לצאת <code>77</code>.</li>
+      </ol>
+      <div class="playground challenge" id="ch-temp" data-check="ch-temp" data-height="200">
+        <script type="text/plain" data-lang="js">
+          // כתבו את הקוד שלכם כאן
+
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const celsius = 25;
+          const fahrenheit = celsius * 1.8 + 32;
+          console.log(fahrenheit);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-temp': (out, win) => {
+            const c = win.eval('typeof celsius === "undefined" ? undefined : celsius');
+            const f = win.eval('typeof fahrenheit === "undefined" ? undefined : fahrenheit');
+            return [
+              [c === 25, 'צריך משתנה בשם celsius עם הערך 25'],
+              [f === 77, 'המשתנה fahrenheit צריך להיות 77 (‏celsius * 1.8 + 32)'],
+              [/fahrenheit\s*=[^;\n]*celsius/.test(out.code), 'חשבו את fahrenheit מתוך celsius, ולא כתבו את המספר ביד'],
+              [out.logs.includes('77'), 'הדפיסו את התוצאה עם console.log'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 2: כמה שעות זה? <span class="level medium">בינוני</span></h3>
+      <p>סרט נמשך <code>135</code> דקות. כתבו קוד שמחשב כמה שעות שלמות וכמה דקות נשארו.</p>
+      <ol>
+        <li>צרו קבוע <code>totalMinutes</code> עם הערך <code>135</code>.</li>
+        <li>צרו קבוע <code>hours</code>: מספר השעות <strong>השלמות</strong>. רמז: <code>Math.floor(x)</code> מעגל מספר כלפי מטה (למשל <code>Math.floor(2.25)</code> הוא <code>2</code>).</li>
+        <li>צרו קבוע <code>minutes</code>: הדקות שנשארו. רמז: <code>%</code>.</li>
+        <li>הדפיסו: <code>console.log(hours, minutes);</code></li>
+      </ol>
+      <p>בדקו את עצמכם: נסו גם <code>200</code> דקות. אמור לצאת 3 שעות ו-20 דקות.</p>
+      <div class="playground challenge" id="ch-minutes" data-check="ch-minutes" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const totalMinutes = 135;
+
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const totalMinutes = 135;
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+          console.log(hours, minutes);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-minutes': (out, win) => {
+            const get = (name) => win.eval(`typeof ${name} === "undefined" ? undefined : ${name}`);
+            const total = get('totalMinutes');
+            return [
+              [typeof total === 'number', 'צריך משתנה totalMinutes עם מספר'],
+              [get('hours') === Math.floor(total / 60), 'המשתנה hours צריך להיות מספר השעות השלמות (‏Math.floor של החילוק ב-60)'],
+              [get('minutes') === total % 60, 'המשתנה minutes צריך להיות שארית החילוק ב-60'],
+              [/%/.test(out.code), 'השתמשו באופרטור % כדי לחשב את הדקות'],
+              [out.logs.includes(`${Math.floor(total / 60)} ${total % 60}`), 'הדפיסו את hours ואת minutes בפקודת console.log אחת'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="strings">מחרוזות: לעבוד עם טקסט <span class="time">10 דק׳</span></h2>
+      <h3>שלושה סוגי מרכאות</h3>
+      <p>מחרוזת כותבים בין מרכאות. יש שלושה סוגים:</p>
+      <ul>
+        <li><code>'גרש בודד'</code>: הנפוץ ביותר בקוד מודרני, ונשתמש בו בקורס.</li>
+        <li><code>"מרכאות כפולות"</code>: עובד בדיוק אותו דבר.</li>
+        <li><code>`גרש הפוך`</code> (backtick): נקרא <strong>template literal</strong>, ויש לו כוחות מיוחדים (ממש עוד מעט).</li>
+      </ul>
+      <p>הכלל היחיד: פותחים וסוגרים באותו סוג. ‏<code>'שלום"</code> היא שגיאה.</p>
+      <div class="box tip">
+        <p><strong>איפה הגרש ההפוך במקלדת?</strong> בדרך כלל במקש שמשמאל ל-<kbd>1</kbd>, מעל <kbd>Tab</kbd> (במקלדת עברית יש שם <kbd>;</kbd>). צריך לעבור לאנגלית כדי להקליד אותו. במק עם מקלדת עברית הוא לפעמים ליד <kbd>Shift</kbd> השמאלי.</p>
+      </div>
+
+      <h3>מרכאות בתוך מחרוזת</h3>
+      <p>מה אם הטקסט עצמו מכיל גרש, כמו במילה <code>צ'יפס</code>? אם המחרוזת בגרשיים, הגרש באמצע "יסגור" אותה מוקדם מדי. שני פתרונות:</p>
+      <div class="playground" id="pg-quotes" data-height="190">
+        <script type="text/plain" data-lang="js">
+          // פתרון 1: להשתמש בסוג מרכאות אחר מבחוץ
+          console.log("אני אוהב צ'יפס");
+
+          // פתרון 2: "לבטל" את הגרש עם לוכסן הפוך (escape)
+          console.log('אני אוהב צ\'יפס');
+
+          // \n יוצר שורה חדשה בתוך מחרוזת
+          console.log('שורה ראשונה\nשורה שנייה');
+        </script>
+      </div>
+
+      <h3>חיבור מחרוזות עם +</h3>
+      <p>האופרטור <code>+</code> על מחרוזות לא מחבר מספרים, אלא <strong>מדביק</strong> טקסטים זה לזה (concatenation):</p>
+      <div class="playground" id="pg-concat" data-height="190">
+        <script type="text/plain" data-lang="js">
+          const firstName = 'דנה';
+          const lastName = 'כהן';
+
+          const fullName = firstName + ' ' + lastName;
+          console.log(fullName);
+
+          const age = 25;
+          console.log('שלום ' + firstName + ', את בת ' + age + '.');
+        </script>
+      </div>
+      <p>שימו לב לרווחים: ‏<code>firstName + lastName</code> ייתן <code>דנהכהן</code>. צריך להוסיף <code>' '</code> באמצע. בשורה האחרונה רואים כמה זה מסורבל: הרבה פלוסים ומרכאות, וקל לשכוח רווח.</p>
+
+      <h3>Template literals: הדרך המודרנית</h3>
+      <p>עם גרשיים הפוכים אפשר לשתול ערך של משתנה <strong>ישר בתוך הטקסט</strong>, בעזרת <code>${...}</code>:</p>
+      <div class="playground" id="pg-template" data-height="230">
+        <script type="text/plain" data-lang="js">
+          const firstName = 'דנה';
+          const age = 25;
+          const city = 'חיפה';
+
+          console.log(`שלום ${firstName}, את בת ${age} וגרה ב${city}.`);
+
+          // בתוך ${} אפשר לכתוב כל ביטוי, גם חישוב
+          console.log(`בעוד 10 שנים תהיי בת ${age + 10}`);
+
+          // ואפשר לרדת שורה בלי \n
+          console.log(`שורה 1
+          שורה 2`);
+        </script>
+      </div>
+      <p>זה קריא הרבה יותר, ולכן בקוד מודרני (וב-React) משתמשים בזה כל הזמן. <strong>כלל אצבע: כשמשלבים משתנים בטקסט, משתמשים ב-template literal.</strong></p>
+      <p>✏️ <strong>נסו:</strong> הוסיפו משתנה <code>hobby</code> והוסיפו אותו למשפט הראשון.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: <code>const n = 3;</code> מה ידפיס <code>console.log('יש ${n} תפוחים');</code> (עם גרש רגיל)?</p>
+        <ul>
+          <li><code>יש 3 תפוחים</code></li>
+          <li data-correct><code>יש ${n} תפוחים</code></li>
+          <li>שגיאה</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>${}</code> עובד <strong>רק</strong> בתוך גרשיים הפוכים <code>`</code>. בגרש רגיל זה סתם טקסט. זו טעות נפוצה מאוד.</p>
+      </div>
+
+      <h3>אורך ותווים בודדים</h3>
+      <p>לכל מחרוזת יש <strong>מאפיין</strong> <code>length</code>: מספר התווים בה (כולל רווחים וסימנים). ואפשר לקבל תו בודד לפי <strong>המיקום</strong> שלו (index) בסוגריים מרובעים. חשוב: <strong>הספירה מתחילה מ-0</strong>, לא מ-1.</p>
+      <div class="playground" id="pg-length" data-height="230">
+        <script type="text/plain" data-lang="js">
+          const word = 'JavaScript';
+          console.log(word.length);    // 10
+
+          console.log(word[0]);        // התו הראשון: J
+          console.log(word[1]);        // השני: a
+          console.log(word[word.length - 1]);  // האחרון: t
+          console.log(word[50]);       // אין תו כזה: undefined
+
+          console.log('שלום עולם'.length);  // גם הרווח נספר
+        </script>
+      </div>
+      <p>למה האינדקס של התו האחרון הוא <code>length - 1</code>? כי אם יש 10 תווים והראשון במקום 0, האחרון במקום 9.</p>
+
+      <h3>מתודות של מחרוזות</h3>
+      <p><strong>מתודה</strong> היא פעולה ששייכת לערך. כותבים נקודה אחרי הערך, את שם המתודה, וסוגריים: <code>word.toUpperCase()</code>. אלה השימושיות ביותר:</p>
+      <table>
+        <tr><th>מתודה</th><th>מה היא עושה</th><th>דוגמה ← תוצאה</th></tr>
+        <tr><td><code>toUpperCase()</code></td><td>הכול באותיות גדולות</td><td><code>'hi'.toUpperCase()</code> ← <code>'HI'</code></td></tr>
+        <tr><td><code>toLowerCase()</code></td><td>הכול באותיות קטנות</td><td><code>'Hi'.toLowerCase()</code> ← <code>'hi'</code></td></tr>
+        <tr><td><code>includes(x)</code></td><td>האם x מופיע בטקסט? (‏true/false)</td><td><code>'banana'.includes('nan')</code> ← <code>true</code></td></tr>
+        <tr><td><code>startsWith(x)</code></td><td>האם הטקסט מתחיל ב-x?</td><td><code>'https://a.com'.startsWith('https')</code> ← <code>true</code></td></tr>
+        <tr><td><code>indexOf(x)</code></td><td>באיזה מקום x מופיע (או ‎-1 אם לא מופיע)</td><td><code>'hello'.indexOf('l')</code> ← <code>2</code></td></tr>
+        <tr><td><code>slice(start, end)</code></td><td>חותך חלק: מ-start עד (לא כולל) end</td><td><code>'JavaScript'.slice(0, 4)</code> ← <code>'Java'</code></td></tr>
+        <tr><td><code>trim()</code></td><td>מוחק רווחים בהתחלה ובסוף</td><td><code>'  hi  '.trim()</code> ← <code>'hi'</code></td></tr>
+        <tr><td><code>replace(a, b)</code></td><td>מחליף את המופע הראשון של a ב-b</td><td><code>'I like cats'.replace('cats', 'dogs')</code></td></tr>
+        <tr><td><code>repeat(n)</code></td><td>חוזר על הטקסט n פעמים</td><td><code>'ha'.repeat(3)</code> ← <code>'hahaha'</code></td></tr>
+      </table>
+      <div class="playground" id="pg-methods" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const email = '  Dana.Cohen@Gmail.com  ';
+
+          // ניקוי קלט ממשתמש: מורידים רווחים והופכים לאותיות קטנות
+          const clean = email.trim().toLowerCase();
+          console.log(clean);
+
+          console.log('יש @?', clean.includes('@'));
+          console.log('המיקום של @:', clean.indexOf('@'));
+
+          // שם המשתמש: מההתחלה עד ה-@
+          console.log(clean.slice(0, clean.indexOf('@')));
+
+          console.log('JavaScript'.slice(4));  // בלי end: עד הסוף
+          console.log('⭐'.repeat(5));
+          console.log('שלום עולם'.replace('עולם', 'כיתה'));
+        </script>
+      </div>
+      <p>בשורה <code>email.trim().toLowerCase()</code> יש <strong>שרשור מתודות</strong>: קודם <code>trim()</code> מחזיר מחרוזת חדשה בלי רווחים, ועליה מפעילים <code>toLowerCase()</code>.</p>
+
+      <h3>מחרוזות לא משתנות</h3>
+      <p>חשוב להבין: אף מתודה <strong>לא משנה</strong> את המחרוזת המקורית. היא מחזירה מחרוזת <strong>חדשה</strong>. אם רוצים לשמור את התוצאה, צריך לשים אותה במשתנה:</p>
+      <div class="playground" id="pg-immutable" data-height="190">
+        <script type="text/plain" data-lang="js">
+          let name = 'dana';
+          name.toUpperCase();
+          console.log(name);        // עדיין dana!
+
+          name = name.toUpperCase(); // שומרים את התוצאה
+          console.log(name);        // DANA
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 3: כרטיס ביקור <span class="level easy">קל</span></h3>
+      <ol>
+        <li>צרו קבוע <code>myName</code> עם השם שלכם (מחרוזת).</li>
+        <li>צרו קבוע <code>myAge</code> עם הגיל שלכם (מספר, בלי מרכאות!).</li>
+        <li>צרו קבוע <code>sentence</code> בעזרת <strong>template literal</strong>, כך שיכיל את השם ואת הגיל. למשל: <code>קוראים לי דנה ואני בת 25</code>.</li>
+        <li>הדפיסו את <code>sentence</code>.</li>
+      </ol>
+      <div class="playground challenge" id="ch-card" data-check="ch-card" data-height="200">
+        <script type="text/plain" data-lang="js">
+          // כתבו את הקוד שלכם כאן
+
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const myName = 'דנה';
+          const myAge = 25;
+          const sentence = `קוראים לי ${myName} ואני בת ${myAge}`;
+          console.log(sentence);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-card': (out, win) => {
+            const get = (name) => win.eval(`typeof ${name} === "undefined" ? undefined : ${name}`);
+            const name = get('myName');
+            const age = get('myAge');
+            const sentence = get('sentence');
+            return [
+              [typeof name === 'string' && name.trim().length > 0, 'צריך קבוע myName עם מחרוזת לא ריקה'],
+              [typeof age === 'number', 'הקבוע myAge צריך להיות מספר (בלי מרכאות)'],
+              [typeof sentence === 'string' && sentence.includes(name) && sentence.includes(String(age)), 'הקבוע sentence צריך להכיל את השם ואת הגיל'],
+              [/`[^`]*\$\{[^`]*`/.test(out.code), 'בנו את sentence בעזרת template literal (גרשיים הפוכים ו-${})'],
+              [out.logs.includes(sentence), 'הדפיסו את sentence עם console.log'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 4: ראשי תיבות <span class="level medium">בינוני</span></h3>
+      <p>נתונים שם פרטי ושם משפחה באנגלית, באותיות קטנות. צרו קבוע <code>initials</code> שמכיל את ראשי התיבות <strong>באותיות גדולות</strong> עם נקודה אחרי כל אות. עבור <code>ada</code> ו-<code>lovelace</code> התוצאה צריכה להיות <code>A.L.</code></p>
+      <p>רמזים: ‏<code>[0]</code> נותן את התו הראשון, ‏<code>toUpperCase()</code> הופך לאות גדולה. הקוד צריך לעבוד גם אם משנים את השמות (אל תכתבו <code>'A.L.'</code> ביד).</p>
+      <div class="playground challenge" id="ch-initials" data-check="ch-initials" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const first = 'ada';
+          const last = 'lovelace';
+
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const first = 'ada';
+          const last = 'lovelace';
+          const initials = `${first[0]}.${last[0]}.`.toUpperCase();
+          console.log(initials);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-initials': (out, win) => {
+            const get = (name) => win.eval(`typeof ${name} === "undefined" ? undefined : ${name}`);
+            const first = get('first');
+            const last = get('last');
+            const expected = typeof first === 'string' && typeof last === 'string'
+              ? `${first[0]}.${last[0]}.`.toUpperCase() : null;
+            return [
+              [expected !== null, 'אל תמחקו את first ואת last'],
+              [get('initials') === expected, `הקבוע initials צריך להיות ${expected}`],
+              [!/['"`]A\.L\.['"`]/.test(out.code), 'חשבו את התוצאה מתוך first ו-last, ולא ביד'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="numbers">מספרים ו-Math</h2>
+      <h3>מספרים עשרוניים ו-0.1 + 0.2</h3>
+      <p>ב-JavaScript יש טיפוס אחד לכל המספרים: שלמים ועשרוניים. מחשבים שומרים מספרים בבסיס 2, ולכן חלק מהשברים העשרוניים לא נשמרים בדיוק. התוצאה המפורסמת:</p>
+      <div class="playground" id="pg-decimals" data-height="200">
+        <script type="text/plain" data-lang="js">
+          console.log(0.1 + 0.2);            // לא בדיוק 0.3!
+          console.log(0.1 + 0.2 === 0.3);    // false
+
+          // הפתרון כשמציגים למשתמש: לעגל לשתי ספרות
+          const price = 19.9 * 3;
+          console.log(price);
+          console.log(price.toFixed(2));     // מחרוזת: '59.70'
+        </script>
+      </div>
+      <p>זה לא באג של JavaScript, כך עובדים כמעט כל שפות התכנות. ‏<code>toFixed(n)</code> מעגל ל-n ספרות אחרי הנקודה. שימו לב שהוא מחזיר <strong>מחרוזת</strong>, כי המטרה היא להציג. בסכומי כסף אמיתיים נוהגים לעבוד באגורות (מספרים שלמים) ולחלק ב-100 רק בהצגה.</p>
+
+      <h3>האובייקט Math</h3>
+      <p>‏<code>Math</code> הוא "ארגז כלים" מובנה עם פעולות מתמטיות:</p>
+      <table>
+        <tr><th>פעולה</th><th>מה היא עושה</th><th>דוגמה ← תוצאה</th></tr>
+        <tr><td><code>Math.round(x)</code></td><td>עיגול לשלם הקרוב</td><td><code>Math.round(4.5)</code> ← <code>5</code></td></tr>
+        <tr><td><code>Math.floor(x)</code></td><td>עיגול <strong>למטה</strong> (רצפה)</td><td><code>Math.floor(4.9)</code> ← <code>4</code></td></tr>
+        <tr><td><code>Math.ceil(x)</code></td><td>עיגול <strong>למעלה</strong> (תקרה)</td><td><code>Math.ceil(4.1)</code> ← <code>5</code></td></tr>
+        <tr><td><code>Math.max(a, b, ...)</code></td><td>הגדול ביותר</td><td><code>Math.max(3, 9, 2)</code> ← <code>9</code></td></tr>
+        <tr><td><code>Math.min(a, b, ...)</code></td><td>הקטן ביותר</td><td><code>Math.min(3, 9, 2)</code> ← <code>2</code></td></tr>
+        <tr><td><code>Math.abs(x)</code></td><td>ערך מוחלט (בלי מינוס)</td><td><code>Math.abs(-7)</code> ← <code>7</code></td></tr>
+        <tr><td><code>Math.sqrt(x)</code></td><td>שורש ריבועי</td><td><code>Math.sqrt(16)</code> ← <code>4</code></td></tr>
+        <tr><td><code>Math.random()</code></td><td>מספר אקראי בין 0 ל-1 (לא כולל 1)</td><td>למשל <code>0.7310...</code></td></tr>
+      </table>
+      <div class="playground" id="pg-math" data-height="230">
+        <script type="text/plain" data-lang="js">
+          console.log(Math.round(2.4), Math.round(2.5));
+          console.log(Math.floor(2.99), Math.ceil(2.01));
+          console.log(Math.max(12, 45, 7), Math.min(12, 45, 7));
+
+          // כמה אוטובוסים של 50 מקומות צריך ל-120 תלמידים?
+          console.log(Math.ceil(120 / 50));
+
+          console.log(Math.random());
+          console.log(Math.random());
+        </script>
+      </div>
+      <p>הריצו כמה פעמים: שתי השורות האחרונות משתנות בכל הרצה.</p>
+
+      <h3>מתכון: מספר שלם אקראי</h3>
+      <p>‏<code>Math.random()</code> נותן שבר בין 0 ל-1. כדי לקבל מספר שלם בין 1 ל-N (למשל קובייה, N=6), משתמשים במתכון הזה:</p>
+      <pre><code class="language-javascript">const roll = Math.floor(Math.random() * 6) + 1;</code></pre>
+      <p>נפרק אותו מבפנים החוצה:</p>
+      <ol>
+        <li><code>Math.random()</code> ← מספר בין 0 ל-0.999...</li>
+        <li><code>* 6</code> ← מספר בין 0 ל-5.999...</li>
+        <li><code>Math.floor(...)</code> ← שלם: ‏0, 1, 2, 3, 4 או 5</li>
+        <li><code>+ 1</code> ← ‏1 עד 6 ✓</li>
+      </ol>
+      <div class="playground" id="pg-random" data-height="150">
+        <script type="text/plain" data-lang="js">
+          const roll = Math.floor(Math.random() * 6) + 1;
+          console.log('יצא לכם:', roll);
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 5: זוג קוביות <span class="level medium">בינוני</span></h3>
+      <ol>
+        <li>צרו שני קבועים, <code>dice1</code> ו-<code>dice2</code>, ובכל אחד מספר שלם אקראי בין 1 ל-6.</li>
+        <li>צרו קבוע <code>sum</code> עם הסכום שלהם.</li>
+        <li>הדפיסו משפט עם template literal, למשל: <code>יצא 3 ו-5, סה״כ 8</code>.</li>
+      </ol>
+      <div class="playground challenge" id="ch-dice" data-check="ch-dice" data-height="200">
+        <script type="text/plain" data-lang="js">
+          // כתבו את הקוד שלכם כאן
+
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const dice1 = Math.floor(Math.random() * 6) + 1;
+          const dice2 = Math.floor(Math.random() * 6) + 1;
+          const sum = dice1 + dice2;
+          console.log(`יצא ${dice1} ו-${dice2}, סה״כ ${sum}`);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-dice': (out, win) => {
+            const get = (name) => win.eval(`typeof ${name} === "undefined" ? undefined : ${name}`);
+            const d1 = get('dice1');
+            const d2 = get('dice2');
+            const isDie = (d) => Number.isInteger(d) && d >= 1 && d <= 6;
+            return [
+              [isDie(d1) && isDie(d2), 'dice1 ו-dice2 צריכים להיות מספרים שלמים בין 1 ל-6'],
+              [/Math\.random\(\)/.test(out.code), 'השתמשו ב-Math.random() כדי שהתוצאה תהיה אקראית'],
+              [get('sum') === d1 + d2, 'הקבוע sum צריך להיות הסכום של שתי הקוביות'],
+              [out.logs.some((l) => l.includes(String(d1 + d2)) && l.includes(String(d1))), 'הדפיסו משפט שמכיל את הקוביות ואת הסכום'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="conversion">המרות בין טיפוסים</h2>
+      <p>הרבה פעמים מקבלים מספר בתור מחרוזת: מה שמשתמש מקליד בטופס, למשל, תמיד מגיע כמחרוזת. כדי לחשב איתו, צריך להמיר אותו למספר.</p>
+      <h3>המלכודת של +</h3>
+      <p>מה יוצא מ-<code>'5' + 3</code>? כש<strong>אחד</strong> הצדדים של <code>+</code> הוא מחרוזת, ‏JavaScript מדביקה במקום לחבר. אבל שאר האופרטורים (<code>- * /</code>) לא עובדים על טקסט, אז היא ממירה בשקט למספר. התוצאה מבלבלת:</p>
+      <div class="playground" id="pg-coercion" data-height="200">
+        <script type="text/plain" data-lang="js">
+          console.log('5' + 3);    // '53'  (הדבקה!)
+          console.log('5' - 3);    // 2     (חיסור)
+          console.log('5' * 3);    // 15
+          console.log(5 + 3 + '1'); // '81': קודם 5+3=8, ואז הדבקה
+
+          // מצב אמיתי: שני "מספרים" שהגיעו מטופס
+          const a = '10';
+          const b = '20';
+          console.log(a + b);      // '1020' 😱
+        </script>
+      </div>
+
+      <h3>המרה מפורשת</h3>
+      <p>הפתרון: להמיר <strong>בעצמכם</strong>, במפורש, לפני שמחשבים.</p>
+      <table>
+        <tr><th>פעולה</th><th>מה היא עושה</th><th>דוגמה ← תוצאה</th></tr>
+        <tr><td><code>Number(x)</code></td><td>ממירה למספר. אם יש תו לא חוקי: <code>NaN</code></td><td><code>Number('42')</code> ← <code>42</code>, ‏<code>Number('42px')</code> ← <code>NaN</code></td></tr>
+        <tr><td><code>parseInt(x)</code></td><td>קוראת מספר <strong>שלם</strong> מתחילת המחרוזת, ועוצרת בתו הראשון שאינו ספרה</td><td><code>parseInt('42px')</code> ← <code>42</code>, ‏<code>parseInt('3.9')</code> ← <code>3</code></td></tr>
+        <tr><td><code>parseFloat(x)</code></td><td>כמו parseInt, אבל כולל נקודה עשרונית</td><td><code>parseFloat('3.9kg')</code> ← <code>3.9</code></td></tr>
+        <tr><td><code>String(x)</code></td><td>ממירה למחרוזת</td><td><code>String(42)</code> ← <code>'42'</code></td></tr>
+      </table>
+      <div class="playground" id="pg-convert" data-height="230">
+        <script type="text/plain" data-lang="js">
+          const a = '10';
+          const b = '20';
+          console.log(Number(a) + Number(b));   // 30 ✓
+
+          console.log(Number('3.5'), parseInt('3.5'), parseFloat('3.5'));
+          console.log(parseInt('100px'));
+          console.log(Number(''), Number('  7  '), Number(true));
+
+          const year = String(2026);
+          console.log(year, typeof year);
+        </script>
+      </div>
+
+      <h3>NaN: "לא מספר"</h3>
+      <p>‏<code>NaN</code> (Not a Number) הוא התוצאה של חישוב שאין לו משמעות, כמו <code>Number('שלום')</code> או <code>'abc' * 2</code>. באופן מוזר, הטיפוס שלו הוא <code>number</code>. כל חישוב עם NaN נותן NaN, אז הוא "מדבק" ומתפשט בקוד. כדי לבדוק אם ערך הוא NaN, משתמשים ב-<code>Number.isNaN(x)</code>:</p>
+      <div class="playground" id="pg-nan" data-height="190">
+        <script type="text/plain" data-lang="js">
+          const input = 'שלושים';
+          const n = Number(input);
+          console.log(n);                 // NaN
+          console.log(typeof n);          // number (!)
+          console.log(n + 5);             // גם NaN
+          console.log(Number.isNaN(n));   // true: ככה בודקים
+          console.log(n === NaN);         // false! NaN לא שווה אפילו לעצמו
+        </script>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מה ידפיס <code>console.log('2' + 2 * 3)</code>?</p>
+        <ul>
+          <li><code>12</code></li>
+          <li><code>8</code></li>
+          <li data-correct><code>26</code></li>
+          <li><code>222</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! קודם הכפל: <code>2 * 3</code> = ‏6. אחר כך <code>'2' + 6</code>: אחד הצדדים מחרוזת, אז מדביקים, ויוצא <code>'26'</code>.</p>
+      </div>
+
+      <h2 id="errors">איך לקרוא הודעת שגיאה <span class="time">5 דק׳</span></h2>
+      <p>שגיאות הן חלק רגיל מתכנות, גם אצל מתכנתים עם 20 שנות ניסיון. ההבדל הוא שמתכנת מנוסה <strong>קורא</strong> את ההודעה, ולא נבהל ממנה. הודעת שגיאה אומרת שלושה דברים:</p>
+      <ol>
+        <li><strong>סוג השגיאה</strong>: המילה שלפני הנקודתיים, למשל <code>ReferenceError</code>.</li>
+        <li><strong>התיאור</strong>: מה בדיוק השתבש, למשל <code>conole is not defined</code>.</li>
+        <li><strong>המיקום</strong>: מספר השורה. בעורך באתר הוא מופיע בסוגריים, ובקונסול של הדפדפן כ-<code>app.js:5</code> (קובץ app.js, שורה 5) בצד ימין של ההודעה. אפשר ללחוץ עליו ולהגיע לשורה.</li>
+      </ol>
+      <p>שלושת הסוגים שתפגשו הכי הרבה:</p>
+
+      <h3>SyntaxError: הקוד לא כתוב לפי חוקי השפה</h3>
+      <p>חסר סוגר, חסרה מרכאה, יש פסיק במקום הלא נכון. המחשב לא מצליח אפילו "לקרוא" את הקוד, ולכן <strong>אף שורה לא רצה</strong>, גם לא השורות התקינות שלפני הטעות. הריצו:</p>
+      <div class="playground" id="pg-syntax" data-height="150">
+        <script type="text/plain" data-lang="js">
+          console.log('השורה הזו תקינה');
+          console.log('כאן חסרה מרכאה סוגרת);
+          console.log('גם זו תקינה');
+        </script>
+      </div>
+      <p>‏<code>Invalid or unexpected token</code> פירושו "מצאתי משהו שלא ציפיתי לו". לפעמים מספר השורה מצביע על השורה <strong>שאחרי</strong> הטעות, כי רק שם המחשב הבין שמשהו לא בסדר. ✏️ תקנו את השגיאה והריצו שוב.</p>
+
+      <h3>ReferenceError: שם שלא קיים</h3>
+      <p>משתמשים במשתנה (או פונקציה) שלא הוגדר. כמעט תמיד זו שגיאת כתיב, או אותיות גדולות/קטנות לא נכונות. כאן הקוד כן מתחיל לרוץ, ונעצר בשורה הבעייתית:</p>
+      <div class="playground" id="pg-reference" data-height="170">
+        <script type="text/plain" data-lang="js">
+          const userName = 'נועה';
+          console.log('השורה הזו רצה');
+          console.log(username);
+          console.log('לכאן לא נגיע');
+        </script>
+      </div>
+      <p>מצאתם את הבעיה? ‏<code>userName</code> עם N גדולה הוגדר, אבל ביקשנו <code>username</code>.</p>
+
+      <h3>TypeError: פעולה שלא מתאימה לערך</h3>
+      <p>הערך קיים, אבל אי אפשר לעשות איתו את מה שביקשתם: לשנות <code>const</code>, לקרוא למתודה שלא קיימת, או לקרוא מאפיין של <code>undefined</code>:</p>
+      <div class="playground" id="pg-type" data-height="170">
+        <script type="text/plain" data-lang="js">
+          const city = 'ירושלים';
+          console.log(city.toUppercase());
+
+          // נסו גם:
+          // let x;
+          // console.log(x.length);
+        </script>
+      </div>
+      <p>‏<code>city.toUppercase is not a function</code>: אין מתודה כזו, כי השם הנכון הוא <code>toUpperCase</code> עם C גדולה.</p>
+
+      <div class="box tip">
+        <p><strong>מה עושים כשיש שגיאה, לפי הסדר:</strong></p>
+        <ol>
+          <li>קוראים את ההודעה עד הסוף, לאט.</li>
+          <li>הולכים לשורה שהיא מציינת (וגם לשורה שלפניה).</li>
+          <li>בודקים כתיב, אותיות גדולות/קטנות, סוגריים ומרכאות.</li>
+          <li>לא מבינים? מעתיקים את ההודעה (בלי שמות המשתנים שלכם) לגוגל. כמעט תמיד מישהו כבר שאל על זה ב-Stack Overflow.</li>
+        </ol>
+      </div>
+
+      <h3>🎯 אתגר 6: תקנו את הבאגים <span class="level medium">בינוני</span></h3>
+      <p>בקוד הזה יש <strong>שלוש</strong> שגיאות. הריצו, קראו את ההודעה, תקנו, והריצו שוב, עד שהקוד מדפיס שתי שורות:</p>
+      <pre><code class="nohighlight">מחברת: 48 ש״ח
+קניתם עוד אחת. עכשיו יש 5</code></pre>
+      <div class="playground challenge" id="ch-bugs" data-check="ch-bugs" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const itemName = 'מחברת;
+          const price = 12;
+          const quantity = 4;
+          const totl = price * quantity;
+          console.log(`${itemName}: ${total} ש״ח`);
+
+          quantity = quantity + 1;
+          console.log('קניתם עוד אחת. עכשיו יש', quantity);
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const itemName = 'מחברת';
+          const price = 12;
+          let quantity = 4;
+          const total = price * quantity;
+          console.log(`${itemName}: ${total} ש״ח`);
+
+          quantity = quantity + 1;
+          console.log('קניתם עוד אחת. עכשיו יש', quantity);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-bugs': (out) => [
+            [out.logs.includes('מחברת: 48 ש״ח'), 'השורה הראשונה צריכה להיות: מחברת: 48 ש״ח'],
+            [out.logs.includes('קניתם עוד אחת. עכשיו יש 5'), 'השורה השנייה צריכה להיות: קניתם עוד אחת. עכשיו יש 5'],
+          ],
+        });
+      </script>
+      <details class="solution">
+        <summary>רמזים (נסו קודם לבד)</summary>
+        <ol>
+          <li>‏SyntaxError בשורה 1: לאיזו מחרוזת חסרה מרכאה סוגרת?</li>
+          <li>‏ReferenceError: באיזה שם הוגדר הסכום, ובאיזה שם השתמשו בו?</li>
+          <li>‏TypeError: אם <code>quantity</code> צריך להשתנות, איך היה צריך להגדיר אותו?</li>
+        </ol>
+      </details>
+
+      <aside class="box lecturer-note">
+        <p>מומלץ לעשות את אתגר 6 יחד, על המקרן: להריץ, לקרוא את ההודעה בקול, לתקן ולהריץ שוב. המטרה היא לנרמל שגיאות ולהראות תהליך, לא רק את הפתרון. כדאי להראות גם את אותה שגיאה בקונסול של Chrome, כדי שהסטודנטים יכירו את הפורמט מחוץ לאתר.</p>
+      </aside>
+
+      <h2 id="cheatsheet">דף סיכום</h2>
+      <table>
+        <tr><th>נושא</th><th>קוד</th><th>הערה</th></tr>
+        <tr><td>הדפסה</td><td><code>console.log('x', y);</code></td><td>כלי הדיבאג המרכזי</td></tr>
+        <tr><td>הערה</td><td><code>// ...</code>, ‏<code>/* ... */</code></td><td><kbd>Ctrl</kbd>+<kbd>/</kbd> ב-VS Code</td></tr>
+        <tr><td>קבוע</td><td><code>const rate = 0.17;</code></td><td>ברירת המחדל</td></tr>
+        <tr><td>משתנה</td><td><code>let count = 0;</code></td><td>רק כשהערך משתנה</td></tr>
+        <tr><td>טיפוס</td><td><code>typeof x</code></td><td>string, ‏number, ‏boolean, ‏undefined (ו-null ← object)</td></tr>
+        <tr><td>חשבון</td><td><code>+ - * / % **</code></td><td><code>%</code> = שארית</td></tr>
+        <tr><td>קיצורים</td><td><code>x += 5; x++; x--;</code></td><td></td></tr>
+        <tr><td>שילוב בטקסט</td><td><code>`שלום ${name}`</code></td><td>רק עם גרשיים הפוכים</td></tr>
+        <tr><td>אורך ותו</td><td><code>s.length</code>, ‏<code>s[0]</code></td><td>האינדקס מתחיל ב-0</td></tr>
+        <tr><td>מתודות מחרוזת</td><td><code>toUpperCase includes slice trim replace</code></td><td>מחזירות מחרוזת חדשה</td></tr>
+        <tr><td>עיגול</td><td><code>Math.round floor ceil</code>, ‏<code>x.toFixed(2)</code></td><td>toFixed מחזיר מחרוזת</td></tr>
+        <tr><td>אקראי 1–N</td><td><code>Math.floor(Math.random() * N) + 1</code></td><td></td></tr>
+        <tr><td>המרה</td><td><code>Number(s)</code>, ‏<code>parseInt(s)</code>, ‏<code>String(n)</code></td><td><code>'5' + 3</code> = ‏<code>'53'</code>!</td></tr>
+        <tr><td>NaN</td><td><code>Number.isNaN(x)</code></td><td>לא להשוות עם <code>===</code></td></tr>
+      </table>
+
+      <h2 id="summary">סיכום ומקורות</h2>
+      <ul>
+        <li>‏JavaScript היא שפת התכנות של הדפדפן (ועם Node, גם של השרת). היא מבצעת הוראות לפי הסדר.</li>
+        <li>מריצים אותה בקונסול (ניסויים), בקובץ עם <code>&lt;script src="..." defer&gt;</code> (פרויקטים), או בעורך באתר (תרגול).</li>
+        <li>משתנים שומרים ערכים. ‏<code>const</code> כברירת מחדל, ‏<code>let</code> כשהערך משתנה, ו-<code>var</code> לא.</li>
+        <li>הטיפוסים הבסיסיים: מחרוזת, מספר, בוליאני, ‏<code>undefined</code> ו-<code>null</code>. ‏<code>'42'</code> הוא לא <code>42</code>.</li>
+        <li>‏Template literals (<code>`...${x}...`</code>) הם הדרך לשלב משתנים בטקסט.</li>
+        <li>שגיאה היא הודעה עם סוג, תיאור ושורה. קוראים אותה, לא מפחדים ממנה.</li>
+      </ul>
+      <p><strong>בחלק הבא</strong> נלמד לקבל החלטות בקוד (<code>if</code>) ולחזור על פעולות (לולאות), וכך התוכניות שלנו יתחילו "לחשוב".</p>
+      <h3>להעמקה</h3>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting" target="_blank" rel="noopener">MDN: JavaScript למתחילים</a>: המדריך הרשמי והמקיף, באנגלית.</li>
+        <li><a href="https://javascript.info/first-steps" target="_blank" rel="noopener">javascript.info: ‏JavaScript Fundamentals</a>: הסבר מסודר וברור עם תרגילים בסוף כל פרק. הפרקים 2.1–2.9 מקבילים לחלק הזה.</li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank" rel="noopener">MDN: כל המתודות של String</a>: כדאי לשמור כסימנייה.</li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p>בסוף החלק כדאי לשאול את הכיתה שתי שאלות: "מה ההבדל בין let ל-const?" ו"מה ידפיס <code>'5' + 3</code>?". אם התשובות נכונות, אפשר לעבור לתנאים. אתגרים 2, 4 ו-5 מתאימים לשיעורי בית. סטודנטים שמסיימים מהר יכולים לעבור על javascript.info פרקים 2.1–2.9.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -254,3 +254,18 @@ a.lesson-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgb(0 
   .layout { display: block; }
   details.solution { display: block; }
 }
+
+/* ---------- עורך JavaScript: מספרי שורות וחלון פלט ---------- */
+.pg-preview[hidden] { display: none; }
+.pg-code { display: flex; background: #0d1117; }
+.pg-code .pg-editor { flex: 1; min-width: 0; }
+.pg-lines { flex-shrink: 0; overflow: hidden; padding: 0.75rem 0.5rem; min-width: 2.2rem; text-align: right; white-space: pre; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.85rem; line-height: 1.55; color: #6e7681; background: #0d1117; border-right: 1px solid #21262d; user-select: none; }
+.pg-btn.run { background: #16a34a; color: white; border-color: #16a34a; font-weight: 600; }
+.pg-console { overflow: auto; background: #0b1020; color: #e6edf3; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82rem; line-height: 1.5; padding: 0.4rem 0; text-align: left; }
+.pg-log { padding: 0.15rem 0.75rem; border-bottom: 1px solid #1c2333; white-space: pre-wrap; overflow-wrap: anywhere; unicode-bidi: plaintext; text-align: start; }
+.pg-log.warn { color: #facc15; background: #2a2410; }
+.pg-log.error { color: #fca5a5; background: #2d1414; }
+.pg-log.hint { color: #94a3b8; font-family: 'Heebo', system-ui, sans-serif; }
+
+/* בלי ליגטורות בגופן הקוד: מתחילים צריכים לראות === ו->= כמו שהם מוקלדים */
+code, pre, kbd, .pg-editor, .pg-lines, .pg-console { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }

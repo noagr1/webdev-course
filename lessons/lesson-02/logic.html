@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 2 · חלק ב׳: תנאים ולולאות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>
+    window.PLAYGROUND_CHECKS = {};
+    // מריץ שוב את הקוד של הסטודנט עם ערך התחלתי אחר, ומחזיר את מה שהודפס.
+    // כך בודקים שהפתרון עובד לכל ערך, ולא רק לזה שכתוב בעורך.
+    window.rerun = (win, code, pattern, replacement) => {
+      const logs = [];
+      const original = win.console.log;
+      win.console.log = (...args) => logs.push(args.map(String).join(' '));
+      try {
+        win.eval(`{\n${code.replace(pattern, replacement)}\n}`);
+      } catch (e) {
+        logs.push(`ERROR ${e.message}`);
+      } finally {
+        win.console.log = original;
+      }
+      return logs;
+    };
+  </script>
+</head>
+<body data-page="lesson" data-lesson="2" data-part="logic" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 2 · חלק ב׳</span>
+      <h1>תנאים ולולאות</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ 40 דק׳ בכיתה</span>
+        <span class="chip">📚 3–4 שעות לימוד עצמי</span>
+        <span class="chip">🧩 דרישת קדם: חלק א׳ (משתנים וטיפוסים)</span>
+      </div>
+
+      <p>עד עכשיו הקוד שכתבנו רץ שורה אחרי שורה, מלמעלה למטה, תמיד באותו סדר. זה כמו מתכון שבו אין אף "אם": תמיד מוסיפים סוכר, תמיד אופים 30 דקות. אבל תוכנות אמיתיות צריכות <strong>להחליט</strong> ("אם המשתמש מחובר, הצג את הפרופיל, אחרת הצג כפתור התחברות") ו<strong>לחזור על פעולות</strong> ("שלח מייל לכל אחד מ-500 הלקוחות"). בחלק הזה נלמד את שני הכלים האלה: <strong>תנאים</strong> ו<strong>לולאות</strong>. אחרי החלק הזה תוכלו לכתוב תוכניות שבאמת "חושבות".</p>
+
+      <div class="box goals">
+        <h3>מטרות החלק</h3>
+        <p>בסוף החלק תדעו:</p>
+        <ul>
+          <li>להשוות ערכים עם <code>===</code>, ‏<code>!==</code>, ‏<code>&lt;</code>, ‏<code>&gt;</code> ולהסביר למה לא משתמשים ב-<code>==</code></li>
+          <li>לשלב תנאים עם <code>&amp;&amp;</code>, ‏<code>||</code> ו-<code>!</code></li>
+          <li>להסביר מה זה truthy ו-falsy, ולמנות את כל הערכים ה-falsy</li>
+          <li>לכתוב <code>if</code>, ‏<code>else if</code>, ‏<code>else</code>, אופרטור טרנרי ו-<code>switch</code></li>
+          <li>לכתוב לולאות <code>for</code> ו-<code>while</code>, ולעקוב אחריהן שלב אחר שלב בטבלה</li>
+          <li>להשתמש ב-<code>break</code> וב-<code>continue</code>, ולעבור על התווים של מחרוזת</li>
+          <li>לזהות דפוסים נפוצים: סכום, ספירה, מקסימום, בניית מחרוזת וחיפוש</li>
+          <li>להבין מה גורם ללולאה אינסופית ואיך יוצאים ממנה</li>
+        </ul>
+      </div>
+
+      <div class="box tip">
+        <p><strong>איך לעבוד עם העמוד:</strong> בכל דוגמה יש עורך JavaScript. לוחצים <strong>▶ הרצה</strong> (או Ctrl+Enter, ובמק Cmd+Enter), ומה שהקוד מדפיס עם <code>console.log</code> מופיע בחלון הפלט. אם יש שגיאה, תופיע הודעה באדום עם מספר השורה והסבר בעברית. שנו כל דוגמה, הריצו שוב, ונסו "לשבור" אותה. ככה לומדים.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>תוכנית ל-40 דקות:</strong> השוואות ו-<code>===</code> (5), ‏<code>&amp;&amp;</code>/<code>||</code> ו-truthy/falsy (5), ‏<code>if/else if/else</code> עם דוגמת הציונים (8), טרנרי ו-switch בקצרה (3), ‏<code>for</code> עם טבלת מעקב על הלוח (8), ‏<code>while</code> ו-<code>break</code> (4), דפוס הסכום והספירה (5), לולאה אינסופית (2). לולאות מקוננות, ‏<code>do...while</code> והאתגרים נשארים לבית. מומלץ לכתוב את טבלת המעקב של לולאת <code>for</code> על הלוח יחד עם הכיתה, שורה אחר שורה: זה הרגע שבו רוב הסטודנטים "מבינים" לולאות.</p>
+      </aside>
+
+      <h2 id="booleans">ערכים בוליאניים והשוואות <span class="time">5 דק׳</span></h2>
+      <p>בחלק א׳ פגשנו את הטיפוס <strong>boolean</strong> (בוליאני): טיפוס שיש לו רק שני ערכים אפשריים, <code>true</code> (אמת) ו-<code>false</code> (שקר). זה נשמע משעמם, אבל כל החלטה שהמחשב מקבל מתחילה בשאלה שהתשובה עליה היא <code>true</code> או <code>false</code>: "האם המשתמש מעל גיל 18?", "האם הסיסמה נכונה?", "האם העגלה ריקה?".</p>
+      <p>את השאלות האלה שואלים בעזרת <strong>אופרטורי השוואה</strong>. אופרטור השוואה לוקח שני ערכים ומחזיר <code>true</code> או <code>false</code>:</p>
+
+      <table>
+        <tr><th>אופרטור</th><th>משמעות</th><th>דוגמה</th><th>תוצאה</th></tr>
+        <tr><td><code>===</code></td><td>שווה (גם בערך וגם בטיפוס)</td><td><code>5 === 5</code></td><td><code>true</code></td></tr>
+        <tr><td><code>!==</code></td><td>שונה</td><td><code>5 !== 3</code></td><td><code>true</code></td></tr>
+        <tr><td><code>&gt;</code></td><td>גדול מ-</td><td><code>10 &gt; 7</code></td><td><code>true</code></td></tr>
+        <tr><td><code>&lt;</code></td><td>קטן מ-</td><td><code>10 &lt; 7</code></td><td><code>false</code></td></tr>
+        <tr><td><code>&gt;=</code></td><td>גדול או שווה</td><td><code>18 &gt;= 18</code></td><td><code>true</code></td></tr>
+        <tr><td><code>&lt;=</code></td><td>קטן או שווה</td><td><code>17 &lt;= 16</code></td><td><code>false</code></td></tr>
+      </table>
+
+      <div class="box warn">
+        <p><strong>זהירות: <code>=</code> זה לא <code>===</code>.</strong> סימן <code>=</code> אחד הוא <strong>השמה</strong>: "שים את הערך הזה בתוך המשתנה". שלושה סימנים <code>===</code> הם <strong>שאלה</strong>: "האם שני הערכים שווים?". ‏<code>age = 18</code> משנה את הגיל ל-18. ‏<code>age === 18</code> רק בודק אם הגיל הוא 18.</p>
+      </div>
+
+      <p>הריצו את הדוגמה. שימו לב שתוצאה של השוואה היא ערך לכל דבר: אפשר להדפיס אותה ואפשר לשמור אותה במשתנה.</p>
+      <div class="playground" id="pg-compare" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const age = 20;
+          console.log(age > 18);    // האם הגיל גדול מ-18?
+          console.log(age === 18);  // האם הגיל בדיוק 18?
+          console.log(age !== 18);  // האם הגיל שונה מ-18?
+          console.log(age <= 20);   // האם הגיל קטן או שווה ל-20?
+
+          // אפשר לשמור את התשובה במשתנה
+          const isAdult = age >= 18;
+          console.log('בגיר?', isAdult);
+          console.log(typeof isAdult);
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את <code>age</code> ל-18, ואחר כך ל-15. אילו שורות שינו את התשובה שלהן?</p>
+
+      <h3>השוואה של מחרוזות</h3>
+      <p>אפשר להשוות גם מחרוזות. ‏<code>===</code> בודק שהן זהות <strong>לגמרי</strong>, כולל אותיות גדולות וקטנות ורווחים:</p>
+      <div class="playground" id="pg-compare-strings" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const password = 'Secret123';
+          console.log(password === 'Secret123');  // זהה לגמרי
+          console.log(password === 'secret123');  // s קטנה: לא זהה!
+          console.log(password === 'Secret123 '); // רווח בסוף: לא זהה!
+
+          // טריק נפוץ: להשוות בלי תלות באותיות גדולות/קטנות
+          const answer = 'YES';
+          console.log(answer.toLowerCase() === 'yes');
+        </script>
+      </div>
+
+      <h2 id="strict-equality">‏<code>===</code> מול <code>==</code>: למה תמיד שלושה</h2>
+      <p>ב-JavaScript יש שני אופרטורים של שוויון:</p>
+      <ul>
+        <li><code>===</code> (<strong>שוויון קפדני</strong>): שווה רק אם גם הערך וגם הטיפוס זהים. ‏<code>5 === '5'</code> הוא <code>false</code>, כי אחד מספר והשני מחרוזת.</li>
+        <li><code>==</code> (<strong>שוויון רופף</strong>): לפני ההשוואה, JavaScript מנסה "להמיר" את הערכים לאותו טיפוס. ‏<code>5 == '5'</code> הוא <code>true</code>.</li>
+      </ul>
+      <p>נשמע נוח? הבעיה היא שחוקי ההמרה של <code>==</code> מסובכים ומפתיעים, ויוצרים באגים שקשה מאוד למצוא. הריצו ותראו:</p>
+      <div class="playground" id="pg-loose" data-height="240">
+        <script type="text/plain" data-lang="js">
+          console.log(5 == '5');      // true  (המיר את '5' למספר)
+          console.log(0 == '');       // true  (?!)
+          console.log(0 == false);    // true  (?!)
+          console.log(null == undefined); // true
+
+          console.log('--- ועכשיו עם === ---');
+          console.log(5 === '5');     // false
+          console.log(0 === '');      // false
+          console.log(0 === false);   // false
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>הכלל בקורס הזה (ובכל צוות פיתוח מקצועי):</strong> משתמשים <strong>תמיד</strong> ב-<code>===</code> וב-<code>!==</code>. אם צריך להשוות מספר למחרוזת, ממירים קודם בעצמכם, למשל <code>Number(input) === 5</code>. כך ברור לכל מי שקורא את הקוד מה קורה.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מה ידפיס <code>console.log(10 === '10')</code>?</p>
+        <ul>
+          <li><code>true</code>, כי שניהם 10</li>
+          <li data-correct><code>false</code>, כי אחד מספר והשני מחרוזת</li>
+          <li>שגיאה, אי אפשר להשוות מספר למחרוזת</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>===</code> בודק גם את הטיפוס. ‏<code>10</code> הוא number ו-<code>'10'</code> הוא string, ולכן התשובה <code>false</code>. אין שגיאה: מותר להשוות כל שני ערכים.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>כדאי להריץ את דוגמת <code>0 == ''</code> מול הכיתה ולתת לתגובות לעשות את העבודה. אין צורך ללמד את חוקי ההמרה של <code>==</code>: המסר היחיד הוא "תמיד <code>===</code>". אם עולה שאלה על <code>null == undefined</code>, אפשר לציין שיש מתכנתים שמשתמשים בזה בכוונה, אבל בקורס לא נצטרך את זה.</p>
+      </aside>
+
+      <h2 id="logical">אופרטורים לוגיים: <code>&amp;&amp;</code>, ‏<code>||</code>, ‏<code>!</code> <span class="time">5 דק׳</span></h2>
+      <p>הרבה פעמים שאלה אחת לא מספיקה. "אפשר להיכנס למסיבה אם <strong>גם</strong> יש כרטיס <strong>וגם</strong> הגיל מעל 18". "מקבלים הנחה אם <strong>או</strong> שאתם סטודנטים <strong>או</strong> שאתם פנסיונרים". בשביל זה יש שלושה <strong>אופרטורים לוגיים</strong>:</p>
+      <table>
+        <tr><th>אופרטור</th><th>שם</th><th>מתי התוצאה <code>true</code></th></tr>
+        <tr><td><code>&amp;&amp;</code></td><td>וגם (AND)</td><td>רק אם <strong>שני</strong> הצדדים <code>true</code></td></tr>
+        <tr><td><code>||</code></td><td>או (OR)</td><td>אם <strong>לפחות אחד</strong> מהצדדים <code>true</code></td></tr>
+        <tr><td><code>!</code></td><td>לא (NOT)</td><td>הופך את התשובה: <code>!true</code> הוא <code>false</code></td></tr>
+      </table>
+
+      <h3>טבלאות אמת</h3>
+      <p>טבלת אמת מראה את התוצאה לכל צירוף אפשרי. כדאי להכיר אותן בעל פה:</p>
+      <div class="features">
+        <table>
+          <tr><th>a</th><th>b</th><th><code>a &amp;&amp; b</code></th></tr>
+          <tr><td>true</td><td>true</td><td><strong>true</strong></td></tr>
+          <tr><td>true</td><td>false</td><td>false</td></tr>
+          <tr><td>false</td><td>true</td><td>false</td></tr>
+          <tr><td>false</td><td>false</td><td>false</td></tr>
+        </table>
+        <table>
+          <tr><th>a</th><th>b</th><th><code>a || b</code></th></tr>
+          <tr><td>true</td><td>true</td><td><strong>true</strong></td></tr>
+          <tr><td>true</td><td>false</td><td><strong>true</strong></td></tr>
+          <tr><td>false</td><td>true</td><td><strong>true</strong></td></tr>
+          <tr><td>false</td><td>false</td><td>false</td></tr>
+        </table>
+        <table>
+          <tr><th>a</th><th><code>!a</code></th></tr>
+          <tr><td>true</td><td>false</td></tr>
+          <tr><td>false</td><td>true</td></tr>
+        </table>
+      </div>
+      <p>דרך קלה לזכור: <code>&amp;&amp;</code> הוא "קפדן", מספיק צד אחד שקרי כדי שהכול ייכשל. ‏<code>||</code> הוא "סלחן", מספיק צד אחד אמיתי כדי שהכול יצליח.</p>
+
+      <div class="playground" id="pg-logical" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const age = 22;
+          const hasTicket = true;
+          const isStudent = false;
+          const isRetired = true;
+
+          // וגם: צריך את שני התנאים
+          const canEnter = age >= 18 && hasTicket;
+          console.log('אפשר להיכנס?', canEnter);
+
+          // או: מספיק אחד
+          const getsDiscount = isStudent || isRetired;
+          console.log('מגיעה הנחה?', getsDiscount);
+
+          // לא: הופך את התשובה
+          console.log('אין כרטיס?', !hasTicket);
+
+          // אפשר לשלב, עם סוגריים כדי שיהיה ברור
+          console.log((age >= 18 && hasTicket) || age >= 65);
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את <code>hasTicket</code> ל-<code>false</code>. מה השתנה? ועכשיו את <code>isRetired</code> ל-<code>false</code>.</p>
+
+      <h3>בדיקת טווח: "בין 1 ל-10"</h3>
+      <p>טעות נפוצה של מתחילים היא לכתוב <code>1 &lt;= x &lt;= 10</code> כמו במתמטיקה. ב-JavaScript זה <strong>לא עובד</strong> (זה תמיד <code>true</code>!). צריך לפרק לשתי שאלות ולחבר עם <code>&amp;&amp;</code>:</p>
+      <div class="playground" id="pg-range" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const x = 50;
+
+          // ✗ לא נכון: תמיד true, גם כש-x הוא 50
+          console.log(1 <= x <= 10);
+
+          // ✓ נכון: גם גדול או שווה ל-1, וגם קטן או שווה ל-10
+          console.log(x >= 1 && x <= 10);
+        </script>
+      </div>
+      <details class="solution"><summary>למה <code>1 &lt;= x &lt;= 10</code> תמיד <code>true</code>?</summary>
+        <p>JavaScript מחשב משמאל לימין. קודם <code>1 &lt;= 50</code>, שזה <code>true</code>. אחר כך <code>true &lt;= 10</code>. כשמשווים בוליאני למספר, ‏<code>true</code> הופך ל-1, ו-<code>1 &lt;= 10</code> זה <code>true</code>. מבלבל, נכון? בדיוק בגלל זה כותבים שתי השוואות מפורשות.</p>
+      </details>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: <code>const a = 5;</code> מה התוצאה של <code>a &gt; 3 &amp;&amp; a &lt; 4</code>?</p>
+        <ul>
+          <li><code>true</code></li>
+          <li data-correct><code>false</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>a &gt; 3</code> הוא <code>true</code>, אבל <code>a &lt; 4</code> הוא <code>false</code>. ב-<code>&amp;&amp;</code> מספיק צד אחד שקרי, ולכן הכול <code>false</code>. אם היה כתוב <code>||</code>, התשובה הייתה <code>true</code>.</p>
+      </div>
+
+      <h2 id="truthy-falsy">‏truthy ו-falsy</h2>
+      <p>עד עכשיו כל תנאי החזיר בדיוק <code>true</code> או <code>false</code>. אבל ב-JavaScript אפשר לשים <strong>כל ערך</strong> במקום שבו מצפים לתנאי: מספר, מחרוזת, כל דבר. JavaScript פשוט מחליטה אם הערך "נחשב אמת" (<strong>truthy</strong>) או "נחשב שקר" (<strong>falsy</strong>).</p>
+      <p>החדשות הטובות: הרשימה של הערכים ה-falsy קצרה, ואפשר ללמוד אותה בעל פה. <strong>כל השאר truthy.</strong></p>
+      <table>
+        <tr><th>ערך falsy</th><th>מה זה</th></tr>
+        <tr><td><code>false</code></td><td>השקר עצמו</td></tr>
+        <tr><td><code>0</code> (וגם <code>-0</code>)</td><td>המספר אפס</td></tr>
+        <tr><td><code>''</code></td><td>מחרוזת ריקה (בלי אף תו, גם לא רווח)</td></tr>
+        <tr><td><code>null</code></td><td>"אין ערך", בכוונה</td></tr>
+        <tr><td><code>undefined</code></td><td>"עוד לא קיבל ערך"</td></tr>
+        <tr><td><code>NaN</code></td><td>"לא מספר", למשל התוצאה של <code>Number('שלום')</code></td></tr>
+      </table>
+      <p>כמה ערכים שנראים "ריקים" אבל הם דווקא <strong>truthy</strong>: <code>'0'</code> (מחרוזת עם התו אפס), <code>' '</code> (מחרוזת עם רווח), ‏<code>'false'</code> (מחרוזת עם המילה false).</p>
+      <p>כדי לראות אם ערך truthy או falsy, אפשר להמיר אותו לבוליאני עם <code>Boolean(...)</code>:</p>
+      <div class="playground" id="pg-truthy" data-height="300">
+        <script type="text/plain" data-lang="js">
+          console.log('--- falsy ---');
+          console.log(Boolean(false));
+          console.log(Boolean(0));
+          console.log(Boolean(''));
+          console.log(Boolean(null));
+          console.log(Boolean(undefined));
+          console.log(Boolean(NaN));
+
+          console.log('--- truthy ---');
+          console.log(Boolean(42));
+          console.log(Boolean(-1));
+          console.log(Boolean('שלום'));
+          console.log(Boolean('0'));    // מחרוזת לא ריקה!
+          console.log(Boolean(' '));    // רווח זה תו!
+        </script>
+      </div>
+      <p>למה זה שימושי? כי אפשר לכתוב תנאים קצרים. למשל "אם המשתמש הקליד שם" אפשר לבדוק פשוט עם <code>if (name)</code>: אם השם ריק, הוא falsy. נראה את זה בפעולה מיד, כשנלמד <code>if</code>.</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: איזה מהערכים הבאים הוא <strong>truthy</strong>?</p>
+        <ul>
+          <li><code>0</code></li>
+          <li><code>''</code></li>
+          <li data-correct><code>'0'</code></li>
+          <li><code>null</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>'0'</code> היא מחרוזת עם תו אחד, ולכן היא לא ריקה. כל מחרוזת לא ריקה היא truthy. ‏<code>0</code> המספר, המחרוזת הריקה ו-<code>null</code> נמצאים ברשימת ה-falsy.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>מספיק להציג את רשימת ששת הערכים ה-falsy ואת המלכודת של <code>'0'</code>. כדאי לבקש מהכיתה לנחש לפני ההרצה של כל שורה: "truthy או falsy?". זה עובד טוב כמשחק קצר של דקה–שתיים.</p>
+      </aside>
+
+      <h2 id="if">‏<code>if</code>: לעשות משהו רק אם <span class="time">4 דק׳</span></h2>
+      <p>עכשיו, כשאנחנו יודעים לשאול שאלות, אפשר לתת לקוד <strong>להחליט</strong>. ‏<code>if</code> (בעברית: "אם") מריץ קטע קוד <strong>רק אם</strong> התנאי truthy. אם התנאי falsy, הקוד בפנים פשוט מדולג.</p>
+      <pre><code class="language-js">if (תנאי) {
+  // הקוד כאן רץ רק אם התנאי truthy
+}</code></pre>
+      <p>החלקים:</p>
+      <ul>
+        <li><code>if</code>: מילה שמורה בשפה.</li>
+        <li><code>( )</code>: בתוך הסוגריים העגולים כותבים את התנאי. הסוגריים <strong>חובה</strong>.</li>
+        <li><code>{ }</code>: בתוך הסוגריים המסולסלים כותבים את הקוד שירוץ אם התנאי מתקיים. זה נקרא <strong>בלוק</strong>. נהוג להזיח (להכניס פנימה ברווחים) את הקוד שבתוך הבלוק, כדי שיהיה ברור מה שייך ל-<code>if</code>.</li>
+      </ul>
+      <div class="flow">
+        <span class="node">❓ התנאי</span><span class="arrow">←</span><span class="node">✅ truthy<small>מריצים את הבלוק</small></span><span class="arrow">←</span><span class="node">⬇️ ממשיכים בקוד</span>
+      </div>
+      <div class="flow">
+        <span class="node">❓ התנאי</span><span class="arrow">←</span><span class="node">❌ falsy<small>מדלגים על הבלוק</small></span><span class="arrow">←</span><span class="node">⬇️ ממשיכים בקוד</span>
+      </div>
+      <div class="playground" id="pg-if" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const temperature = 32;
+
+          console.log('בודקים את מזג האוויר...');
+
+          if (temperature > 30) {
+            console.log('חם מאוד! 🥵');
+            console.log('כדאי לשתות מים');
+          }
+
+          console.log('סוף התוכנית'); // השורה הזו רצה תמיד
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את הטמפרטורה ל-20 והריצו. אילו שורות נעלמו? שימו לב שהשורה הראשונה והאחרונה מודפסות בכל מקרה, כי הן מחוץ לבלוק.</p>
+
+      <h3>‏<code>if</code> עם truthy ו-falsy</h3>
+      <div class="playground" id="pg-if-truthy" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const userName = 'מאיה';   // נסו לשנות למחרוזת ריקה: ''
+
+          if (userName) {
+            console.log('שלום ' + userName + '!');
+          }
+
+          if (!userName) {
+            console.log('לא הוזן שם');
+          }
+        </script>
+      </div>
+
+      <h2 id="else">‏<code>else</code>: ואם לא?</h2>
+      <p>הרבה פעמים יש שתי אפשרויות: "אם יורד גשם קח מטריה, <strong>אחרת</strong> קח משקפי שמש". בשביל ה"אחרת" יש את <code>else</code>. הבלוק של <code>else</code> רץ <strong>רק אם התנאי של ה-<code>if</code> נכשל</strong>. תמיד ירוץ בדיוק אחד מהשניים: או זה, או זה, לעולם לא שניהם ולעולם לא אף אחד.</p>
+      <div class="flow">
+        <span class="node">❓ התנאי</span><span class="arrow">←</span><span class="node">✅ truthy<small>בלוק ה-if</small></span>
+        <span class="arrow">/</span><span class="node">❌ falsy<small>בלוק ה-else</small></span>
+      </div>
+      <div class="playground" id="pg-else" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const age = 16;
+
+          if (age >= 18) {
+            console.log('אפשר להוציא רישיון נהיגה 🚗');
+          } else {
+            const yearsLeft = 18 - age;
+            console.log('עוד ' + yearsLeft + ' שנים לרישיון');
+          }
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את הגיל ל-18 ול-25. ואז ל-17. האם אי פעם מודפסות שתי השורות?</p>
+
+      <h3>דוגמה פתורה: זוגי או אי-זוגי</h3>
+      <p>האופרטור <code>%</code> (שארית, modulo) מחזיר את השארית של חלוקה. ‏<code>7 % 2</code> הוא 1 (כי 7 = 2×3 + <strong>1</strong>), ו-<code>10 % 2</code> הוא 0. מספר זוגי הוא מספר שהשארית שלו בחלוקה ב-2 היא 0:</p>
+      <div class="playground" id="pg-even" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const n = 14;
+
+          console.log(n + ' % 2 =', n % 2);
+
+          if (n % 2 === 0) {
+            console.log(n + ' הוא מספר זוגי');
+          } else {
+            console.log(n + ' הוא מספר אי-זוגי');
+          }
+        </script>
+      </div>
+
+      <h2 id="else-if">‏<code>else if</code>: יותר משתי אפשרויות <span class="time">4 דק׳</span></h2>
+      <p>מה אם יש שלוש אפשרויות או יותר? למשל, ציון במבחן: 90 ומעלה זה "מצוין", 80 ומעלה "טוב מאוד", 60 ומעלה "עובר", ומתחת ל-60 "נכשל". בשביל זה משרשרים <code>else if</code>:</p>
+      <pre><code class="language-js">if (תנאי1) {
+  // רץ אם תנאי1 מתקיים
+} else if (תנאי2) {
+  // רץ אם תנאי1 לא מתקיים, אבל תנאי2 כן
+} else if (תנאי3) {
+  // רץ אם 1 ו-2 לא מתקיימים, אבל 3 כן
+} else {
+  // רץ אם אף תנאי לא התקיים
+}</code></pre>
+      <p>JavaScript בודקת את התנאים <strong>לפי הסדר, מלמעלה למטה</strong>. ברגע שתנאי אחד מתקיים, היא מריצה את הבלוק שלו <strong>ומדלגת על כל השאר</strong>. ה-<code>else</code> בסוף לא חובה: הוא "רשת הביטחון" לכל מה שלא התאים לשום תנאי.</p>
+      <div class="playground" id="pg-else-if" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const score = 85;
+
+          if (score >= 90) {
+            console.log('מצוין 🏆');
+          } else if (score >= 80) {
+            console.log('טוב מאוד 👏');
+          } else if (score >= 60) {
+            console.log('עובר ✔️');
+          } else {
+            console.log('נכשל, נסו שוב 💪');
+          }
+
+          console.log('הציון היה', score);
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את הציון ל-95, ‏80, ‏60, ‏59 ו-0. מה מודפס בכל פעם?</p>
+
+      <h3>הסדר חשוב!</h3>
+      <p>שימו לב: ל-85 מתאימים גם התנאי <code>score &gt;= 80</code> וגם <code>score &gt;= 60</code>. הוא מקבל "טוב מאוד" כי התנאי הזה מופיע <strong>קודם</strong>. מה יקרה אם נהפוך את הסדר?</p>
+      <div class="playground" id="pg-order-bug" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const score = 95;
+
+          // ✗ באג: הסדר הפוך
+          if (score >= 60) {
+            console.log('עובר');
+          } else if (score >= 80) {
+            console.log('טוב מאוד');
+          } else if (score >= 90) {
+            console.log('מצוין');
+          }
+          // 95 גדול מ-60, אז התנאי הראשון מתקיים, וכל השאר מדולגים!
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>כלל אצבע:</strong> כשבודקים טווחים עם <code>&gt;=</code>, מתחילים מהערך <strong>הגבוה ביותר</strong> ויורדים. כשבודקים עם <code>&lt;</code>, מתחילים מה<strong>נמוך ביותר</strong> ועולים.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: <code>const x = 7;</code> מה ידפיס הקוד?<br><code>if (x &gt; 5) { console.log('A'); } else if (x &gt; 3) { console.log('B'); } else { console.log('C'); }</code></p>
+        <ul>
+          <li data-correct><code>A</code> בלבד</li>
+          <li><code>A</code> ואחריו <code>B</code></li>
+          <li><code>B</code> בלבד</li>
+          <li><code>A</code>, ‏<code>B</code> ו-<code>C</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏7 גדול מ-5, אז התנאי הראשון מתקיים ומודפס <code>A</code>. אחרי שבלוק אחד רץ, כל ה-<code>else if</code> וה-<code>else</code> שאחריו מדולגים, גם אם 7 גדול מ-3.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>הדגמת "הסדר ההפוך" חשובה מאוד: זה הבאג הנפוץ ביותר בתרגילי ציונים. כדאי להריץ אותה, לשאול "למה 95 קיבל רק 'עובר'?" ולתת לסטודנטים להסביר. זו גם הזדמנות טובה להראות שכל <code>if</code> רגיל (בלי <code>else</code>) נבדק בנפרד, בניגוד לשרשרת <code>else if</code>.</p>
+      </aside>
+
+      <h3>🎯 אתגר 1: זוגי או אי-זוגי <span class="level easy">קל</span></h3>
+      <p>בשורה הראשונה מוגדר המשתנה <code>number</code>. כתבו קוד שמדפיס <strong>בדיוק</strong> את המילה <code>זוגי</code> אם המספר זוגי, או <code>אי-זוגי</code> אם הוא אי-זוגי (בלי טקסט נוסף באותה שורה).</p>
+      <p>הבדיקה תריץ את הקוד שלכם גם עם מספרים אחרים, אז אל תכתבו את התשובה "על יבש". את השורה הראשונה אל תשנו, חוץ מהמספר עצמו.</p>
+      <div class="playground challenge" id="ch-even-odd" data-check="ch-even-odd" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const number = 7;
+
+          // כתבו כאן את ה-if וה-else
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const number = 7;
+
+          if (number % 2 === 0) {
+            console.log('זוגי');
+          } else {
+            console.log('אי-זוגי');
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-even-odd': (out, win) => {
+            const pattern = /const number = -?\d+/;
+            const hasLine = pattern.test(out.code);
+            const result = (n) => (hasLine ? rerun(win, out.code, pattern, `const number = ${n}`) : []).join('|');
+            return [
+              [hasLine, 'השורה const number = ... צריכה להישאר בקוד'],
+              [/%/.test(out.code), 'השתמשו באופרטור % כדי לבדוק את השארית בחלוקה ב-2'],
+              [result(7) === 'אי-זוגי', 'כש-number הוא 7, צריך להדפיס רק: אי-זוגי'],
+              [result(10) === 'זוגי', 'כש-number הוא 10, צריך להדפיס רק: זוגי'],
+              [result(0) === 'זוגי', 'כש-number הוא 0, צריך להדפיס: זוגי (גם 0 הוא זוגי)'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>🎯 אתגר 2: ציון באותיות <span class="level medium">בינוני</span></h3>
+      <p>בארצות הברית ציונים נכתבים באותיות. כתבו קוד שמדפיס את האות המתאימה ל-<code>score</code>:</p>
+      <table>
+        <tr><th>ציון</th><th>להדפיס</th></tr>
+        <tr><td>90 ומעלה</td><td><code>A</code></td></tr>
+        <tr><td>80 עד 89</td><td><code>B</code></td></tr>
+        <tr><td>70 עד 79</td><td><code>C</code></td></tr>
+        <tr><td>60 עד 69</td><td><code>D</code></td></tr>
+        <tr><td>מתחת ל-60</td><td><code>F</code></td></tr>
+      </table>
+      <p>הקוד צריך להדפיס שורה אחת בלבד: האות. גם כאן הבדיקה תנסה ציונים שונים, כולל ציוני הגבול (90, 80, 70, 60).</p>
+      <div class="playground challenge" id="ch-grade" data-check="ch-grade" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const score = 85;
+
+          // כתבו כאן שרשרת if / else if / else
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const score = 85;
+
+          if (score >= 90) {
+            console.log('A');
+          } else if (score >= 80) {
+            console.log('B');
+          } else if (score >= 70) {
+            console.log('C');
+          } else if (score >= 60) {
+            console.log('D');
+          } else {
+            console.log('F');
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-grade': (out, win) => {
+            const pattern = /const score = -?\d+/;
+            const hasLine = pattern.test(out.code);
+            const result = (n) => (hasLine ? rerun(win, out.code, pattern, `const score = ${n}`) : []).join('|');
+            const cases = [[100, 'A'], [90, 'A'], [89, 'B'], [80, 'B'], [75, 'C'], [70, 'C'], [65, 'D'], [60, 'D'], [59, 'F'], [0, 'F']];
+            return [
+              [hasLine, 'השורה const score = ... צריכה להישאר בקוד'],
+              ...cases.map(([n, letter]) => [result(n) === letter, `כש-score הוא ${n}, צריך להדפיס רק: ${letter}`]),
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="nested">תנאים מקוננים מול <code>&amp;&amp;</code></h2>
+      <p>אפשר לשים <code>if</code> בתוך <code>if</code>. זה נקרא <strong>קינון</strong> (nesting). שתי הדוגמאות הבאות עושות בדיוק אותו דבר:</p>
+      <div class="playground" id="pg-nested" data-height="320">
+        <script type="text/plain" data-lang="js">
+          const age = 25;
+          const hasLicense = true;
+
+          // גרסה 1: if בתוך if
+          if (age >= 18) {
+            if (hasLicense) {
+              console.log('גרסה 1: אפשר לנהוג');
+            }
+          }
+
+          // גרסה 2: תנאי אחד עם &&
+          if (age >= 18 && hasLicense) {
+            console.log('גרסה 2: אפשר לנהוג');
+          }
+        </script>
+      </div>
+      <p>הגרסה עם <code>&amp;&amp;</code> קצרה וקלה יותר לקריאה, ולכן עדיפה כשכל מה שרוצים הוא "גם וגם". קינון שימושי כשבכל שלב רוצים לעשות משהו <strong>אחר</strong>:</p>
+      <div class="playground" id="pg-nested-useful" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const age = 25;
+          const hasLicense = false;
+
+          if (age >= 18) {
+            if (hasLicense) {
+              console.log('אפשר לנהוג 🚗');
+            } else {
+              console.log('הגיל מתאים, אבל קודם צריך לעבור טסט');
+            }
+          } else {
+            console.log('צריך לחכות עד גיל 18');
+          }
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>טיפ:</strong> אם הקוד מתחיל להיראות כמו מדרגות (if בתוך if בתוך if...), זה סימן שכדאי לנסות לשלב תנאים עם <code>&amp;&amp;</code> או לפרק לשרשרת <code>else if</code>. קוד שטוח קל יותר לקרוא.</p>
+      </div>
+
+      <h2 id="ternary">האופרטור הטרנרי: <code>? :</code></h2>
+      <p>לפעמים כל מה שרוצים הוא לבחור בין <strong>שני ערכים</strong> לפי תנאי. במקום <code>if/else</code> ארוך, אפשר לכתוב שורה אחת:</p>
+      <pre><code class="language-js">const result = condition ? valueIfTrue : valueIfFalse;</code></pre>
+      <p>קוראים את זה כך: "התנאי מתקיים? אם כן, הערך הראשון. אם לא, הערך השני."</p>
+      <div class="playground" id="pg-ternary" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const age = 20;
+
+          // עם if / else
+          let status1;
+          if (age >= 18) {
+            status1 = 'בגיר';
+          } else {
+            status1 = 'קטין';
+          }
+          console.log(status1);
+
+          // אותו דבר עם האופרטור הטרנרי
+          const status2 = age >= 18 ? 'בגיר' : 'קטין';
+          console.log(status2);
+
+          // שימושי גם בתוך מחרוזות
+          const items = 1;
+          console.log(`יש לכם ${items} ${items === 1 ? 'פריט' : 'פריטים'} בעגלה`);
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את <code>items</code> ל-3. שימו לב שהמילה משתנה מ"פריט" ל"פריטים".</p>
+      <p>נשתמש באופרטור הטרנרי <strong>המון</strong> ב-React, כי שם הרבה פעמים צריך לבחור מה להציג בתוך ביטוי אחד. אבל אל תגזימו: אם יש יותר משתי אפשרויות, ‏<code>if / else if</code> קריא הרבה יותר מטרנרי בתוך טרנרי.</p>
+
+      <h2 id="switch">‏<code>switch</code>: בחירה לפי ערך אחד</h2>
+      <p>כשמשווים <strong>משתנה אחד</strong> להרבה ערכים אפשריים ("אם היום ראשון..., אם שני..., אם שלישי..."), שרשרת <code>else if</code> נהיית ארוכה ומלאה בחזרות. ‏<code>switch</code> הוא דרך מסודרת יותר לכתוב את זה:</p>
+      <div class="playground" id="pg-switch" data-height="380">
+        <script type="text/plain" data-lang="js">
+          const day = 'שישי';
+
+          switch (day) {
+            case 'ראשון':
+            case 'שני':
+            case 'שלישי':
+            case 'רביעי':
+            case 'חמישי':
+              console.log('יום עבודה 💼');
+              break;
+            case 'שישי':
+              console.log('חצי יום 🛒');
+              break;
+            case 'שבת':
+              console.log('סוף שבוע 🏖️');
+              break;
+            default:
+              console.log('זה לא יום בשבוע 🤔');
+          }
+        </script>
+      </div>
+      <p>איך זה עובד:</p>
+      <ul>
+        <li><code>switch (day)</code>: הערך שבודקים.</li>
+        <li><code>case 'שישי':</code>: "אם הערך שווה (ב-<code>===</code>) ל-'שישי', התחילו לרוץ מכאן".</li>
+        <li><code>break</code>: "סיימנו, צאו מה-switch". <strong>חשוב מאוד</strong>, ראו מיד למה.</li>
+        <li><code>default</code>: רץ אם אף <code>case</code> לא התאים, כמו ה-<code>else</code> בסוף.</li>
+        <li>כמה <code>case</code> ברצף בלי קוד ביניהם (ראשון עד חמישי) חולקים את אותו קוד.</li>
+      </ul>
+
+      <h3>המלכודת: לשכוח <code>break</code></h3>
+      <p>בלי <code>break</code>, אחרי שנמצא <code>case</code> מתאים, JavaScript <strong>ממשיכה לרוץ</strong> לתוך ה-case הבא, וגם לזה שאחריו, עד שתגיע ל-<code>break</code> או לסוף. זה נקרא "נפילה" (fall-through):</p>
+      <div class="playground" id="pg-switch-bug" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const color = 'צהוב';
+
+          switch (color) {
+            case 'אדום':
+              console.log('עצרו 🛑');
+            case 'צהוב':
+              console.log('היכונו ⚠️');
+            case 'ירוק':
+              console.log('סעו 🟢');
+          }
+          // שכחנו break, ולכן מודפס גם "היכונו" וגם "סעו"!
+        </script>
+      </div>
+      <p><strong>נסו לתקן:</strong> הוסיפו <code>break;</code> אחרי כל <code>console.log</code> והריצו שוב.</p>
+
+      <h2 id="defaults">ערכי ברירת מחדל: <code>||</code> ו-<code>??</code></h2>
+      <p>טריק שימושי מאוד: <code>||</code> לא תמיד מחזיר <code>true</code> או <code>false</code>. הוא מחזיר <strong>את הצד הראשון אם הוא truthy, ואחרת את הצד השני</strong>. ככה אפשר לתת ערך ברירת מחדל:</p>
+      <div class="playground" id="pg-defaults" data-height="300">
+        <script type="text/plain" data-lang="js">
+          const typedName = '';            // המשתמש לא הקליד כלום
+          const displayName = typedName || 'אורח';
+          console.log('שלום', displayName);  // אורח
+
+          // הבעיה של || : גם 0 הוא falsy
+          const volume = 0;                // המשתמש בחר בכוונה: שקט
+          console.log('עם || :', volume || 50);   // 50 ✗ (דרס את הבחירה!)
+
+          // ?? מחליף רק null או undefined, ולא 0 או ''
+          console.log('עם ?? :', volume ?? 50);   // 0 ✓
+
+          let nickname;                    // undefined: עוד לא קיבל ערך
+          console.log(nickname ?? 'אין כינוי');
+        </script>
+      </div>
+      <table>
+        <tr><th>אופרטור</th><th>מחליף בברירת המחדל כשהערך...</th><th>מתאים ל...</th></tr>
+        <tr><td><code>a || b</code></td><td>falsy (כולל <code>0</code> ו-<code>''</code>)</td><td>טקסטים, כשמחרוזת ריקה = "אין ערך"</td></tr>
+        <tr><td><code>a ?? b</code></td><td>רק <code>null</code> או <code>undefined</code></td><td>מספרים והגדרות, כש-0 הוא ערך חוקי</td></tr>
+      </table>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מה ידפיס <code>console.log(0 ?? 10)</code>?</p>
+        <ul>
+          <li><code>10</code></li>
+          <li data-correct><code>0</code></li>
+          <li><code>true</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>??</code> מחליף רק <code>null</code> ו-<code>undefined</code>. ‏<code>0</code> הוא ערך אמיתי מבחינתו, ולכן נשאר. עם <code>||</code> התשובה הייתה <code>10</code>, כי 0 הוא falsy.</p>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>‏<code>switch</code> ו-<code>??</code> אפשר להציג בקצרה בכיתה (3 דקות סך הכול) ולהפנות לעמוד. ב-React ‏<code>switch</code> פחות נפוץ, אבל <code>||</code> ו-<code>??</code> לברירות מחדל יופיעו שוב ושוב, וגם <code>&amp;&amp;</code> לתצוגה מותנית (<code>{isLoggedIn &amp;&amp; &lt;Profile /&gt;}</code>). כדאי לציין שזה יחזור.</p>
+      </aside>
+
+      <h2 id="why-loops">למה צריך לולאות? <span class="time">2 דק׳</span></h2>
+      <p>נניח שרוצים להדפיס את המספרים 1 עד 5. אפשר לכתוב:</p>
+      <pre><code class="language-js">console.log(1);
+console.log(2);
+console.log(3);
+console.log(4);
+console.log(5);</code></pre>
+      <p>עובד. אבל מה אם צריך עד 1,000? או עד מספר שהמשתמש בוחר, ולא יודעים מראש כמה? כאן נכנסות <strong>לולאות</strong> (loops): קוד שאומר למחשב "חזור על הפעולה הזו שוב ושוב, כל עוד תנאי מסוים מתקיים". מחשבים מצוינים בזה: הם לא מתעייפים ולא מתבלבלים, גם אחרי מיליון חזרות.</p>
+      <p>כל לולאה בנויה משלושה רכיבים:</p>
+      <ol>
+        <li><strong>נקודת התחלה</strong>: למשל "מתחילים לספור מ-1".</li>
+        <li><strong>תנאי להמשך</strong>: למשל "כל עוד לא עברנו את 5". כשהתנאי נכשל, הלולאה נעצרת.</li>
+        <li><strong>התקדמות</strong>: למשל "אחרי כל סיבוב, הוסיפו 1". בלי התקדמות, התנאי לעולם לא ייכשל והלולאה לא תיגמר!</li>
+      </ol>
+      <p>כל סיבוב של לולאה נקרא <strong>איטרציה</strong> (iteration).</p>
+
+      <h2 id="for">לולאת <code>for</code> <span class="time">8 דק׳</span></h2>
+      <p>לולאת <code>for</code> היא הלולאה הנפוצה ביותר. היא מתאימה כשיודעים <strong>כמה פעמים</strong> רוצים לחזור (5 פעמים, 100 פעמים, כמספר התווים במילה). כל שלושת הרכיבים כתובים בשורה אחת:</p>
+      <pre><code class="language-js">for (let i = 1; i &lt;= 5; i++) {
+  console.log(i);
+}</code></pre>
+      <p>בתוך הסוגריים יש שלושה חלקים, מופרדים בנקודה-פסיק <code>;</code>:</p>
+      <table>
+        <tr><th>חלק</th><th>בדוגמה</th><th>מה הוא עושה</th><th>מתי רץ</th></tr>
+        <tr><td>1. אתחול</td><td><code>let i = 1</code></td><td>יוצר משתנה מונה ונותן לו ערך התחלתי</td><td><strong>פעם אחת</strong>, בהתחלה</td></tr>
+        <tr><td>2. תנאי</td><td><code>i &lt;= 5</code></td><td>אם truthy, מריצים עוד סיבוב. אם falsy, הלולאה נגמרת</td><td><strong>לפני</strong> כל סיבוב</td></tr>
+        <tr><td>3. עדכון</td><td><code>i++</code></td><td>מקדם את המונה. ‏<code>i++</code> זה קיצור של <code>i = i + 1</code></td><td><strong>אחרי</strong> כל סיבוב</td></tr>
+      </table>
+      <p>השם <code>i</code> הוא מוסכמה (קיצור של index). אפשר לקרוא למונה בכל שם, אבל כל מתכנת יזהה מיד את <code>i</code>.</p>
+      <div class="flow">
+        <span class="node">1️⃣ אתחול<small>let i = 1</small></span><span class="arrow">←</span><span class="node">2️⃣ תנאי<small>i &lt;= 5 ?</small></span><span class="arrow">←</span><span class="node">✅ כן: גוף הלולאה<small>console.log(i)</small></span><span class="arrow">←</span><span class="node">3️⃣ עדכון<small>i++</small></span><span class="arrow">↩</span><span class="node">חוזרים לתנאי</span>
+      </div>
+      <div class="flow">
+        <span class="node">2️⃣ תנאי<small>i &lt;= 5 ?</small></span><span class="arrow">←</span><span class="node">❌ לא<small>יוצאים מהלולאה</small></span><span class="arrow">←</span><span class="node">⬇️ ממשיכים בקוד</span>
+      </div>
+
+      <h3>מעקב שלב אחר שלב</h3>
+      <p>הדרך הכי טובה להבין לולאה היא "לשחק מחשב": לעקוב עם טבלה אחרי מה שקורה בכל סיבוב. זו הטבלה של הלולאה למעלה:</p>
+      <table>
+        <tr><th>סיבוב</th><th>ערך <code>i</code></th><th>התנאי <code>i &lt;= 5</code></th><th>מה מודפס</th><th>אחרי <code>i++</code></th></tr>
+        <tr><td>1</td><td>1</td><td>true ✅</td><td>1</td><td>2</td></tr>
+        <tr><td>2</td><td>2</td><td>true ✅</td><td>2</td><td>3</td></tr>
+        <tr><td>3</td><td>3</td><td>true ✅</td><td>3</td><td>4</td></tr>
+        <tr><td>4</td><td>4</td><td>true ✅</td><td>4</td><td>5</td></tr>
+        <tr><td>5</td><td>5</td><td>true ✅</td><td>5</td><td>6</td></tr>
+        <tr><td>—</td><td>6</td><td>false ❌</td><td colspan="2">הלולאה נגמרת</td></tr>
+      </table>
+      <p>שימו לב: התנאי נבדק <strong>6 פעמים</strong>, אבל גוף הלולאה רץ רק <strong>5 פעמים</strong>. בבדיקה השישית <code>i</code> כבר 6, והתנאי נכשל.</p>
+      <div class="playground" id="pg-for" data-height="200">
+        <script type="text/plain" data-lang="js">
+          for (let i = 1; i <= 5; i++) {
+            console.log('סיבוב מספר', i);
+          }
+          console.log('הלולאה נגמרה!');
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong></p>
+      <ul>
+        <li>את <code>5</code> ל-<code>10</code>. כמה שורות הודפסו?</li>
+        <li>את <code>i &lt;= 5</code> ל-<code>i &lt; 5</code>. מה ההבדל? (רמז: 5 עצמו)</li>
+        <li>את <code>let i = 1</code> ל-<code>let i = 0</code>.</li>
+      </ul>
+
+      <h3>ספירה לאחור, וקפיצות של 2</h3>
+      <p>אפשר לספור בכל כיוון ובכל קצב. רק צריך להתאים את שלושת החלקים:</p>
+      <div class="playground" id="pg-for-variations" data-height="320">
+        <script type="text/plain" data-lang="js">
+          console.log('--- ספירה לאחור ---');
+          for (let i = 5; i >= 1; i--) {   // i-- זה i = i - 1
+            console.log(i);
+          }
+          console.log('🚀 המראה!');
+
+          console.log('--- מספרים זוגיים עד 10 ---');
+          for (let i = 0; i <= 10; i += 2) {  // i += 2 זה i = i + 2
+            console.log(i);
+          }
+
+          console.log('--- כפולות של 5 ---');
+          for (let i = 5; i <= 25; i += 5) {
+            console.log(i);
+          }
+        </script>
+      </div>
+
+      <h3>לולאה עם תנאי בפנים</h3>
+      <p>אפשר (ומאוד נפוץ) לשים <code>if</code> בתוך לולאה. למשל, להדפיס רק את המספרים שמתחלקים ב-3:</p>
+      <div class="playground" id="pg-for-if" data-height="220">
+        <script type="text/plain" data-lang="js">
+          for (let i = 1; i <= 20; i++) {
+            if (i % 3 === 0) {
+              console.log(i + ' מתחלק ב-3');
+            }
+          }
+        </script>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: כמה פעמים יודפס "היי"?<br><code>for (let i = 0; i &lt; 4; i++) { console.log('היי'); }</code></p>
+        <ul>
+          <li>3</li>
+          <li data-correct>4</li>
+          <li>5</li>
+        </ul>
+        <p class="quiz-explain">נכון! ‏<code>i</code> מקבל את הערכים 0, 1, 2, 3, כלומר 4 סיבובים. כש-<code>i</code> מגיע ל-4, התנאי <code>4 &lt; 4</code> נכשל. התבנית <code>let i = 0; i &lt; N</code> רצה תמיד בדיוק N פעמים, וניתקל בה המון.</p>
+      </div>
+
+      <h3>🎯 אתגר 3: סכום 1 עד 100 <span class="level easy">קל</span></h3>
+      <p>כתבו לולאה שמחברת את כל המספרים מ-1 עד 100 (כלומר 1 + 2 + 3 + ... + 100) לתוך המשתנה <code>sum</code>, ואחרי הלולאה הדפיסו את <code>sum</code>.</p>
+      <p><strong>רמז:</strong> בכל סיבוב מוסיפים את <code>i</code> ל-<code>sum</code>: ‏<code>sum = sum + i</code> (או בקיצור <code>sum += i</code>). אל תכתבו את התשובה עצמה בקוד.</p>
+      <div class="playground challenge" id="ch-sum" data-check="ch-sum" data-height="220">
+        <script type="text/plain" data-lang="js">
+          let sum = 0;
+
+          // כתבו כאן לולאת for
+
+          // ואחרי הלולאה: הדפיסו את sum
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          let sum = 0;
+
+          for (let i = 1; i <= 100; i++) {
+            sum += i;
+          }
+
+          console.log(sum);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-sum': (out, win) => [
+            [/\bfor\b|\bwhile\b/.test(out.code), 'צריך להשתמש בלולאה (for)'],
+            [!/5050/.test(out.code), 'אל תכתבו את התשובה בקוד, תנו ללולאה לחשב אותה'],
+            [win.eval('typeof sum !== "undefined" ? sum : null') === 5050, 'בסוף הקוד, sum צריך להיות שווה ל-5050'],
+            [out.logs.includes('5050'), 'הדפיסו את sum אחרי הלולאה'],
+          ],
+        });
+      </script>
+
+      <aside class="box lecturer-note">
+        <p>זה הרגע לכתוב את טבלת המעקב על הלוח יחד עם הכיתה: עמודות לסיבוב, ‏<code>i</code>, התנאי והפלט. כדאי לעשות את זה <strong>לפני</strong> שמריצים, ולבקש מהכיתה לנחש מה יודפס. אחר כך כדאי לשאול "מה צריך לשנות כדי לספור לאחור?" ולתת לסטודנט לנסות בעורך מול כולם. סיפור קצר שעובד טוב: גאוס, שכבר בגיל 8 חישב את 1+...+100 בלי לולאה (‏<code>100 × 101 / 2</code>), ולכן לולאה היא לא תמיד הפתרון היחיד.</p>
+      </aside>
+
+      <h2 id="while">לולאת <code>while</code> <span class="time">4 דק׳</span></h2>
+      <p>‏<code>while</code> (בעברית: "כל עוד") היא הלולאה הפשוטה ביותר: יש לה רק תנאי. היא חוזרת על הבלוק <strong>כל עוד</strong> התנאי מתקיים:</p>
+      <pre><code class="language-js">while (תנאי) {
+  // רץ שוב ושוב, כל עוד התנאי truthy
+}</code></pre>
+      <p>את האתחול כותבים <strong>לפני</strong> הלולאה, ואת ההתקדמות כותבים <strong>בתוך</strong> הבלוק. זו אותה לולאה מ-1 עד 5, הפעם עם <code>while</code>:</p>
+      <div class="playground" id="pg-while" data-height="220">
+        <script type="text/plain" data-lang="js">
+          let i = 1;            // 1. אתחול: לפני הלולאה
+
+          while (i <= 5) {      // 2. תנאי
+            console.log(i);
+            i++;                // 3. התקדמות: בתוך הבלוק. בלי השורה הזו הלולאה לא תיגמר!
+          }
+
+          console.log('אחרי הלולאה, i =', i);
+        </script>
+      </div>
+
+      <h3>אז מתי <code>while</code> ומתי <code>for</code>?</h3>
+      <table>
+        <tr><th>משתמשים ב...</th><th>כאשר...</th><th>דוגמה</th></tr>
+        <tr><td><code>for</code></td><td>יודעים <strong>מראש</strong> כמה סיבובים יהיו</td><td>"הדפס 10 שורות", "עבור על כל התווים במילה"</td></tr>
+        <tr><td><code>while</code></td><td><strong>לא יודעים</strong> כמה סיבובים יהיו, רק מתי לעצור</td><td>"חזור עד שהמשתמש ינחש נכון", "הכפל עד שתעבור מיליון"</td></tr>
+      </table>
+      <p>דוגמה קלאסית ל-<code>while</code>: יש לכם 1,000 ₪ בחיסכון, והם גדלים ב-10% כל שנה. כמה שנים ייקח עד שיהיו לכם לפחות 2,000 ₪? אנחנו לא יודעים מראש כמה סיבובים, ובדיוק זו השאלה:</p>
+      <div class="playground" id="pg-while-money" data-height="280">
+        <script type="text/plain" data-lang="js">
+          let money = 1000;
+          let years = 0;
+
+          while (money < 2000) {
+            money = money * 1.1;   // גדל ב-10%
+            years++;
+            console.log(`אחרי ${years} שנים: ${Math.round(money)} ₪`);
+          }
+
+          console.log(`ייקח ${years} שנים להכפיל את הכסף 💰`);
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את הריבית ל-5% (כלומר <code>1.05</code>). כמה שנים עכשיו?</p>
+
+      <h3>‏<code>do...while</code>: לפחות פעם אחת</h3>
+      <p>יש גרסה נדירה יותר: <code>do...while</code>. ההבדל היחיד: התנאי נבדק <strong>בסוף</strong> הסיבוב ולא בהתחלה, ולכן הבלוק רץ <strong>לפחות פעם אחת</strong>, גם אם התנאי שקרי מההתחלה:</p>
+      <div class="playground" id="pg-do-while" data-height="240">
+        <script type="text/plain" data-lang="js">
+          let count = 10;
+
+          while (count < 5) {
+            console.log('while: לא יודפס אף פעם');
+          }
+
+          do {
+            console.log('do...while: מודפס פעם אחת, count =', count);
+          } while (count < 5);
+        </script>
+      </div>
+      <p>בפועל משתמשים בזה מעט מאוד. מספיק לדעת שזה קיים ולזהות את זה.</p>
+
+      <h2 id="break-continue">‏<code>break</code> ו-<code>continue</code></h2>
+      <p>שתי מילים ששולטות בלולאה מבפנים:</p>
+      <ul>
+        <li><code>break</code>: "<strong>עצרו את הלולאה עכשיו</strong>". יוצאים מהלולאה מיד, גם אם התנאי עדיין מתקיים. מתאים כשמצאנו את מה שחיפשנו.</li>
+        <li><code>continue</code>: "<strong>דלגו לסיבוב הבא</strong>". מפסיקים את הסיבוב הנוכחי (מה שאחרי <code>continue</code> לא רץ), וממשיכים לסיבוב הבא.</li>
+      </ul>
+      <div class="playground" id="pg-break" data-height="260">
+        <script type="text/plain" data-lang="js">
+          // break: מחפשים את המספר הראשון מעל 50 שמתחלק ב-7
+          for (let i = 50; i <= 100; i++) {
+            if (i % 7 === 0) {
+              console.log('מצאתי:', i);
+              break;   // אין טעם להמשיך לחפש
+            }
+            console.log(i, 'לא מתחלק ב-7');
+          }
+          console.log('סיימנו לחפש');
+        </script>
+      </div>
+      <div class="playground" id="pg-continue" data-height="220">
+        <script type="text/plain" data-lang="js">
+          // continue: מדפיסים את 1 עד 10, חוץ מ-4 ו-7
+          for (let i = 1; i <= 10; i++) {
+            if (i === 4 || i === 7) {
+              continue;   // מדלגים על שאר הסיבוב הזה
+            }
+            console.log(i);
+          }
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> בדוגמה השנייה, החליפו את <code>continue</code> ב-<code>break</code>. מה מודפס עכשיו, ולמה?</p>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מה ידפיס הקוד?<br><code>for (let i = 1; i &lt;= 5; i++) { if (i === 3) { break; } console.log(i); }</code></p>
+        <ul>
+          <li><code>1 2 3</code></li>
+          <li data-correct><code>1 2</code></li>
+          <li><code>1 2 4 5</code></li>
+          <li><code>3</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! כש-<code>i</code> הוא 3, ‏<code>break</code> עוצר את הלולאה <strong>לפני</strong> שמגיעים ל-<code>console.log</code>. לכן מודפסים רק 1 ו-2. עם <code>continue</code> התשובה הייתה <code>1 2 4 5</code>.</p>
+      </div>
+
+      <h3>🎯 אתגר 4: FizzBuzz <span class="level medium">בינוני</span></h3>
+      <p>FizzBuzz הוא אחד התרגילים המפורסמים בעולם התכנות, ושואלים אותו גם בראיונות עבודה. כתבו לולאה שעוברת על המספרים <strong>1 עד 30</strong>, ולכל מספר מדפיסה שורה אחת:</p>
+      <ul>
+        <li>אם המספר מתחלק ב-3 <strong>וגם</strong> ב-5: הדפיסו <code>FizzBuzz</code></li>
+        <li>אחרת, אם הוא מתחלק ב-3: הדפיסו <code>Fizz</code></li>
+        <li>אחרת, אם הוא מתחלק ב-5: הדפיסו <code>Buzz</code></li>
+        <li>אחרת: הדפיסו את המספר עצמו</li>
+      </ul>
+      <p>הפלט צריך להתחיל כך: <code>1, 2, Fizz, 4, Buzz, Fizz, 7...</code> (כל אחד בשורה נפרדת). ‏<strong>רמז:</strong> חשבו טוב על <strong>הסדר</strong> של התנאים. מה יקרה ל-15 אם בודקים קודם "מתחלק ב-3"?</p>
+      <div class="playground challenge" id="ch-fizzbuzz" data-check="ch-fizzbuzz" data-height="300">
+        <script type="text/plain" data-lang="js">
+          // כתבו כאן את הלולאה מ-1 עד 30
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          for (let i = 1; i <= 30; i++) {
+            if (i % 3 === 0 && i % 5 === 0) {
+              console.log('FizzBuzz');
+            } else if (i % 3 === 0) {
+              console.log('Fizz');
+            } else if (i % 5 === 0) {
+              console.log('Buzz');
+            } else {
+              console.log(i);
+            }
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-fizzbuzz': (out) => {
+            const expected = [];
+            for (let i = 1; i <= 30; i++) {
+              expected.push(i % 15 === 0 ? 'FizzBuzz' : i % 3 === 0 ? 'Fizz' : i % 5 === 0 ? 'Buzz' : String(i));
+            }
+            const logs = out.logs.map((l) => l.trim());
+            const firstWrong = expected.findIndex((e, i) => logs[i] !== e);
+            return [
+              [logs.length === 30, `צריך להדפיס בדיוק 30 שורות (הודפסו ${logs.length})`],
+              [firstWrong === -1, firstWrong === -1 ? '' : `שורה ${firstWrong + 1} צריכה להיות ${expected[firstWrong]}, אבל הודפס: ${logs[firstWrong] ?? '(כלום)'}`],
+              [logs[14] === 'FizzBuzz', 'בשביל 15 צריך להדפיס FizzBuzz. בדקו את סדר התנאים'],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="strings">לולאה על מחרוזת</h2>
+      <p>בחלק א׳ ראינו שלמחרוזת יש אורך (<code>length</code>), ושאפשר לגשת לתו לפי <strong>המיקום</strong> שלו (אינדקס) עם סוגריים מרובעים. האינדקס מתחיל מ-<strong>0</strong>: ב-<code>'שלום'</code>, התו <code>'ש'</code> נמצא באינדקס 0, ו-<code>'ם'</code> באינדקס 3.</p>
+      <table>
+        <tr><th>אינדקס</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+        <tr><th>תו ב-<code>'hello'</code></th><td>h</td><td>e</td><td>l</td><td>l</td><td>o</td></tr>
+      </table>
+      <p>לכן, כדי לעבור על כל התווים, סופרים מ-0 עד <code>length - 1</code>. התבנית <code>i &lt; text.length</code> עושה בדיוק את זה:</p>
+      <div class="playground" id="pg-string-for" data-height="220">
+        <script type="text/plain" data-lang="js">
+          const word = 'hello';
+          console.log('אורך המילה:', word.length);
+
+          for (let i = 0; i < word.length; i++) {
+            console.log('אינדקס', i, '→', word[i]);
+          }
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את המילה לשם שלכם, בעברית או באנגלית.</p>
+
+      <h3>‏<code>for...of</code>: בלי אינדקסים</h3>
+      <p>כשלא צריך את מספר המיקום אלא רק את התווים עצמם, יש דרך קצרה וקריאה יותר: <code>for...of</code>. בכל סיבוב המשתנה מקבל את התו הבא:</p>
+      <div class="playground" id="pg-for-of" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const word = 'JavaScript';
+
+          for (const letter of word) {
+            console.log(letter);
+          }
+        </script>
+      </div>
+      <p>שימו לב שכאן אפשר להשתמש ב-<code>const</code>: בכל סיבוב נוצר משתנה <code>letter</code> חדש. בשיעור הבא נשתמש ב-<code>for...of</code> גם כדי לעבור על <strong>מערכים</strong> (רשימות), וזה השימוש הנפוץ שלו.</p>
+
+      <h3>דוגמה פתורה: ספירת אות מסוימת</h3>
+      <div class="playground" id="pg-count-letter" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const sentence = 'banana bread';
+          let count = 0;
+
+          for (const ch of sentence) {
+            if (ch === 'a') {
+              count++;
+            }
+          }
+
+          console.log(`האות a מופיעה ${count} פעמים`);
+        </script>
+      </div>
+
+      <h3>🎯 אתגר 5: ספירת תנועות <span class="level medium">בינוני</span></h3>
+      <p>כתבו קוד שסופר כמה <strong>תנועות</strong> באנגלית (<code>a</code>, ‏<code>e</code>, ‏<code>i</code>, ‏<code>o</code>, ‏<code>u</code>) יש במחרוזת <code>text</code>, ומדפיס <strong>רק את המספר</strong>. הטקסט תמיד באותיות קטנות.</p>
+      <p><strong>רמז:</strong> אפשר לבדוק את כל חמש התנועות עם <code>||</code>. דרך קצרה יותר: <code>'aeiou'.includes(ch)</code> מחזיר <code>true</code> אם התו <code>ch</code> נמצא במחרוזת <code>'aeiou'</code>.</p>
+      <div class="playground challenge" id="ch-vowels" data-check="ch-vowels" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const text = 'javascript is awesome';
+          let vowels = 0;
+
+          // כתבו כאן לולאה שעוברת על התווים וסופרת תנועות
+
+          console.log(vowels);
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const text = 'javascript is awesome';
+          let vowels = 0;
+
+          for (const ch of text) {
+            if ('aeiou'.includes(ch)) {
+              vowels++;
+            }
+          }
+
+          console.log(vowels);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-vowels': (out, win) => {
+            const pattern = /const text = '[^']*'/;
+            const hasLine = pattern.test(out.code);
+            const last = (t) => (hasLine ? rerun(win, out.code, pattern, `const text = '${t}'`) : []).pop();
+            return [
+              [hasLine, "השורה const text = '...' צריכה להישאר בקוד"],
+              [/\bfor\b|\bwhile\b/.test(out.code), 'צריך לעבור על התווים בלולאה'],
+              [last('javascript is awesome') === '8', "ב-'javascript is awesome' יש 8 תנועות, והשורה האחרונה שמודפסת צריכה להיות 8"],
+              [last('hello world') === '3', "ב-'hello world' יש 3 תנועות"],
+              [last('rhythm') === '0', "ב-'rhythm' אין תנועות בכלל, אז צריך להדפיס 0"],
+            ];
+          },
+        });
+      </script>
+
+      <h2 id="nested-loops">לולאות מקוננות</h2>
+      <p>אפשר לשים לולאה בתוך לולאה. על כל סיבוב <strong>אחד</strong> של הלולאה החיצונית, הלולאה הפנימית רצה <strong>מההתחלה ועד הסוף</strong>. חשבו על שעון: על כל סיבוב של מחוג השעות, מחוג הדקות מסתובב 60 פעמים.</p>
+      <div class="playground" id="pg-nested-loops" data-height="260">
+        <script type="text/plain" data-lang="js">
+          for (let row = 1; row <= 3; row++) {
+            console.log(`--- שורה ${row} ---`);
+            for (let col = 1; col <= 4; col++) {
+              console.log(`  שורה ${row}, עמודה ${col}`);
+            }
+          }
+          // סך הכול: 3 × 4 = 12 הדפסות פנימיות
+        </script>
+      </div>
+      <p>שימו לב שלכל לולאה יש מונה משלה (<code>row</code> ו-<code>col</code>). אם שתיהן היו משתמשות ב-<code>i</code>, הן היו מתבלבלות. כשיש שתי לולאות, נהוג לקרוא למונים <code>i</code> ו-<code>j</code>, או בשמות עם משמעות כמו כאן.</p>
+
+      <h3>דוגמה פתורה: לוח הכפל</h3>
+      <p>הלולאה הפנימית בונה <strong>מחרוזת</strong> של שורה אחת, והחיצונית מדפיסה אותה בסוף כל סיבוב:</p>
+      <div class="playground" id="pg-times-table" data-height="280">
+        <script type="text/plain" data-lang="js">
+          for (let i = 1; i <= 5; i++) {
+            let line = '';
+            for (let j = 1; j <= 5; j++) {
+              line += String(i * j).padStart(4);  // padStart מוסיף רווחים כדי ליישר עמודות
+            }
+            console.log(line);
+          }
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> את שתי ה-<code>5</code> ל-<code>10</code>, ותקבלו את לוח הכפל המלא.</p>
+
+      <h3>🎯 אתגר 6: משולש כוכבים <span class="level hard">מאתגר</span></h3>
+      <p>כתבו קוד שמדפיס משולש של כוכביות. מספר השורות נקבע לפי <code>rows</code>. בשורה הראשונה כוכבית אחת, בשנייה שתיים, וכן הלאה. כש-<code>rows</code> הוא 4, הפלט צריך להיות:</p>
+      <pre><code class="nohighlight">*
+**
+***
+****</code></pre>
+      <p><strong>רמז:</strong> לולאה חיצונית לשורות. בתוכה, צרו מחרוזת ריקה, ולולאה פנימית שמוסיפה לה כוכבית אחת בכל סיבוב. כמה סיבובים צריכה הלולאה הפנימית לעשות בשורה מספר <code>i</code>? הבדיקה תנסה גם מספר שורות אחר.</p>
+      <div class="playground challenge" id="ch-triangle" data-check="ch-triangle" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const rows = 4;
+
+          // כתבו כאן את הלולאות
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          const rows = 4;
+
+          for (let i = 1; i <= rows; i++) {
+            let line = '';
+            for (let j = 1; j <= i; j++) {
+              line += '*';
+            }
+            console.log(line);
+          }
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-triangle': (out, win) => {
+            const pattern = /const rows = \d+/;
+            const hasLine = pattern.test(out.code);
+            const triangle = (n) => Array.from({ length: n }, (_, i) => '*'.repeat(i + 1)).join('|');
+            const result = (n) => (hasLine ? rerun(win, out.code, pattern, `const rows = ${n}`) : []).join('|');
+            return [
+              [hasLine, 'השורה const rows = ... צריכה להישאר בקוד'],
+              [result(4) === triangle(4), 'כש-rows הוא 4, צריך להדפיס 4 שורות: *, **, ***, ****'],
+              [result(6) === triangle(6), 'כש-rows הוא 6, צריך להדפיס 6 שורות. בדקו שהלולאה משתמשת ב-rows ולא במספר קבוע'],
+              [result(1) === '*', 'כש-rows הוא 1, צריך להדפיס כוכבית אחת'],
+            ];
+          },
+        });
+      </script>
+      <details class="solution"><summary>בונוס: משולש הפוך, ומשולש ממורכז</summary>
+        <p>אחרי שהאתגר עובד, נסו לשנות את הקוד כך שהמשולש יהיה הפוך (‏<code>****</code> בהתחלה ו-<code>*</code> בסוף). רמז: הלולאה החיצונית יכולה לספור לאחור. ואם רוצים אתגר אמיתי: פירמידה ממורכזת, שבה בכל שורה יש קודם רווחים ואחר כך כוכביות.</p>
+      </details>
+
+      <h2 id="patterns">דפוסים נפוצים בלולאות <span class="time">5 דק׳</span></h2>
+      <p>רוב הלולאות שתכתבו בחיים יהיו אחת מחמש תבניות. כדאי להכיר אותן, כי ברגע שמזהים את התבנית, הקוד כמעט כותב את עצמו. בכולן יש משתנה שמוגדר <strong>לפני</strong> הלולאה, מתעדכן <strong>בתוכה</strong>, ונקרא <strong>אחריה</strong>.</p>
+
+      <h3>1. סכום (צובר)</h3>
+      <p>מתחילים מ-0, ובכל סיבוב מוסיפים.</p>
+      <div class="playground" id="pg-pattern-sum" data-height="180">
+        <script type="text/plain" data-lang="js">
+          let total = 0;
+          for (let i = 1; i <= 10; i++) {
+            total += i * i;   // סכום הריבועים 1 + 4 + 9 + ...
+          }
+          console.log('סכום הריבועים:', total);
+        </script>
+      </div>
+
+      <h3>2. ספירה (מונה)</h3>
+      <p>מתחילים מ-0, ומוסיפים 1 רק כשמשהו מתקיים.</p>
+      <div class="playground" id="pg-pattern-count" data-height="200">
+        <script type="text/plain" data-lang="js">
+          let count = 0;
+          for (let i = 1; i <= 100; i++) {
+            if (i % 7 === 0) {
+              count++;
+            }
+          }
+          console.log('בין 1 ל-100 יש', count, 'מספרים שמתחלקים ב-7');
+        </script>
+      </div>
+
+      <h3>3. מקסימום ומינימום</h3>
+      <p>שומרים את "הכי גדול עד עכשיו", ובכל סיבוב בודקים אם מצאנו גדול יותר. בדוגמה מחפשים את הספרה הגדולה ביותר במספר טלפון (כמחרוזת):</p>
+      <div class="playground" id="pg-pattern-max" data-height="240">
+        <script type="text/plain" data-lang="js">
+          const phone = '0523847162';
+          let maxDigit = -1;   // מתחילים מערך קטן מכל ספרה אפשרית
+
+          for (const ch of phone) {
+            const digit = Number(ch);
+            if (digit > maxDigit) {
+              maxDigit = digit;
+            }
+          }
+
+          console.log('הספרה הגדולה ביותר:', maxDigit);
+        </script>
+      </div>
+
+      <h3>4. בניית מחרוזת</h3>
+      <p>מתחילים ממחרוזת ריקה, ובכל סיבוב מוסיפים לה. למשל, היפוך מילה:</p>
+      <div class="playground" id="pg-pattern-build" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const word = 'stressed';
+          let reversed = '';
+
+          for (const ch of word) {
+            reversed = ch + reversed;   // מוסיפים כל תו בהתחלה
+          }
+
+          console.log(reversed);   // desserts 🍰
+        </script>
+      </div>
+
+      <h3>5. חיפוש</h3>
+      <p>מניחים "לא מצאנו", ומחפשים. כשמוצאים, מעדכנים ועוצרים עם <code>break</code>:</p>
+      <div class="playground" id="pg-pattern-search" data-height="260">
+        <script type="text/plain" data-lang="js">
+          const email = 'noa.cohen@gmail.com';
+          let atIndex = -1;   // -1 אומר "לא נמצא"
+
+          for (let i = 0; i < email.length; i++) {
+            if (email[i] === '@') {
+              atIndex = i;
+              break;
+            }
+          }
+
+          if (atIndex === -1) {
+            console.log('כתובת לא תקינה: אין @');
+          } else {
+            console.log('ה-@ נמצא באינדקס', atIndex);
+          }
+        </script>
+      </div>
+      <p><strong>נסו לשנות:</strong> מחקו את ה-<code>@</code> מהכתובת והריצו שוב.</p>
+
+      <aside class="box lecturer-note">
+        <p>בכיתה מספיק להציג את הסכום והספירה (הם כבר הופיעו באתגר 3), ולציין ששלושת האחרים בעמוד. כדאי להדגיש את המבנה המשותף: "לפני הלולאה, בתוך הלולאה, אחרי הלולאה". בשיעור הבא, ‏<code>reduce</code>, ‏<code>filter</code> ו-<code>find</code> יעשו את אותם דפוסים על מערכים בשורה אחת, ואז החיבור הזה יעזור מאוד.</p>
+      </aside>
+
+      <h2 id="infinite">לולאות אינסופיות <span class="time">2 דק׳</span></h2>
+      <p>לולאה אינסופית היא לולאה שהתנאי שלה <strong>אף פעם לא נכשל</strong>, ולכן היא לא נגמרת. הדפדפן עסוק כל הזמן בהרצת הלולאה, ולא מספיק לעשות שום דבר אחר: הלשונית "קופאת", הכפתורים לא מגיבים, ואחרי כמה שניות הדפדפן מציע לסגור את הדף.</p>
+      <p>שלוש הסיבות הנפוצות:</p>
+      <div class="features">
+        <div class="exercise">
+          <h4>1. שכחנו לקדם</h4>
+          <pre><code class="language-js">let i = 1;
+while (i &lt;= 5) {
+  console.log(i);
+  // שכחנו i++
+}</code></pre>
+          <p><code>i</code> נשאר 1 לנצח.</p>
+        </div>
+        <div class="exercise">
+          <h4>2. מקדמים בכיוון הלא נכון</h4>
+          <pre><code class="language-js">for (let i = 10; i &gt; 0; i++) {
+  console.log(i);
+}</code></pre>
+          <p><code>i</code> רק גדל, ותמיד יהיה גדול מ-0. התכוונו ל-<code>i--</code>.</p>
+        </div>
+        <div class="exercise">
+          <h4>3. תנאי שתמיד מתקיים</h4>
+          <pre><code class="language-js">let n = 1;
+while (n !== 10) {
+  n += 2;   // 1, 3, 5, 7, 9, 11...
+}</code></pre>
+          <p><code>n</code> מדלג מעל 10 ואף פעם לא שווה לו בדיוק. בטוח יותר: <code>n &lt; 10</code>.</p>
+        </div>
+      </div>
+
+      <div class="box warn">
+        <p><strong>ואם זה קרה לכם?</strong> לא נורא, זה קורה לכל מתכנת. כך יוצאים מזה:</p>
+        <ol>
+          <li><strong>באתר הזה:</strong> רעננו את העמוד (F5, או Cmd+R במק). אם הדף לא מגיב, סגרו את הלשונית ופתחו אותה מחדש. הקוד ששמרתם לא ירוץ לבד אחרי הרענון. בגלל זה העורכים בעמוד מריצים קוד <strong>רק כשלוחצים ▶ הרצה</strong>, ולא תוך כדי הקלדה: אחרת, באמצע הקלדה של לולאה, הדף היה נתקע.</li>
+          <li><strong>בדף שלכם ב-VS Code:</strong> סגרו את הלשונית, תקנו את הקוד ושמרו, ורק אז פתחו שוב.</li>
+          <li><strong>לפני שמריצים לולאה</strong>, שאלו את עצמכם: "מה משתנה בכל סיבוב, ומתי בדיוק התנאי ייכשל?"</li>
+        </ol>
+      </div>
+
+      <h2 id="debugging">איך מוצאים באג בלולאה</h2>
+      <p>הלולאה רצה אבל התוצאה לא נכונה? הכלי הכי פשוט וחזק הוא להוסיף <code>console.log</code> <strong>בתוך</strong> הלולאה, ולהדפיס את כל המשתנים החשובים בכל סיבוב. זו בעצם טבלת המעקב שבנינו קודם, רק שהמחשב ממלא אותה בשבילנו.</p>
+      <p>בקוד הבא יש באג: הוא אמור לחשב את הממוצע של 1 עד 5 (שהוא 3), אבל יוצא משהו אחר. הריצו והסתכלו על הפלט של כל סיבוב. מצאתם?</p>
+      <div class="playground" id="pg-debug" data-height="260">
+        <script type="text/plain" data-lang="js">
+          let sum = 0;
+          let count = 0;
+
+          for (let i = 1; i < 5; i++) {
+            sum += i;
+            count++;
+            console.log(`סיבוב: i=${i}, sum=${sum}, count=${count}`);  // הדפסת דיבאג
+          }
+
+          console.log('ממוצע:', sum / count);  // אמור להיות 3
+        </script>
+      </div>
+      <details class="solution"><summary>הפתרון</summary>
+        <p>בפלט רואים ש-<code>i</code> מגיע רק עד 4. התנאי <code>i &lt; 5</code> עוצר לפני 5. צריך <code>i &lt;= 5</code>. זו טעות כל כך נפוצה שיש לה שם: <strong>off-by-one</strong> ("טעות של אחד"). אחרי שמתקנים, כדאי למחוק את הדפסות הדיבאג.</p>
+      </details>
+      <div class="box tip">
+        <p><strong>טיפ:</strong> כשמדפיסים כמה משתנים, תנו לכל אחד שם בהדפסה (<code>i=${i}</code>) ולא רק את הערך. כשיש 20 שורות פלט, קל להתבלבל איזה מספר שייך למה.</p>
+      </div>
+
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: איזו מהלולאות הבאות <strong>אינסופית</strong>?</p>
+        <ul>
+          <li><code>for (let i = 0; i &lt; 10; i++) { }</code></li>
+          <li><code>for (let i = 10; i &gt; 0; i--) { }</code></li>
+          <li data-correct><code>for (let i = 0; i &lt; 10; i--) { }</code></li>
+          <li><code>let i = 0; while (i &lt; 10) { i += 3; }</code></li>
+        </ul>
+        <p class="quiz-explain">נכון! ב-<code>i--</code> המונה רק קטן: 0, ‏-1, ‏-2... הוא תמיד יהיה קטן מ-10, ולכן התנאי לא ייכשל אף פעם. באפשרות האחרונה <code>i</code> מגיע ל-0, 3, 6, 9, 12, וב-12 התנאי נכשל, כי בודקים <code>&lt;</code> ולא <code>!==</code>.</p>
+      </div>
+
+      <h2 id="cheatsheet">דף סיכום</h2>
+      <table>
+        <tr><th>מה</th><th>תחביר</th><th>הערה</th></tr>
+        <tr><td>השוואה</td><td><code>=== !== &gt; &lt; &gt;= &lt;=</code></td><td>תמיד <code>===</code>, אף פעם <code>==</code></td></tr>
+        <tr><td>לוגיקה</td><td><code>a &amp;&amp; b</code>, ‏<code>a || b</code>, ‏<code>!a</code></td><td>וגם, או, לא</td></tr>
+        <tr><td>falsy</td><td><code>false 0 '' null undefined NaN</code></td><td>כל השאר truthy</td></tr>
+        <tr><td>תנאי</td><td><code>if (c) { } else if (c2) { } else { }</code></td><td>נבדק לפי הסדר, רץ רק בלוק אחד</td></tr>
+        <tr><td>טרנרי</td><td><code>c ? a : b</code></td><td>בחירה בין שני ערכים</td></tr>
+        <tr><td>switch</td><td><code>switch (x) { case 1: ...; break; default: ... }</code></td><td>לא לשכוח <code>break</code></td></tr>
+        <tr><td>ברירת מחדל</td><td><code>a || b</code>, ‏<code>a ?? b</code></td><td><code>??</code> לא מחליף 0 ו-<code>''</code></td></tr>
+        <tr><td>for</td><td><code>for (let i = 0; i &lt; n; i++) { }</code></td><td>כשיודעים כמה סיבובים</td></tr>
+        <tr><td>while</td><td><code>while (c) { ... }</code></td><td>כשיודעים רק מתי לעצור. לזכור לקדם!</td></tr>
+        <tr><td>for...of</td><td><code>for (const ch of text) { }</code></td><td>על כל תו במחרוזת (ובשיעור הבא: כל פריט במערך)</td></tr>
+        <tr><td>שליטה</td><td><code>break</code>, ‏<code>continue</code></td><td>עצירה, דילוג לסיבוב הבא</td></tr>
+        <tr><td>קיצורים</td><td><code>i++ i-- i += 2 sum += x</code></td><td><code>i = i + 1</code> וכו׳</td></tr>
+      </table>
+
+      <h2 id="summary">סיכום ומקורות</h2>
+      <ul>
+        <li>כל החלטה מתחילה בשאלה שהתשובה עליה <code>true</code> או <code>false</code>. שואלים עם <code>===</code> ושאר אופרטורי ההשוואה, ומשלבים עם <code>&amp;&amp;</code>, ‏<code>||</code> ו-<code>!</code>.</li>
+        <li>‏<code>if / else if / else</code> בוחר בלוק אחד בלבד, לפי הסדר. הסדר של התנאים חשוב.</li>
+        <li>לולאה חוזרת על קוד: <code>for</code> כשיודעים כמה פעמים, ‏<code>while</code> כשיודעים רק מתי לעצור.</li>
+        <li>לכל לולאה יש התחלה, תנאי והתקדמות. בלי התקדמות נכונה, הלולאה אינסופית.</li>
+        <li>חמשת הדפוסים: סכום, ספירה, מקסימום, בניית מחרוזת וחיפוש.</li>
+        <li>כשמשהו לא עובד: <code>console.log</code> בתוך הלולאה, וטבלת מעקב.</li>
+      </ul>
+      <p><strong>בחלק הבא</strong> נלמד <strong>פונקציות</strong>: איך לארוז קוד כמו בדיקת זוגיות או ציון באותיות בתוך "מכונה" עם שם, ולהשתמש בה שוב ושוב עם ערכים שונים.</p>
+      <h3>להעמקה</h3>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Conditionals" target="_blank" rel="noopener">MDN: Making decisions in your code</a></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Loops" target="_blank" rel="noopener">MDN: Looping code</a></li>
+        <li><a href="https://javascript.info/ifelse" target="_blank" rel="noopener">javascript.info: Conditional branching</a> ו-<a href="https://javascript.info/while-for" target="_blank" rel="noopener">Loops: while and for</a></li>
+        <li><a href="https://javascript.info/logical-operators" target="_blank" rel="noopener">javascript.info: Logical operators</a></li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p>לסיום החלק בכיתה כדאי לשאול שתי שאלות מהירות: "מה ההבדל בין <code>=</code> ל-<code>===</code>?" ו"מה צריך שיהיה בכל לולאה כדי שהיא תיגמר?". אתגרים 4–6 (FizzBuzz, תנועות, משולש) מתאימים כשיעורי בית. FizzBuzz כדאי להציג כ"שאלת ראיון עבודה אמיתית", זה מוטיבציה טובה. בשיעור הבא כדאי לפתוח בפתרון משותף של המשולש.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

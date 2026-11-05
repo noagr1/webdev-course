@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 2: JavaScript מודרני א׳</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body data-page="lesson" data-lesson="2" data-part="index" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 2</span>
+      <h1>JavaScript מודרני א׳</h1>
+      <div class="lesson-meta">
+        <span class="chip">⏱️ שעתיים בכיתה</span>
+        <span class="chip">📚 5–7 שעות לימוד עצמי</span>
+        <span class="chip">🧑‍🎓 נדרש: שיעור 1</span>
+      </div>
+
+      <p>בשיעור הקודם בנינו דף שנראה טוב, אבל הוא לא <em>עושה</em> כלום. ‏HTML קובע מה יש בדף ו-CSS קובע איך הוא נראה. ‏<strong>JavaScript</strong> היא שפת התכנות של הווב: היא מחליטה, מחשבת וזוכרת. בשיעור הזה נלמד את היסודות שכל מתכנת צריך, בכל שפה: משתנים, טיפוסים, תנאים, לולאות ופונקציות.</p>
+      <p>‏React, שנתחיל בשיעור 4, כתובה כולה ב-JavaScript. כל מה שנלמד כאן ובשיעור הבא הוא הבסיס שבלעדיו React לא תהיה מובנת.</p>
+
+      <div class="box goals">
+        <h3>מטרות השיעור</h3>
+        <p>בסוף השיעור תדעו:</p>
+        <ul>
+          <li>להריץ JavaScript בשלוש דרכים: בקונסול של הדפדפן, מתוך דף HTML, ובעורך שבאתר</li>
+          <li>ליצור משתנים עם <code>let</code> ו-<code>const</code>, ולדעת מתי להשתמש בכל אחד</li>
+          <li>לעבוד עם מחרוזות, מספרים וערכים בוליאניים, ולהמיר ביניהם</li>
+          <li>לקבל החלטות בקוד עם <code>if</code>, ‏<code>else</code> ואופרטורים לוגיים</li>
+          <li>לחזור על פעולות עם לולאות <code>for</code> ו-<code>while</code></li>
+          <li>לכתוב פונקציות שמקבלות פרמטרים ומחזירות ערך, כולל arrow functions</li>
+          <li>לקרוא הודעת שגיאה ולמצוא בעזרתה את הבאג</li>
+        </ul>
+      </div>
+
+      <h2 id="parts">חלקי השיעור</h2>
+      <p>מומלץ לעבור על העמודים לפי הסדר. כל חלק נשען על הקודם:</p>
+      <div class="features">
+        <a class="lesson-card" href="basics.html">
+          <span class="lesson-num">חלק א׳</span>
+          <h3>משתנים וטיפוסים</h3>
+          <p>איפה מריצים JavaScript, ‏console.log, ‏let ו-const, מחרוזות, מספרים, המרות, וקריאת שגיאות</p>
+        </a>
+        <a class="lesson-card" href="logic.html">
+          <span class="lesson-num">חלק ב׳</span>
+          <h3>תנאים ולולאות</h3>
+          <p>השוואות, ‏&& ו-||, ‏if/else, ‏switch, לולאות for ו-while, ותבניות נפוצות כמו סכום ומקסימום</p>
+        </a>
+        <a class="lesson-card" href="functions.html">
+          <span class="lesson-num">חלק ג׳</span>
+          <h3>פונקציות</h3>
+          <p>פרמטרים, ‏return, ‏scope, ‏arrow functions, ופונקציות שמקבלות פונקציות</p>
+        </a>
+        <a class="lesson-card" href="project.html">
+          <span class="lesson-num">פרויקט</span>
+          <h3>קופה של בית קפה</h3>
+          <p>בונים תוכנית קופה צעד אחר צעד, מעבירים אותה ל-VS Code ומעלים ל-GitHub</p>
+        </a>
+      </div>
+
+      <h2 id="editor">העורך החדש: JavaScript באתר</h2>
+      <p>בשיעור הזה העורך באתר מריץ JavaScript. הוא קצת שונה מהעורך של HTML ו-CSS:</p>
+      <table>
+        <tr><th>מה רואים</th><th>מה זה אומר</th></tr>
+        <tr><td><strong>▶ הרצה</strong> (כפתור ירוק)</td><td>הקוד רץ רק כשלוחצים על הכפתור, או על <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (ב-Mac: <kbd>⌘</kbd>+<kbd>Enter</kbd>). כך טעות כמו לולאה שלא נגמרת לא תתקע את העמוד בזמן ההקלדה.</td></tr>
+        <tr><td><strong>פלט (Console)</strong></td><td>כל מה שמדפיסים עם <code>console.log</code> מופיע כאן, שורה אחר שורה.</td></tr>
+        <tr><td><strong>שורה אדומה ✖</strong></td><td>שגיאה. מופיע מספר השורה שבה היא קרתה, ומתחתיה 💡 הסבר בעברית מה כנראה הבעיה.</td></tr>
+        <tr><td><strong>מספרים בצד העורך</strong></td><td>מספרי השורות, כדי שיהיה קל למצוא את השורה שהשגיאה מדברת עליה.</td></tr>
+      </table>
+      <p>נסו: לחצו ▶ הרצה, ואחר כך שנו את המספר בשורה הראשונה והריצו שוב.</p>
+      <div class="playground" id="pg-intro" data-height="200">
+        <script type="text/plain" data-lang="js">
+          const students = 24;
+          console.log('שלום, כיתה!');
+          console.log('יש בכיתה', students, 'סטודנטים');
+          console.log('אם כל אחד מביא 2 עוגיות, יהיו', students * 2, 'עוגיות');
+        </script>
+      </div>
+      <p>ועכשיו נסו לגרום לשגיאה בכוונה: מחקו את האות <code>s</code> האחרונה מהמילה <code>students</code> באחת השורות, והריצו. קראו את ההודעה האדומה. ככה תיראה רוב העבודה שלכם בהתחלה, וזה בסדר גמור.</p>
+
+      <div class="box tip">
+        <p><strong>טיפ ללמידה:</strong> בתכנות לומדים בידיים. הקלידו את הדוגמאות בעצמכם במקום להעתיק, גם אם זה לוקח יותר זמן. כל טעות הקלדה שתתקנו מלמדת אתכם לקרוא שגיאות.</p>
+      </div>
+
+      <h2 id="setup">הכנה לשיעור</h2>
+      <ul>
+        <li>אין צורך להתקין שום דבר חדש. מספיקים הדפדפן, ‏VS Code ו-Git משיעור 1.</li>
+        <li>כדאי לוודא שהתוסף <strong>Live Server</strong> מותקן ב-VS Code. נשתמש בו בפרויקט.</li>
+        <li>אם לא סיימתם את דף הפרופיל משיעור 1, זה הזמן. בפרויקט של השיעור הזה נעלה קוד ל-GitHub באותה דרך.</li>
+      </ul>
+
+      <aside class="box lecturer-note">
+        <p><strong>תוכנית לשעתיים בכיתה.</strong> לרוב הסטודנטים זו היכרות ראשונה עם תכנות. עדיף להתקדם לאט ולוודא הבנה, מאשר לכסות הכול. מה שלא הספקנו נשאר לקריאה בבית, כי העמודים כתובים ללמידה עצמית.</p>
+        <table>
+          <tr><th>זמן</th><th>מה עושים</th><th>עמוד</th></tr>
+          <tr><td>10 דק׳</td><td>פתיחה: מה JavaScript מוסיפה ל-HTML ול-CSS. הדגמה של הקונסול בדפדפן, ושל העורך באתר כולל שגיאה בכוונה</td><td>סקירה</td></tr>
+          <tr><td>30 דק׳</td><td>משתנים, ‏let מול const, טיפוסים, ‏template literals, ‏"5" + 3 מול "5" - 3</td><td>חלק א׳</td></tr>
+          <tr><td>35 דק׳</td><td>השוואות ו-===, ‏if/else if, לולאת for עם טבלת מעקב על הלוח. ‏FizzBuzz בזוגות</td><td>חלק ב׳</td></tr>
+          <tr><td>35 דק׳</td><td>פונקציות: פרמטרים, ‏return מול console.log (להשקיע כאן!), ‏arrow functions, ‏callback ראשון</td><td>חלק ג׳</td></tr>
+          <tr><td>10 דק׳</td><td>הצגת הפרויקט (קופה של בית קפה), והדגמה של העברת הקוד ל-VS Code עם <code>&lt;script src&gt;</code></td><td>פרויקט</td></tr>
+        </table>
+        <p>‏<strong>הבלבול הנפוץ ביותר בשיעור:</strong> ההבדל בין פונקציה <em>שמדפיסה</em> לפונקציה <em>שמחזירה</em>. כדאי לשאול את הכיתה מה יודפס ב-<code>const x = f(); console.log(x)</code> כש-f רק מדפיסה, ולתת להם לגלות את ה-<code>undefined</code> בעצמם.</p>
+        <p>שאלה טובה לפתיחה: "מה הדבר הראשון שהייתם רוצים שהדף שלכם משיעור 1 יעשה?" התשובות (כפתור, טופס שבודק, מצב כהה) הן בדיוק מה שנבנה בהמשך הקורס.</p>
+      </aside>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

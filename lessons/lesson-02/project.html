@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>שיעור 2 · פרויקט: קופה של בית קפה ותרגול מסכם</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script>window.PLAYGROUND_CHECKS = {};</script>
+</head>
+<body data-page="lesson" data-lesson="2" data-part="project" data-base="../../">
+  <header class="topbar">
+    <a class="brand" href="../../index.html">פיתוח ווב <span>מודרני</span></a>
+    <button id="lecturer-toggle" type="button" aria-pressed="false">🎓 מצב מרצה</button>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"><nav id="lesson-nav" aria-label="שיעורים"></nav></aside>
+
+    <main>
+      <span class="chip">שיעור 2 · פרויקט</span>
+      <h1>קופה של בית קפה: מאפס ועד GitHub</h1>
+      <div class="lesson-meta">
+        <span class="chip">משתנים</span>
+        <span class="chip">תנאים</span>
+        <span class="chip">לולאות</span>
+        <span class="chip">פונקציות</span>
+        <span class="chip">Git</span>
+      </div>
+
+      <p>בעמוד הזה נחבר את כל מה שלמדנו בשיעור לתוכנית אחת: <strong>קופה של בית קפה</strong>. הקופה יודעת כמה עולה כל מוצר, מחשבת את סכום ההזמנה, נותנת הנחה לסטודנטים ובשעת השמחה (Happy Hour), מוסיפה מע״מ ומדפיסה קבלה מסודרת. בסוף נעביר את הקוד לקבצים ב-VS Code ונשמור אותו ב-GitHub.</p>
+      <p>נבנה את הקופה בשלבים. בכל שלב יש עורך JavaScript עם <strong>כל הקוד עד אותו שלב</strong>. התוספת של השלב מסומנת בהערה <code>// חדש</code>, כך שקל לראות מה השתנה. לחצו "▶ הרצה" (או Ctrl+Enter) ותראו את הפלט בחלון השחור.</p>
+      <p><a class="btn" href="../../examples/lesson-02/cafe/index.html" target="_blank">👀 לקוד הסופי</a></p>
+
+      <div class="box goals">
+        <h3>מה נתרגל כאן</h3>
+        <ul>
+          <li>לפרק בעיה גדולה לחלקים קטנים, ולכתוב פונקציה לכל חלק</li>
+          <li>להשתמש בקבועים (<code>const</code>) במקום "מספרי קסם" שמפוזרים בקוד</li>
+          <li>לקבל החלטות עם <code>if</code> ו-<code>switch</code></li>
+          <li>לבנות מחרוזות עם template literals ולחזור על פעולות עם לולאה</li>
+          <li>לבדוק קלט לא תקין ולצאת מפונקציה מוקדם עם <code>return</code></li>
+          <li>להעביר קוד לקבצים אמיתיים, להריץ אותו בדפדפן ולשמור אותו ב-Git</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>בכיתה מומלץ לבנות את שלבים 1–4 יחד, בקצב של הכיתה (כ-20 דק׳), ולהשאיר את שלבים 5–8, האתגרים ומשימת ההגשה לבית. כדאי לעצור אחרי כל שלב ולשאול "מה הפונקציה הבאה שחסרה לנו?" לפני שמראים אותה. זה מתרגל את החשיבה של פירוק בעיה, שהיא החשובה ביותר בשיעור.</p>
+        <p>מחוון לבדיקת משימת ההגשה מופיע בסוף העמוד, בהערת מרצה.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="plan">שלב 0: מתכננים לפני שכותבים</h2>
+      <p>לפני שכותבים שורת קוד, מתארים במילים פשוטות <strong>מה התוכנית צריכה לעשות</strong>. כך נראה התיאור של הקופה שלנו:</p>
+      <ol>
+        <li>בתפריט יש שני מוצרים: קפה ב-12 ₪ ועוגה ב-18 ₪ (המחירים לפני מע״מ).</li>
+        <li>הלקוח מזמין כמה כוסות קפה וכמה פרוסות עוגה.</li>
+        <li>סטודנטים מקבלים 10% הנחה. בשעת השמחה, בין 16:00 ל-18:00, כולם מקבלים 20% הנחה. ההנחות לא מצטברות: מקבלים את הגדולה מביניהן.</li>
+        <li>אחרי ההנחה מוסיפים מע״מ של 18%.</li>
+        <li>מדפיסים קבלה: שם בית הקפה, המוצרים, ההנחה, המע״מ והסכום לתשלום.</li>
+        <li>אם הכמות לא הגיונית (למשל ‎-1 כוסות קפה), מציגים הודעת שגיאה ולא מדפיסים קבלה.</li>
+      </ol>
+      <p>עכשיו מחפשים בתיאור את ה<strong>פעולות</strong>. כל פעולה תהפוך לפונקציה קטנה עם שם ברור:</p>
+      <div class="flow" dir="rtl" style="flex-direction: column; align-items: stretch; max-width: 460px;">
+        <div class="node">priceOf(item)<small>כמה עולה מוצר אחד?</small></div>
+        <div class="node">calculateTotal(coffees, cakes)<small>כמה עולה כל ההזמנה, לפני הנחה?</small></div>
+        <div class="node">discountRate(isStudent, hour)<small>כמה אחוז הנחה מגיע ללקוח?</small></div>
+        <div class="node">roundMoney(amount) ‏+ formatPrice(amount)<small>עיגול לאגורות והצגה יפה: ‎₪49.56</small></div>
+        <div class="node"><span dir="ltr">printReceipt(...)</span><small>מחברת את הכול ומדפיסה קבלה</small></div>
+      </div>
+      <div class="box tip">
+        <p><strong>למה כל כך הרבה פונקציות קטנות?</strong> לפונקציה קטנה קל לתת שם, קל לבדוק אותה לבד (מריצים אותה עם כמה ערכים ומסתכלים על התוצאה), וקל לתקן אותה בלי לשבור דברים אחרים. כשבית הקפה יעלה את מחיר הקפה, נשנה מקום אחד בלבד.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-constants">שלב 1: קבועים לתפריט</h2>
+      <p>מתחילים מהנתונים שלא משתנים בזמן שהתוכנית רצה: שם בית הקפה והמחירים. שומרים אותם ב-<code>const</code>.</p>
+      <p>שימו לב לשמות: נהוג לכתוב קבועים "של הגדרות" באותיות גדולות עם קו תחתון, למשל <code>COFFEE_PRICE</code>. זה אומר לכל מי שקורא את הקוד: "זה ערך קבוע של התוכנית, לא משתנה רגיל".</p>
+      <div class="playground" id="pg-step1" data-height="300">
+        <script type="text/plain" data-lang="js">
+          // נתוני התפריט
+          const SHOP_NAME = 'קפה פינה';
+          const COFFEE_PRICE = 12;
+          const CAKE_PRICE = 18;
+
+          console.log(`ברוכים הבאים ל${SHOP_NAME}!`);
+          console.log(`קפה: ${COFFEE_PRICE} ₪, עוגה: ${CAKE_PRICE} ₪`);
+
+          // הזמנה ראשונה: 2 קפה ועוגה אחת
+          const total = 2 * COFFEE_PRICE + 1 * CAKE_PRICE;
+          console.log('סה״כ:', total);
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>למה לא לכתוב פשוט <code>2 * 12 + 18</code>?</strong> המספר 12 לבד הוא "מספר קסם": מי שקורא את הקוד לא יודע מה הוא אומר. ואם המחיר ישתנה, נצטרך למצוא כל 12 בקוד ולנחש אם הוא מחיר קפה או משהו אחר. עם <code>COFFEE_PRICE</code> הקוד מסביר את עצמו, ומשנים את המחיר בשורה אחת.</p>
+      </div>
+      <p><strong>נסו בעצמכם:</strong></p>
+      <ul>
+        <li>שנו את מחיר הקפה ל-14 והריצו שוב. כמה השתנה הסכום?</li>
+        <li>נסו לכתוב <code>COFFEE_PRICE = 15;</code> בסוף הקוד. איזו שגיאה מקבלים? למה?</li>
+        <li>חשבו בעצמכם הזמנה של 3 קפה ו-2 עוגות. תוצאה נכונה: 72.</li>
+      </ul>
+
+      <!-- ===================================================== -->
+      <h2 id="step-price">שלב 2: כמה עולה מוצר? ‏<code>priceOf</code></h2>
+      <p>הפעולה הראשונה ברשימה שלנו: מקבלים שם של מוצר ומחזירים את המחיר שלו. זו החלטה עם כמה אפשרויות לפי ערך אחד, ולכן <code>switch</code> מתאים כאן במיוחד.</p>
+      <div class="playground" id="pg-step2" data-height="400">
+        <script type="text/plain" data-lang="js">
+          const SHOP_NAME = 'קפה פינה';
+          const COFFEE_PRICE = 12;
+          const CAKE_PRICE = 18;
+
+          // חדש: מחיר של מוצר אחד לפי השם שלו
+          function priceOf(item) {
+            switch (item) {
+              case 'קפה':
+                return COFFEE_PRICE;
+              case 'עוגה':
+                return CAKE_PRICE;
+              default:
+                return 0; // מוצר שלא קיים בתפריט
+            }
+          }
+
+          console.log('קפה:', priceOf('קפה'));
+          console.log('עוגה:', priceOf('עוגה'));
+          console.log('פיצה:', priceOf('פיצה'));
+        </script>
+      </div>
+      <p>כמה דברים לשים לב אליהם:</p>
+      <ul>
+        <li><strong>אין צורך ב-<code>break</code></strong>: ‏<code>return</code> יוצא מהפונקציה מיד, אז הוא גם יוצא מה-<code>switch</code>.</li>
+        <li><strong><code>default</code></strong> תופס כל ערך שלא התאים לאף <code>case</code>. בלעדיו, הפונקציה הייתה מחזירה <code>undefined</code> עבור "פיצה".</li>
+        <li><strong>ההשוואה היא בדיוק כמו <code>===</code></strong>: ‏<code>'קפה '</code> עם רווח בסוף הוא כבר לא <code>'קפה'</code>. נסו!</li>
+      </ul>
+      <details class="solution">
+        <summary>איך זה נראה עם if במקום switch?</summary>
+        <pre><code class="language-js">function priceOf(item) {
+  if (item === 'קפה') return COFFEE_PRICE;
+  if (item === 'עוגה') return CAKE_PRICE;
+  return 0;
+}</code></pre>
+        <p>שתי הגרסאות נכונות. ‏<code>switch</code> נוח כשבודקים <strong>ערך אחד</strong> מול הרבה אפשרויות. ‏<code>if</code> גמיש יותר, כי אפשר לבדוק בו כל תנאי, למשל <code>price &gt; 100</code>.</p>
+      </details>
+      <p><strong>נסו בעצמכם:</strong> הוסיפו לתפריט מוצר שלישי, <code>'כריך'</code> במחיר 28 ₪. צריך גם קבוע חדש וגם <code>case</code> חדש.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="step-total">שלב 3: סכום ההזמנה ‏<code>calculateTotal</code></h2>
+      <p>עכשיו פונקציה שמקבלת <strong>כמויות</strong>: כמה כוסות קפה וכמה פרוסות עוגה. היא משתמשת ב-<code>priceOf</code> שכתבנו, כך שכל המחירים עדיין מגיעים ממקום אחד.</p>
+      <div class="playground" id="pg-step3" data-height="440">
+        <script type="text/plain" data-lang="js">
+          const SHOP_NAME = 'קפה פינה';
+          const COFFEE_PRICE = 12;
+          const CAKE_PRICE = 18;
+
+          function priceOf(item) {
+            switch (item) {
+              case 'קפה':
+                return COFFEE_PRICE;
+              case 'עוגה':
+                return CAKE_PRICE;
+              default:
+                return 0;
+            }
+          }
+
+          // חדש: הסכום של כל ההזמנה, לפני הנחה ומע״מ
+          function calculateTotal(coffees, cakes) {
+            return coffees * priceOf('קפה') + cakes * priceOf('עוגה');
+          }
+
+          // בודקים את הפונקציה עם כמה הזמנות שאנחנו יודעים מה התשובה שלהן
+          console.log(calculateTotal(2, 1)); // 42
+          console.log(calculateTotal(0, 3)); // 54
+          console.log(calculateTotal(0, 0)); // 0
+        </script>
+      </div>
+      <div class="box tip">
+        <p><strong>ככה בודקים פונקציה:</strong> מחשבים בראש (או במחשבון) את התשובה לכמה מקרים, כותבים אותה בהערה, ומשווים לפלט. כדאי לבדוק גם מקרי קצה, כמו הזמנה ריקה (<code>0, 0</code>). מתכנתים עושים את זה כל הזמן, ובהמשך הקורס נלמד לעשות את זה אוטומטית עם בדיקות.</p>
+      </div>
+      <h3>‏return לעומת console.log</h3>
+      <p>שימו לב ש-<code>calculateTotal</code> <strong>מחזירה</strong> את הסכום עם <code>return</code> ולא מדפיסה אותו. זה חשוב: מספר שחוזר מפונקציה אפשר להמשיך לחשב איתו (להוריד הנחה, להוסיף מע״מ). הדפסה רק מציגה טקסט על המסך, ואי אפשר לעשות איתה שום דבר אחר.</p>
+      <pre><code class="language-js">const subtotal = calculateTotal(2, 1); // 42, אפשר להמשיך לחשב
+console.log(subtotal * 2);            // 84</code></pre>
+      <div class="quiz">
+        <p class="quiz-q">🤔 בדקו את עצמכם: מה ידפיס הקוד הזה?</p>
+        <pre><code class="language-js">function total(coffees) {
+  console.log(coffees * 12);
+}
+console.log(total(2) + 10);</code></pre>
+        <ul>
+          <li>34</li>
+          <li>24 ואחריו 34</li>
+          <li data-correct>24 ואחריו NaN</li>
+          <li>שגיאה, והקוד נעצר</li>
+        </ul>
+        <p class="quiz-explain">‏<code>total(2)</code> מדפיסה 24, אבל לא מחזירה כלום, כלומר מחזירה <code>undefined</code>. ואז <code>undefined + 10</code> הוא <code>NaN</code> (Not a Number). אם נחליף את <code>console.log</code> בתוך הפונקציה ב-<code>return</code>, יודפס רק 34.</p>
+      </div>
+      <aside class="box lecturer-note">
+        <p>הבלבול בין <code>return</code> ל-<code>console.log</code> הוא הטעות הנפוצה ביותר בשיעור הזה. כדאי להדגים בכיתה גרסה של <code>calculateTotal</code> שמדפיסה במקום להחזיר, ואז להריץ <code>console.log(calculateTotal(2, 1) * 2)</code>. הפלט יהיה 42 ואחריו NaN, וזו נקודה טובה לשאול את הכיתה למה.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="step-discount">שלב 4: הנחות ‏<code>discountRate</code></h2>
+      <p>נחזור לחוקי ההנחה מהתכנון: סטודנטים מקבלים 10%. בשעת השמחה (מ-16:00 ועד לפני 18:00) כולם מקבלים 20%. ההנחות לא מצטברות.</p>
+      <p>נכתוב שתי פונקציות:</p>
+      <ul>
+        <li><code>isHappyHour(hour)</code>: מחזירה <code>true</code> או <code>false</code>. זו פונקציה קצרה מאוד, אז נכתוב אותה כ-arrow function.</li>
+        <li><code>discountRate(isStudent, hour)</code>: מחזירה את שיעור ההנחה כמספר עשרוני: ‏<code>0.2</code>, ‏<code>0.1</code> או <code>0</code>.</li>
+      </ul>
+      <div class="playground" id="pg-step4" data-height="520">
+        <script type="text/plain" data-lang="js">
+          const SHOP_NAME = 'קפה פינה';
+          const COFFEE_PRICE = 12;
+          const CAKE_PRICE = 18;
+          // חדש: חוקי ההנחה
+          const STUDENT_DISCOUNT = 0.1;
+          const HAPPY_HOUR_DISCOUNT = 0.2;
+          const HAPPY_HOUR_START = 16;
+          const HAPPY_HOUR_END = 18;
+
+          function priceOf(item) {
+            switch (item) {
+              case 'קפה':
+                return COFFEE_PRICE;
+              case 'עוגה':
+                return CAKE_PRICE;
+              default:
+                return 0;
+            }
+          }
+
+          function calculateTotal(coffees, cakes) {
+            return coffees * priceOf('קפה') + cakes * priceOf('עוגה');
+          }
+
+          // חדש: האם השעה בתוך שעת השמחה?
+          const isHappyHour = (hour) => hour >= HAPPY_HOUR_START && hour < HAPPY_HOUR_END;
+
+          // חדש: כמה הנחה מגיעה? בודקים קודם את ההנחה הגדולה
+          function discountRate(isStudent = false, hour = 12) {
+            if (isHappyHour(hour)) return HAPPY_HOUR_DISCOUNT;
+            if (isStudent) return STUDENT_DISCOUNT;
+            return 0;
+          }
+
+          console.log(discountRate());          // 0: לא סטודנט, 12 בצהריים
+          console.log(discountRate(true));      // 0.1: סטודנט, 12 בצהריים
+          console.log(discountRate(false, 17)); // 0.2: שעת השמחה
+          console.log(discountRate(true, 17));  // 0.2: לא מצטבר, מקבלים את הגדולה
+          console.log(discountRate(true, 18));  // 0.1: ב-18:00 שעת השמחה כבר נגמרה
+        </script>
+      </div>
+      <h3>מה קורה כאן?</h3>
+      <ul>
+        <li><strong>פרמטרים עם ברירת מחדל</strong>: ‏<code>isStudent = false</code> ו-<code>hour = 12</code>. אם קוראים ל-<code>discountRate()</code> בלי ערכים, הפונקציה משתמשת בברירות המחדל. זה מאפשר לכתוב <code>discountRate(true)</code> כשהשעה לא משנה.</li>
+        <li><strong>הסדר של ה-if חשוב</strong>: בודקים קודם את שעת השמחה, כי ההנחה שלה גדולה יותר. אם היינו בודקים קודם את הסטודנט, סטודנט בשעה 17:00 היה מקבל רק 10%. נסו להחליף את הסדר ולראות מה משתנה בפלט.</li>
+        <li><strong><code>return</code> מוקדם</strong>: ברגע שמצאנו תשובה יוצאים מהפונקציה. לכן אין צורך ב-<code>else</code>.</li>
+        <li><strong>‏<code>&gt;=</code> ו-<code>&lt;</code></strong>: השעה 16 בפנים, והשעה 18 בחוץ. כשכותבים טווח, תמיד כדאי לבדוק את הקצוות.</li>
+      </ul>
+      <div class="box tip">
+        <p><strong>איך הייתי חושב על זה:</strong> כשיש כמה חוקים, אני כותב טבלה קטנה של מקרים ומה התשובה הנכונה בכל אחד (בדיוק כמו ההערות ליד ה-<code>console.log</code> למעלה), ורק אז כותב את ה-if-ים. אחרי ההרצה אני משווה את הפלט לטבלה. כל שורה שלא מתאימה מראה לי איפה הבאג.</p>
+      </div>
+
+      <!-- ===================================================== -->
+      <h2 id="step-vat">שלב 5: מע״מ ועיגול כסף</h2>
+      <p>אחרי ההנחה מוסיפים מע״מ של 18%. בדרך נגלה בעיה מפתיעה של מספרים עשרוניים במחשב:</p>
+      <div class="playground" id="pg-float" data-height="160">
+        <script type="text/plain" data-lang="js">
+          console.log(0.1 + 0.2);          // ציפינו ל-0.3...
+          console.log(48 * 0.2);           // 20% הנחה מ-48: ציפינו ל-9.6
+          console.log((0.1 + 0.2).toFixed(2));
+        </script>
+      </div>
+      <p>המחשב שומר מספרים עשרוניים בבסיס 2, ולכן חלק מהם, כמו 0.1, נשמרים רק בקירוב. בדרך כלל זה לא מורגש, אבל בכסף רואים את זה מיד: אף אחד לא רוצה לקבל הנחה של ‎₪9.600000000000001. הפתרון: <strong>מעגלים לאגורות</strong> אחרי כל חישוב.</p>
+      <div class="playground" id="pg-step5" data-height="420">
+        <script type="text/plain" data-lang="js">
+          // (הקבועים והפונקציות משלבים 1–4 נמצאים כאן בקיצור)
+          const COFFEE_PRICE = 12;
+          const CAKE_PRICE = 18;
+          const calculateTotal = (coffees, cakes) => coffees * COFFEE_PRICE + cakes * CAKE_PRICE;
+          const discountRate = (isStudent = false, hour = 12) =>
+            hour >= 16 && hour < 18 ? 0.2 : isStudent ? 0.1 : 0;
+
+          // חדש: מע״מ, עיגול והצגה
+          const VAT_RATE = 0.18;
+
+          // מעגלת לשתי ספרות אחרי הנקודה (אגורות)
+          const roundMoney = (amount) => Math.round(amount * 100) / 100;
+
+          // הופכת מספר למחרוזת יפה: 49.5 -> '₪49.50'
+          const formatPrice = (amount) => `₪${amount.toFixed(2)}`;
+
+          const subtotal = calculateTotal(1, 2);                          // 48
+          const discount = roundMoney(subtotal * discountRate(false, 17)); // 9.6
+          const afterDiscount = subtotal - discount;                      // 38.4
+          const vat = roundMoney(afterDiscount * VAT_RATE);               // 6.91
+          const total = roundMoney(afterDiscount + vat);                  // 45.31
+
+          console.log('לפני מע״מ:', formatPrice(afterDiscount));
+          console.log('מע״מ:', formatPrice(vat));
+          console.log('לתשלום:', formatPrice(total));
+        </script>
+      </div>
+      <h3>‏Math.round לעומת toFixed</h3>
+      <table>
+        <tr><th></th><th><code>roundMoney(x)</code></th><th><code>x.toFixed(2)</code></th></tr>
+        <tr><td>מה מחזיר?</td><td><strong>מספר</strong>: ‏<code>6.91</code></td><td><strong>מחרוזת</strong>: ‏<code>'6.91'</code></td></tr>
+        <tr><td>אפשר להמשיך לחשב?</td><td>כן</td><td>לא כדאי: ‏<code>'6.91' + 1</code> נותן <code>'6.911'</code></td></tr>
+        <tr><td>מתי משתמשים?</td><td>באמצע החישובים</td><td>רק בסוף, כשמציגים למשתמש</td></tr>
+      </table>
+      <p>לכן ב-<code>formatPrice</code> משתמשים ב-<code>toFixed</code>: היא תמיד מראה שתי ספרות, גם כשהסכום עגול (‎₪42.00 ולא ‎₪42).</p>
+      <aside class="box lecturer-note">
+        <p>בעורך הזה הקוד משלבים קודמים מוצג בקיצור (כולל ternary מקונן), כדי שהשלב יתמקד בעיגול. כדאי לציין בכיתה שזה רק לצורך הקיצור, ושב-ternary מקונן כמו כאן עדיף בקוד אמיתי להשתמש ב-if. בשלב הבא חוזרים לגרסה המלאה.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="step-receipt">שלב 6: מדפיסים קבלה ‏<code>printReceipt</code></h2>
+      <p>יש לנו את כל החלקים. עכשיו פונקציה אחת שמחברת אותם ומדפיסה קבלה. נצטרך גם קו מפריד מ-30 מקפים. במקום להקליד 30 מקפים, נבנה אותו בלולאה.</p>
+      <div class="playground wide" id="pg-step6" data-height="560">
+        <script type="text/plain" data-lang="js">
+          const SHOP_NAME = 'קפה פינה';
+          const COFFEE_PRICE = 12;
+          const CAKE_PRICE = 18;
+          const STUDENT_DISCOUNT = 0.1;
+          const HAPPY_HOUR_DISCOUNT = 0.2;
+          const HAPPY_HOUR_START = 16;
+          const HAPPY_HOUR_END = 18;
+          const VAT_RATE = 0.18;
+
+          function priceOf(item) {
+            switch (item) {
+              case 'קפה':
+                return COFFEE_PRICE;
+              case 'עוגה':
+                return CAKE_PRICE;
+              default:
+                return 0;
+            }
+          }
+
+          function calculateTotal(coffees, cakes) {
+            return coffees * priceOf('קפה') + cakes * priceOf('עוגה');
+          }
+
+          const isHappyHour = (hour) => hour >= HAPPY_HOUR_START && hour < HAPPY_HOUR_END;
+
+          function discountRate(isStudent = false, hour = 12) {
+            if (isHappyHour(hour)) return HAPPY_HOUR_DISCOUNT;
+            if (isStudent) return STUDENT_DISCOUNT;
+            return 0;
+          }
+
+          const roundMoney = (amount) => Math.round(amount * 100) / 100;
+          const formatPrice = (amount) => `₪${amount.toFixed(2)}`;
+
+          // חדש: בונה קו מפריד באורך שמבקשים
+          function line(length = 30) {
+            let result = '';
+            for (let i = 0; i < length; i++) {
+              result += '-';
+            }
+            return result;
+          }
+
+          // חדש: מחשבת הכול ומדפיסה קבלה
+          function printReceipt(coffees, cakes, isStudent = false, hour = 12) {
+            const subtotal = calculateTotal(coffees, cakes);
+            const discount = roundMoney(subtotal * discountRate(isStudent, hour));
+            const afterDiscount = subtotal - discount;
+            const vat = roundMoney(afterDiscount * VAT_RATE);
+            const total = roundMoney(afterDiscount + vat);
+
+            console.log(line());
+            console.log(`  ${SHOP_NAME}`);
+            console.log(line());
+            if (coffees > 0) console.log(`קפה ×${coffees}: ${formatPrice(coffees * COFFEE_PRICE)}`);
+            if (cakes > 0) console.log(`עוגה ×${cakes}: ${formatPrice(cakes * CAKE_PRICE)}`);
+            if (discount > 0) console.log(`הנחה: -${formatPrice(discount)}`);
+            console.log(`מע״מ (18%): ${formatPrice(vat)}`);
+            console.log(`לתשלום: ${formatPrice(total)}`);
+            console.log(line());
+          }
+
+          printReceipt(2, 1);           // לקוח רגיל בצהריים: 49.56
+          printReceipt(1, 2, true, 17); // סטודנט בשעת השמחה: 45.31
+        </script>
+      </div>
+      <h3>מה חדש כאן?</h3>
+      <ul>
+        <li><strong>הלולאה ב-<code>line</code></strong>: מתחילים ממחרוזת ריקה ומוסיפים מקף אחד בכל סיבוב. אחרי 30 סיבובים יש 30 מקפים. זו תבנית שתחזור הרבה: <em>מתחילים מערך ריק ומוסיפים לו בלולאה</em>. בדיוק כך סוכמים מספרים, רק עם <code>0</code> במקום <code>''</code>.</li>
+        <li><strong>if בשורה אחת</strong>: ‏<code>if (cakes &gt; 0) console.log(...)</code>. כשיש פקודה אחת בלבד אפשר לוותר על הסוגריים המסולסלים. ככה לא מדפיסים "עוגה ×0".</li>
+        <li><strong>template literals</strong> עם <code>${...}</code> בתוך גרשיים הפוכים מרכיבים את כל השורות. אפשר לשים בתוך ה-<code>${}</code> כל ביטוי, גם קריאה לפונקציה.</li>
+        <li><strong>פונקציה שקוראת לפונקציות</strong>: ‏<code>printReceipt</code> לא מחשבת כמעט כלום בעצמה. היא "מנהלת" את הפונקציות הקטנות. כך נראה קוד מסודר.</li>
+      </ul>
+      <div class="box tip">
+        <p><strong>קיצור דרך:</strong> ל-JavaScript יש פעולה מוכנה שעושה את מה שעושה <code>line</code>: ‏<code>'-'.repeat(30)</code>. כאן כתבנו את הלולאה בעצמנו כדי לתרגל, אבל בקוד אמיתי משתמשים ב-<code>repeat</code>.</p>
+      </div>
+      <p><strong>נסו בעצמכם:</strong> הוסיפו לקבלה שורה שמציגה את השעה, למשל <code>שעה: 17:00</code>. רמז: יש כבר משתנה <code>hour</code> בתוך הפונקציה.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="step-validate">שלב 7: מה אם הקלט לא תקין?</h2>
+      <p>מה יקרה אם מישהו יקרא ל-<code>printReceipt(-1, 2)</code>? או ל-<code>printReceipt(1.5, 0)</code>? או אפילו ל-<code>printReceipt('שתיים', 1)</code>? נסו בעורך של שלב 6. התוכנית תדפיס קבלה עם סכומים מוזרים, או עם <code>NaN</code>. קופה אמיתית צריכה לסרב.</p>
+      <p>נוסיף פונקציה שבודקת אם כמות תקינה: מספר שלם, 0 או יותר. אם הכמות לא תקינה, <code>calculateTotal</code> תדפיס שגיאה ותחזיר <code>null</code>. ‏<code>printReceipt</code> תבדוק את זה ותצא מיד, בלי להדפיס קבלה.</p>
+      <div class="playground" id="pg-step7" data-height="480">
+        <script type="text/plain" data-lang="js">
+          const COFFEE_PRICE = 12;
+          const CAKE_PRICE = 18;
+
+          // חדש: כמות תקינה היא מספר שלם, 0 או יותר
+          const isValidAmount = (amount) => Number.isInteger(amount) && amount >= 0;
+
+          function calculateTotal(coffees, cakes) {
+            // חדש: בודקים את הקלט לפני שמחשבים
+            if (!isValidAmount(coffees) || !isValidAmount(cakes)) {
+              console.error('כמות לא תקינה: צריך מספר שלם, 0 או יותר');
+              return null;
+            }
+            return coffees * COFFEE_PRICE + cakes * CAKE_PRICE;
+          }
+
+          function printReceipt(coffees, cakes) {
+            const subtotal = calculateTotal(coffees, cakes);
+            if (subtotal === null) return; // חדש: אין מה להדפיס
+            console.log(`לפני מע״מ: ₪${subtotal.toFixed(2)}`);
+            // ... שאר הקבלה, כמו בשלב 6
+          }
+
+          printReceipt(2, 1);       // תקין
+          printReceipt(-1, 2);      // מספר שלילי
+          printReceipt(1.5, 0);     // חצי כוס קפה?
+          printReceipt('שתיים', 1); // מחרוזת במקום מספר
+        </script>
+      </div>
+      <h3>שלושה רעיונות חשובים</h3>
+      <ol>
+        <li><strong><code>Number.isInteger</code></strong> מחזירה <code>true</code> רק למספר שלם. עבור <code>1.5</code>, עבור <code>'2'</code> (מחרוזת) ועבור <code>NaN</code> היא מחזירה <code>false</code>. כך בדיקה אחת תופסת שלושה סוגים של קלט שגוי.</li>
+        <li><strong><code>console.error</code></strong> מדפיס הודעה באדום. משתמשים בו לשגיאות, כדי שיבלטו בין שאר ההודעות. יש גם <code>console.warn</code> שמדפיס בצהוב, לאזהרות.</li>
+        <li><strong>יציאה מוקדמת (early return)</strong>: בודקים את המקרים הבעייתיים <em>בתחילת</em> הפונקציה ויוצאים מיד. ככה שאר הפונקציה יכולה להניח שהכול תקין, ולא צריך לעטוף את כל הקוד ב-<code>if</code> ענק.</li>
+      </ol>
+      <div class="box tip">
+        <p><strong>למה <code>null</code> ולא <code>0</code>?</strong> הזמנה ריקה (0 קפה, 0 עוגות) היא הזמנה <em>תקינה</em> שעולה 0. אם היינו מחזירים 0 גם על שגיאה, לא היינו יודעים להבדיל בין שני המקרים. ‏<code>null</code> אומר "אין כאן ערך", וזה בדיוק מה שקרה.</p>
+      </div>
+      <p><strong>נסו בעצמכם:</strong> שנו את <code>priceOf</code> (בעורך של שלב 6) כך שעבור מוצר שלא קיים בתפריט היא תדפיס אזהרה עם <code>console.warn</code>, למשל <code>'אין בתפריט: פיצה'</code>, לפני שהיא מחזירה 0.</p>
+
+      <!-- ===================================================== -->
+      <h2 id="step-vscode">שלב 8: מעבירים ל-VS Code ול-GitHub</h2>
+      <p>העורך באתר נועד לניסויים. תוכנית אמיתית נמצאת בקבצים במחשב. ‏JavaScript של דף אינטרנט רץ בדפדפן, ולכן צריך דף HTML שיטען את הקוד.</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>יוצרים תיקייה ופותחים אותה ב-VS Code</h4>
+          <pre class="terminal"><code class="nohighlight">$ mkdir cafe-cashier
+$ cd cafe-cashier
+$ code .</code></pre>
+          <p>אם הפקודה <code>code</code> לא מוכרת, פתחו את VS Code ובחרו בתפריט <strong>File ← Open Folder</strong>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>יוצרים <code>index.html</code> שטוען את הסקריפט</h4>
+          <p class="file-name">index.html</p>
+          <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="he" dir="rtl"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;קפה פינה | קופה&lt;/title&gt;
+  &lt;script src="app.js" defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;☕ הקופה של קפה פינה&lt;/h1&gt;
+  &lt;p&gt;פתחו את הקונסול (F12) כדי לראות את הקבלות.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          <ul>
+            <li><code>src="app.js"</code>: הקובץ שבו נמצא הקוד. השם צריך להתאים בדיוק לשם הקובץ.</li>
+            <li><code>defer</code>: "הורד את הקובץ עכשיו, אבל הרץ אותו רק אחרי שכל ה-HTML נטען". זו הדרך המומלצת לטעון סקריפטים, ובשיעורים הבאים נראה למה זה חשוב.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>יוצרים <code>app.js</code></h4>
+          <p>מדביקים לתוכו את הקוד משלב 6, ומוסיפים את הבדיקות משלב 7. הקובץ המלא, מסודר עם הערות, נמצא <a href="../../examples/lesson-02/cafe/app.js" target="_blank">כאן</a>. שימו לב: בקובץ <code>.js</code> כותבים קוד בלבד, בלי תגית <code>&lt;script&gt;</code>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>פותחים בדפדפן ומסתכלים בקונסול</h4>
+          <p>פותחים את <code>index.html</code> עם Live Server (כפתור ימני ← <strong>Open with Live Server</strong>). בדף עצמו רואים רק כותרת. הקבלות מופיעות בקונסול: לוחצים <kbd>F12</kbd> (ב-Mac: ‏<kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>J</kbd>) ועוברים ללשונית <strong>Console</strong>.</p>
+          <p>אם הקונסול ריק, כמעט תמיד הבעיה היא אחת משתיים: שם הקובץ ב-<code>src</code> לא תואם, או שיש שגיאה באדום בקונסול. לחיצה על שם הקובץ שליד השגיאה (למשל <code>app.js:12</code>) קופצת לשורה הבעייתית.</p>
+          <p>אפשר גם לקרוא לפונקציות ישירות מהקונסול! הקלידו שם <code>printReceipt(3, 3, true)</code> ולחצו Enter.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>שומרים ב-Git ומעלים ל-GitHub</h4>
+          <p>בדיוק כמו בשיעור 1 (<a href="../lesson-01/git.html">חלק ג׳: Git ו-GitHub</a>). מומלץ commit אחרי כל שלב שעובד:</p>
+          <pre class="terminal"><code class="nohighlight">$ git init
+$ git add index.html app.js
+$ git commit -m "Add cafe cashier with prices and totals"
+# אחרי שמוסיפים הנחות, קבלה ובדיקות קלט:
+$ git add .
+$ git commit -m "Add discounts, receipt and input validation"
+# יוצרים ב-GitHub ריפו ריק בשם cafe-cashier, ואז:
+$ git branch -M main
+$ git remote add origin https://github.com/USERNAME/cafe-cashier.git
+$ git push -u origin main</code></pre>
+          <p>‏<code>USERNAME</code> מחליפים בשם המשתמש שלכם ב-GitHub. אחרי ה-push, רעננו את דף הריפו ב-GitHub. שני הקבצים אמורים להופיע שם.</p>
+        </div>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p>זו הפעם הראשונה שהסטודנטים מריצים JavaScript מחוץ לאתר. בעיות נפוצות: קובץ בשם <code>app.js.txt</code> ב-Windows (כשהסיומות מוסתרות), תגית <code>&lt;script&gt;</code> שהודבקה בתוך <code>app.js</code>, ושכחה לשמור את הקובץ (העיגול הלבן בלשונית של VS Code). כדאי להפעיל את <strong>File ← Auto Save</strong> כבר עכשיו.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="challenges">אתגרים</h2>
+      <p>ארבעה אתגרים, מהקל לקשה. בכל אתגר כתבו את הקוד, לחצו "▶ הרצה" כדי לראות מה קורה, ואז "✓ בדיקה". הבדיקה קוראת לפונקציה שלכם עם הרבה ערכים שונים, ואומרת לכם מה עוד לא עובד.</p>
+      <div class="box warn">
+        <p><strong>לולאה אינסופית?</strong> אם כתבתם לולאת <code>while</code> שהתנאי שלה אף פעם לא נהיה <code>false</code>, העמוד ייתקע. זה קורה לכולם 🙂. סגרו את הלשונית או רעננו את העמוד. הקוד שלכם נשמר, והוא לא ירוץ שוב עד שתלחצו "▶ הרצה". לפני שמריצים, בדקו שמשהו בתוך הלולאה משנה את התנאי.</p>
+      </div>
+
+      <h3>אתגר 1: שנה מעוברת <span class="level easy">קל</span></h3>
+      <p>בלוח הגרגוריאני, שנה מעוברת (עם 29 בפברואר) נקבעת כך:</p>
+      <ul>
+        <li>שנה שמתחלקת ב-4 היא מעוברת. למשל 2024.</li>
+        <li><strong>חוץ</strong> משנה שמתחלקת ב-100, שהיא לא מעוברת. למשל 1900.</li>
+        <li><strong>חוץ</strong> משנה שמתחלקת ב-400, שהיא כן מעוברת. למשל 2000.</li>
+      </ul>
+      <p>כתבו פונקציה <code>isLeapYear(year)</code> שמחזירה <code>true</code> או <code>false</code>.</p>
+      <p>רמז: "מתחלק ב-4" בקוד זה <code>year % 4 === 0</code>. מתחילים מהחוק הכי ספציפי (400), כמו שעשינו בהנחות בשלב 4.</p>
+      <div class="playground challenge" id="ch-leap" data-check="ch-leap" data-height="300">
+        <script type="text/plain" data-lang="js">
+          function isLeapYear(year) {
+            // כתבו כאן את הקוד
+
+          }
+
+          console.log(2024, isLeapYear(2024)); // true
+          console.log(2023, isLeapYear(2023)); // false
+          console.log(1900, isLeapYear(1900)); // false
+          console.log(2000, isLeapYear(2000)); // true
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function isLeapYear(year) {
+            if (year % 400 === 0) return true;
+            if (year % 100 === 0) return false;
+            return year % 4 === 0;
+          }
+
+          console.log(2024, isLeapYear(2024)); // true
+          console.log(2023, isLeapYear(2023)); // false
+          console.log(1900, isLeapYear(1900)); // false
+          console.log(2000, isLeapYear(2000)); // true
+        </script>
+      </div>
+      <script>
+        // מוצאת פונקציה בקוד של הסטודנט, גם אם הוגדרה עם const
+        function findFn(win, name) {
+          return win.eval(`typeof ${name} === 'function' ? ${name} : null`);
+        }
+        // קוראת לפונקציה בלי שהפלט של הבדיקה יופיע בחלון הפלט
+        function quiet(win, fn) {
+          const log = win.console.log;
+          win.console.log = () => {};
+          try { return fn(); } finally { win.console.log = log; }
+        }
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-leap': (out, win) => {
+            const fn = findFn(win, 'isLeapYear');
+            const is = (year, expected) => fn && quiet(win, () => fn(year)) === expected;
+            return [
+              [fn, 'לא נמצאה פונקציה בשם isLeapYear'],
+              [is(2024, true) && is(2020, true), 'שנה שמתחלקת ב-4, כמו 2024, צריכה להחזיר true'],
+              [is(2023, false) && is(2025, false), 'שנה שלא מתחלקת ב-4, כמו 2023, צריכה להחזיר false'],
+              [is(1900, false) && is(2100, false), 'שנה שמתחלקת ב-100 ולא ב-400, כמו 1900, צריכה להחזיר false'],
+              [is(2000, true) && is(1600, true), 'שנה שמתחלקת ב-400, כמו 2000, צריכה להחזיר true'],
+            ];
+          },
+        });
+      </script>
+
+      <h3>אתגר 2: המחשב מנחש מספר <span class="level medium">בינוני</span></h3>
+      <p>המחשב צריך לנחש מספר סודי בין 1 ל-100. אחרי כל ניחוש הוא שומע "גבוה מדי" או "נמוך מדי". השיטה החכמה: תמיד לנחש את <strong>האמצע</strong> של הטווח שנשאר.</p>
+      <ul>
+        <li>מתחילים עם <code>low = 1</code> ו-<code>high = 100</code>.</li>
+        <li>הניחוש הוא האמצע: <code>Math.floor((low + high) / 2)</code>.</li>
+        <li>אם הניחוש גבוה מדי, המספר נמצא מתחת לו: <code>high = guess - 1</code>. אם נמוך מדי: <code>low = guess + 1</code>.</li>
+        <li>ממשיכים בלולאת <code>while</code> עד שהניחוש שווה למספר הסודי.</li>
+      </ul>
+      <p>כתבו פונקציה <code>guessNumber(secret)</code> שמדפיסה כל ניחוש, למשל <code>50: גבוה מדי</code>, ובסוף <code>37: מצאתי!</code>. היא צריכה <strong>להחזיר</strong> את מספר הניסיונות.</p>
+      <div class="playground challenge" id="ch-guess" data-check="ch-guess" data-height="380">
+        <script type="text/plain" data-lang="js">
+          function guessNumber(secret) {
+            let low = 1;
+            let high = 100;
+            let tries = 0;
+
+            // כתבו כאן לולאת while שמנחשת עד שמוצאים את secret.
+            // אל תשכחו להגדיל את tries בכל ניחוש!
+
+            return tries;
+          }
+
+          console.log('ניסיונות:', guessNumber(37)); // 3
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function guessNumber(secret) {
+            let low = 1;
+            let high = 100;
+            let tries = 0;
+            let guess = 0;
+
+            while (guess !== secret) {
+              guess = Math.floor((low + high) / 2);
+              tries++;
+              if (guess > secret) {
+                console.log(`${guess}: גבוה מדי`);
+                high = guess - 1;
+              } else if (guess < secret) {
+                console.log(`${guess}: נמוך מדי`);
+                low = guess + 1;
+              } else {
+                console.log(`${guess}: מצאתי!`);
+              }
+            }
+
+            return tries;
+          }
+
+          console.log('ניסיונות:', guessNumber(37)); // 3
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-guess': (out, win) => {
+            const fn = findFn(win, 'guessNumber');
+            // הפתרון שלנו, כדי לדעת כמה ניסיונות צריכים לצאת
+            const expected = (secret) => {
+              let low = 1, high = 100, tries = 0, guess = 0;
+              while (guess !== secret) {
+                guess = Math.floor((low + high) / 2);
+                tries++;
+                if (guess > secret) high = guess - 1;
+                else if (guess < secret) low = guess + 1;
+              }
+              return tries;
+            };
+            const tries = (secret) => fn && quiet(win, () => fn(secret)) === expected(secret);
+            const logs = out.logs.join('\n');
+            return [
+              [fn, 'לא נמצאה פונקציה בשם guessNumber'],
+              [tries(50), 'guessNumber(50) צריכה להחזיר 1: הניחוש הראשון הוא 50'],
+              [tries(37) && tries(1) && tries(100) && tries(73), 'מספר הניסיונות לא נכון. בדקו שמגדילים את tries בכל ניחוש, ושמעדכנים את low ואת high'],
+              [/גבוה מדי/.test(logs) && /נמוך מדי/.test(logs), 'הדפיסו בכל ניחוש "גבוה מדי" או "נמוך מדי"'],
+              [/מצאתי/.test(logs), 'כשמוצאים את המספר, הדפיסו "מצאתי!"'],
+            ];
+          },
+        });
+      </script>
+      <details class="solution">
+        <summary>למה אף פעם לא צריך יותר מ-7 ניסיונות?</summary>
+        <p>כל ניחוש מוריד בערך חצי מהטווח: 100 ← 50 ← 25 ← 12 ← 6 ← 3 ← 1. אחרי 7 חצאים נשאר מספר אחד. השיטה הזו נקראת <strong>חיפוש בינארי</strong>, והיא אחת השיטות החשובות במדעי המחשב. עם מיליון מספרים צריך רק 20 ניסיונות.</p>
+      </details>
+
+      <h3>אתגר 3: מספרים ראשוניים <span class="level medium">בינוני</span></h3>
+      <p>מספר ראשוני הוא מספר שלם גדול מ-1, שמתחלק בלי שארית רק ב-1 ובעצמו. למשל 2, ‏3, ‏5, ‏7 ו-11 ראשוניים. ‏9 לא ראשוני, כי הוא מתחלק ב-3.</p>
+      <ol>
+        <li>כתבו פונקציה <code>isPrime(n)</code> שמחזירה <code>true</code> אם <code>n</code> ראשוני, ו-<code>false</code> אחרת. מספרים קטנים מ-2 (כולל 0 ומספרים שליליים) אינם ראשוניים.</li>
+        <li>כתבו פונקציה <code>printPrimes(limit)</code> שמדפיסה את כל הראשוניים מ-2 ועד <code>limit</code>, <strong>כל מספר בשורה נפרדת</strong> (<code>console.log</code> אחד לכל מספר). היא צריכה להשתמש ב-<code>isPrime</code>.</li>
+        <li>קראו ל-<code>printPrimes(50)</code>.</li>
+      </ol>
+      <p>רמז ל-<code>isPrime</code>: עוברים בלולאה על כל המספרים מ-2 ועד <code>n - 1</code>. אם <code>n</code> מתחלק באחד מהם (<code>n % i === 0</code>), מחזירים מיד <code>false</code>. אם הלולאה הסתיימה ולא מצאנו מחלק, המספר ראשוני.</p>
+      <div class="playground challenge" id="ch-primes" data-check="ch-primes" data-height="340">
+        <script type="text/plain" data-lang="js">
+          function isPrime(n) {
+            // כתבו כאן
+          }
+
+          function printPrimes(limit) {
+            // כתבו כאן לולאה שעוברת על המספרים מ-2 ועד limit
+          }
+
+          printPrimes(50);
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function isPrime(n) {
+            if (n < 2) return false;
+            for (let i = 2; i < n; i++) {
+              if (n % i === 0) return false; // מצאנו מחלק: לא ראשוני
+            }
+            return true;
+          }
+
+          function printPrimes(limit) {
+            for (let n = 2; n <= limit; n++) {
+              if (isPrime(n)) console.log(n);
+            }
+          }
+
+          printPrimes(50);
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-primes': (out, win) => {
+            const fn = findFn(win, 'isPrime');
+            const is = (n, expected) => fn && quiet(win, () => fn(n)) === expected;
+            const printed = out.logs.map((l) => l.trim()).filter((l) => /^-?\d+$/.test(l)).join(', ');
+            return [
+              [fn, 'לא נמצאה פונקציה בשם isPrime'],
+              [is(2, true) && is(3, true) && is(13, true) && is(97, true), 'מספרים ראשוניים כמו 2, 13 ו-97 צריכים להחזיר true'],
+              [is(4, false) && is(9, false) && is(15, false) && is(49, false), 'מספרים שמתחלקים במשהו, כמו 9 ו-49, צריכים להחזיר false'],
+              [is(1, false) && is(0, false) && is(-7, false), 'מספרים קטנים מ-2 (1, 0 ומספרים שליליים) אינם ראשוניים'],
+              [findFn(win, 'printPrimes'), 'לא נמצאה פונקציה בשם printPrimes'],
+              [printed === '2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47', 'printPrimes(50) צריכה להדפיס את 2, 3, 5 ... 47, כל מספר בשורה נפרדת'],
+            ];
+          },
+        });
+      </script>
+      <details class="solution">
+        <summary>שיפור: אפשר לעצור הרבה יותר מוקדם</summary>
+        <p>אם למספר יש מחלק, לפחות אחד מהמחלקים שלו קטן או שווה לשורש שלו. לכן מספיק לבדוק עד <code>Math.sqrt(n)</code>: ‏<code>for (let i = 2; i * i &lt;= n; i++)</code>. עבור 1,000,003 זה 1,000 בדיקות במקום מיליון.</p>
+      </details>
+
+      <h3>אתגר 4: מתי הכסף יוכפל? <span class="level hard">קשה</span></h3>
+      <p>שמים סכום בבנק עם ריבית שנתית קבועה. בסוף כל שנה הבנק מוסיף את הריבית לסכום, ובשנה הבאה הריבית מחושבת על הסכום החדש (ריבית דריבית). למשל 1,000 ₪ בריבית של 10%: אחרי שנה 1,100 ₪, אחרי שנתיים 1,210 ₪ וכן הלאה.</p>
+      <p>כתבו פונקציה <code>yearsToDouble(amount, ratePercent)</code> שמחזירה <strong>כמה שנים</strong> צריך לחכות עד שהסכום יגיע לפחות לכפול מהסכום ההתחלתי. ‏<code>ratePercent</code> הוא אחוז: 10 אומר 10%.</p>
+      <ul>
+        <li>בכל שנה, הדפיסו שורה כמו <code>שנה 1: ₪1100.00</code>.</li>
+        <li>אם <code>ratePercent</code> הוא 0 או שלילי, הכסף אף פעם לא יוכפל. במקרה כזה החזירו <code>-1</code> מיד, <strong>לפני</strong> הלולאה.</li>
+      </ul>
+      <p>לדוגמה: ‏<code>yearsToDouble(1000, 10)</code> מחזירה 8, ו-<code>yearsToDouble(1000, 7)</code> מחזירה 11.</p>
+      <div class="playground challenge" id="ch-double" data-check="ch-double" data-height="360">
+        <script type="text/plain" data-lang="js">
+          function yearsToDouble(amount, ratePercent) {
+            // 1. אם הריבית 0 או שלילית, החזירו -1
+            // 2. שמרו את היעד: פי 2 מהסכום ההתחלתי
+            // 3. בלולאה: הוסיפו ריבית, ספרו שנה והדפיסו שורה
+            return 0;
+          }
+
+          console.log('שנים:', yearsToDouble(1000, 10)); // 8
+        </script>
+        <script type="text/plain" data-lang="solution-js">
+          function yearsToDouble(amount, ratePercent) {
+            if (ratePercent <= 0) return -1; // אחרת הלולאה לא תיגמר לעולם
+
+            const target = amount * 2;
+            let balance = amount;
+            let years = 0;
+
+            while (balance < target) {
+              balance = balance + balance * (ratePercent / 100);
+              years++;
+              console.log(`שנה ${years}: ₪${balance.toFixed(2)}`);
+            }
+
+            return years;
+          }
+
+          console.log('שנים:', yearsToDouble(1000, 10)); // 8
+        </script>
+      </div>
+      <script>
+        Object.assign(window.PLAYGROUND_CHECKS, {
+          'ch-double': (out, win) => {
+            const fn = findFn(win, 'yearsToDouble');
+            const years = (amount, rate, expected) => fn && quiet(win, () => fn(amount, rate)) === expected;
+            return [
+              [fn, 'לא נמצאה פונקציה בשם yearsToDouble'],
+              [years(1000, 10, 8), 'yearsToDouble(1000, 10) צריכה להחזיר 8'],
+              [years(1000, 7, 11) && years(250, 7, 11), 'yearsToDouble(1000, 7) צריכה להחזיר 11. שימו לב שהריבית מחושבת כל שנה על הסכום החדש'],
+              [years(500, 100, 1) && years(1, 50, 2), 'yearsToDouble(500, 100) צריכה להחזיר 1: אחרי שנה אחת הסכום כבר כפול'],
+              [/שנה 1: ₪1100\.00/.test(out.logs.join('\n')), 'הדפיסו בכל שנה שורה כמו "שנה 1: ₪1100.00"'],
+            ];
+          },
+        });
+      </script>
+      <div class="box tip">
+        <p><strong>למה הבדיקה לא בודקת ריבית 0?</strong> אם הפונקציה שלכם לא מטפלת בריבית 0, הלולאה לא תיגמר לעולם, והבדיקה עצמה הייתה תוקעת את העמוד. לכן את המקרה הזה בדקו בעצמכם, אבל רק <strong>אחרי</strong> שהוספתם את ה-<code>if</code> בתחילת הפונקציה: ‏<code>console.log(yearsToDouble(1000, 0))</code> צריך להדפיס ‎-1. זה בדיוק התפקיד של בדיקת קלט: להגן על הקוד ממקרים שהוא לא בנוי להם.</p>
+      </div>
+      <aside class="box lecturer-note">
+        <p>אתגר 4 הוא הזדמנות טובה לדבר על "כלל ה-72" שבנקאים משתמשים בו: מספר השנים להכפלה הוא בערך 72 חלקי אחוז הריבית (72 / 10 ≈ 7.2, ובפועל 8 שנים שלמות). אפשר לבקש מהסטודנטים להשוות את הנוסחה לתוצאה של הפונקציה עבור כמה ריביות.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="homework">משימת הגשה: מחשבון ציונים וקבלה לקורס</h2>
+      <div class="box goals">
+        <h3>מה מגישים</h3>
+        <p>תוכנית שמחשבת את הציון של סטודנט ומחליטה אם הוא התקבל לקורס המשך. התוכנית נמצאת בריפו ב-GitHub בשם <code>grades-calculator</code>, עם <code>index.html</code> ו-<code>app.js</code>, ומדפיסה את התוצאות בקונסול. מגישים קישור לריפו.</p>
+      </div>
+
+      <h3>החוקים</h3>
+      <ul>
+        <li>לכל סטודנט יש שלושה ציונים: <strong>תרגילים</strong> (20%), <strong>פרויקט</strong> (30%) ו<strong>מבחן</strong> (50%). כל ציון הוא בין 0 ל-100.</li>
+        <li>הציון הסופי הוא הממוצע המשוקלל, מעוגל למספר שלם.</li>
+        <li>אם ציון המבחן נמוך מ-56, הציון הסופי הוא ציון המבחן בלבד ("מבחן עובר" הוא תנאי חובה).</li>
+        <li>דירוג במילים: 90 ומעלה "מצוין", 80–89 "טוב מאוד", 70–79 "טוב", 56–69 "עובר", מתחת ל-56 "נכשל".</li>
+        <li>מתקבלים לקורס ההמשך עם ציון סופי של 80 ומעלה. מי שהגיש את כל התרגילים בזמן מתקבל כבר מ-75.</li>
+      </ul>
+
+      <h3>פונקציות שצריך לכתוב</h3>
+      <table>
+        <tr><th>פונקציה</th><th>מה היא עושה</th><th>דוגמה</th></tr>
+        <tr><td><code>isValidGrade(grade)</code></td><td>בודקת שהציון הוא מספר בין 0 ל-100</td><td><code>isValidGrade(101)</code> ← <code>false</code></td></tr>
+        <tr><td><code>finalGrade(exercises, project, exam)</code></td><td>מחזירה את הציון הסופי לפי החוקים, או <code>null</code> אם אחד הציונים לא תקין</td><td><code>finalGrade(90, 80, 70)</code> ← <code>77</code></td></tr>
+        <tr><td><code>gradeLabel(grade)</code></td><td>מחזירה את הדירוג במילים</td><td><code>gradeLabel(77)</code> ← <code>'טוב'</code></td></tr>
+        <tr><td><code>isAccepted(grade, allOnTime = false)</code></td><td>מחזירה <code>true</code> או <code>false</code></td><td><code>isAccepted(77, true)</code> ← <code>true</code></td></tr>
+        <tr><td><code>printReport(name, exercises, project, exam, allOnTime)</code></td><td>מדפיסה דוח מסודר לסטודנט, עם קווים מפרידים (שימוש חוזר ב-<code>line</code>)</td><td>ראו למטה</td></tr>
+      </table>
+      <p>דוגמה לדוח של <code>printReport('נועה', 90, 80, 70, true)</code>:</p>
+      <pre><code class="nohighlight">------------------------------
+דוח ציונים: נועה
+------------------------------
+ציון סופי: 77 (טוב)
+התקבלה לקורס ההמשך: כן
+------------------------------</code></pre>
+      <p>בסוף הקובץ קראו ל-<code>printReport</code> לפחות 4 פעמים, עם סטודנטים שמכסים את כל המקרים: מצטיין, נכשל במבחן, מתקבל רק בזכות הגשה בזמן, וציון לא תקין.</p>
+
+      <h3>רשימת בדיקה לפני הגשה</h3>
+      <table>
+        <tr><th>נושא</th><th>דרישה</th></tr>
+        <tr><td>קבועים</td><td>המשקלים (0.2, ‏0.3, ‏0.5) וסף הקבלה (80, ‏75) שמורים ב-<code>const</code> בראש הקובץ, בלי מספרי קסם בתוך הפונקציות</td></tr>
+        <tr><td>פונקציות</td><td>כל חמש הפונקציות קיימות, עם השמות והפרמטרים שבטבלה. כל פונקציה עושה דבר אחד</td></tr>
+        <tr><td>return</td><td>כל הפונקציות חוץ מ-<code>printReport</code> <strong>מחזירות</strong> ערך ולא מדפיסות</td></tr>
+        <tr><td>תנאים</td><td>החוק של מבחן מתחת ל-56 עובד. הדירוג נכון גם בקצוות (90, ‏80, ‏56)</td></tr>
+        <tr><td>קלט לא תקין</td><td>ציון כמו 120, ‎-5 או <code>'מאה'</code> מדפיס שגיאה עם <code>console.error</code> ולא מדפיס דוח</td></tr>
+        <tr><td>קוד קריא</td><td>שמות משתנים באנגלית שמסבירים את עצמם, הזחה מסודרת והערות קצרות במקומות לא ברורים</td></tr>
+        <tr><td>Git</td><td>לפחות <strong>3 commits</strong> עם הודעות שמתארות את השינוי, וקובץ שאפשר לפתוח ולהריץ</td></tr>
+      </table>
+
+      <div class="exercise">
+        <h3>בונוס <span class="level hard">אתגר</span></h3>
+        <ul>
+          <li><strong>פקטור:</strong> הוסיפו פרמטר <code>bonus = 0</code> ל-<code>finalGrade</code> שמוסיף נקודות לציון הסופי, אבל אף פעם לא מעל 100. רמז: <code>Math.min</code>.</li>
+          <li><strong>לשון נכונה:</strong> הוסיפו פרמטר שמאפשר להדפיס "התקבל", "התקבלה" או "התקבלו", לפי מה שהסטודנט בחר.</li>
+          <li><strong>סטטיסטיקה:</strong> כתבו לולאה שעוברת על כל הציונים האפשריים במבחן (0 עד 100, כשתרגילים ופרויקט קבועים על 85), וסופרת בכמה מהם הסטודנט מתקבל.</li>
+        </ul>
+      </div>
+
+      <aside class="box lecturer-note">
+        <p><strong>מחוון מוצע (100 נק׳):</strong> נכונות החישובים (ממוצע משוקלל, חוק המבחן, דירוג וקבלה) 35, בדיקת קלט ו-early return ‏15, חלוקה לפונקציות ושימוש ב-return ‏20, קבועים וקוד קריא 15, ‏Git (לפחות 3 commits עם הודעות משמעותיות) 10, הרצה תקינה מתוך index.html ‏5. בונוס: עד 10 נק׳.</p>
+        <p>בדיקה מהירה: לפתוח את <code>index.html</code> מהריפו, ובקונסול להריץ <code>finalGrade(90, 80, 70)</code> (צריך לצאת 77), ‏<code>finalGrade(100, 100, 50)</code> (צריך לצאת 50), ‏<code>gradeLabel(80)</code> ו-<code>isAccepted(75, true)</code>. ארבע הקריאות האלה חושפות את רוב הטעויות הנפוצות: עיגול, החוק של המבחן, טווחים בקצוות וברירת מחדל.</p>
+      </aside>
+
+      <!-- ===================================================== -->
+      <h2 id="self-check">בדקו את עצמכם לפני שממשיכים</h2>
+      <p>לפני שעוברים לשיעור 3, ודאו שאתם יכולים לעשות את כל אלה <strong>בלי להסתכל בחומר</strong>. אם משהו עדיין לא ברור, חזרו לחלק המתאים:</p>
+      <table>
+        <tr><th>מה צריך לדעת לעשות</th><th>איפה לחזור</th></tr>
+        <tr><td>להגדיר משתנה עם <code>let</code> או <code>const</code>, ולהסביר מתי משתמשים בכל אחד</td><td><a href="basics.html">חלק א׳</a></td></tr>
+        <tr><td>לבנות מחרוזת עם template literal ולהשתמש ב-<code>toFixed</code></td><td><a href="basics.html">חלק א׳</a></td></tr>
+        <tr><td>להסביר את ההבדל בין <code>===</code> ל-<code>==</code>, ולכתוב תנאי עם <code>&amp;&amp;</code> ו-<code>||</code></td><td><a href="logic.html">חלק ב׳</a></td></tr>
+        <tr><td>לכתוב לולאת <code>for</code> שסוכמת מספרים, ולולאת <code>while</code> שנעצרת בזמן</td><td><a href="logic.html">חלק ב׳</a></td></tr>
+        <tr><td>לכתוב פונקציה עם פרמטרים, ברירת מחדל ו-<code>return</code></td><td><a href="functions.html">חלק ג׳</a></td></tr>
+        <tr><td>להפוך פונקציה רגילה ל-arrow function, ולהפך</td><td><a href="functions.html">חלק ג׳</a></td></tr>
+        <tr><td>להסביר למה <code>console.log</code> בתוך פונקציה הוא לא אותו דבר כמו <code>return</code></td><td><a href="#step-total">שלב 3 בעמוד הזה</a></td></tr>
+        <tr><td>להריץ קובץ <code>app.js</code> מתוך דף HTML ולמצוא שגיאות בקונסול</td><td><a href="#step-vscode">שלב 8 בעמוד הזה</a></td></tr>
+      </table>
+
+      <!-- ===================================================== -->
+      <h2 id="summary">סיכום שיעור 2</h2>
+      <ul>
+        <li><strong>משתנים:</strong> ‏<code>const</code> כברירת מחדל, ו-<code>let</code> רק כשהערך צריך להשתנות. קבועים של הגדרות כותבים באותיות גדולות.</li>
+        <li><strong>טיפוסים:</strong> מחרוזות, מספרים, בוליאניים, <code>null</code> ו-<code>undefined</code>. מספרים עשרוניים לא תמיד מדויקים, ולכן מעגלים כסף.</li>
+        <li><strong>תנאים:</strong> ‏<code>if</code>, ‏<code>else if</code>, ‏<code>switch</code> ו-ternary. הסדר של התנאים חשוב.</li>
+        <li><strong>לולאות:</strong> ‏<code>for</code> כשיודעים כמה פעמים, ו-<code>while</code> כשממשיכים עד שמשהו קורה. תמיד לוודא שהלולאה תיגמר.</li>
+        <li><strong>פונקציות:</strong> מפרקים בעיה לפונקציות קטנות עם שמות ברורים. פונקציה מחזירה ערך עם <code>return</code>, ובודקת את הקלט שלה בהתחלה.</li>
+      </ul>
+      <div class="box tip">
+        <p><strong>בשיעור הבא:</strong> מערכים ואובייקטים. הקופה שלנו יודעת רק על קפה ועוגה, כי כל מוצר הוא משתנה נפרד. בשיעור 3 נשמור את כל התפריט ברשימה אחת, נעבור עליה עם <code>map</code> ו-<code>filter</code>, ונטען נתונים אמיתיים מהאינטרנט עם <code>fetch</code>.</p>
+      </div>
+
+      <nav id="lesson-pager" aria-label="ניווט בין עמודים"></nav>
+    </main>
+
+    <aside class="toc" id="toc"></aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>
